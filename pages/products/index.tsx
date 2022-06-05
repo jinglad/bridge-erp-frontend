@@ -1,9 +1,11 @@
-import { Image } from "@mui/icons-material";
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
   ButtonGroup,
   IconButton,
-  InputBase,
   Paper,
   Stack,
   Table,
@@ -17,12 +19,9 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React from "react";
-import Layout from "../components/Layout/Layout";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import SearchIcon from "@mui/icons-material/Search";
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import Layout from "../../components/Layout/Layout";
+import { useRouter } from "next/router";
+
 type Props = {};
 
 function createData(id: number, createdBy: string, productDetails: string, category: string, image: string) {
@@ -45,6 +44,8 @@ function Products({}: Props) {
     createData(5, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
     createData(6, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
   ];
+
+  const router = useRouter();
 
   return (
     <Layout>
@@ -70,6 +71,7 @@ function Products({}: Props) {
             Search
           </Button>
           <Button
+            onClick={() => router.push("/products/create")}
             variant="contained"
             sx={{
               textTransform: "none",
@@ -110,13 +112,13 @@ function Products({}: Props) {
                   <TableCell>{row.category}</TableCell>
                   <TableCell>{row.createdBy}</TableCell>
                   <TableCell align="right">
-                    <ButtonGroup>
-                      <IconButton aria-label="edit">
-                        <ModeEditOutlineOutlinedIcon color="info" />
-                      </IconButton>
-                      <IconButton aria-label="delete">
-                        <DeleteOutlineOutlinedIcon color="error" />
-                      </IconButton>
+                    <ButtonGroup size="small">
+                      <Button color="info" variant="contained" onClick={() => router.push(`/products/edit/${row.id}`)}>
+                        <ModeEditOutlineOutlinedIcon />
+                      </Button>
+                      <Button color="error" variant="contained">
+                        <DeleteOutlineOutlinedIcon />
+                      </Button>
                     </ButtonGroup>
                   </TableCell>
                 </TableRow>
