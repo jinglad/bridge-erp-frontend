@@ -6,7 +6,6 @@ import {
   Button,
   ButtonGroup,
   Chip,
-  IconButton,
   Paper,
   Stack,
   Table,
@@ -19,6 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
+import { useRouter } from "next/router";
 import React from "react";
 import Layout from "../../components/Layout/Layout";
 
@@ -43,6 +43,8 @@ function Categories({}: Props) {
     createData(4, "Category Name", false, true, "John Doe"),
     createData(5, "Category Name", true, false, "John Doe"),
   ];
+
+  const router = useRouter();
 
   return (
     <Layout>
@@ -73,6 +75,7 @@ function Categories({}: Props) {
               textTransform: "none",
             }}
             startIcon={<AddOutlinedIcon />}
+            onClick={() => router.push("/categories/create")}
           >
             Add Category
           </Button>
@@ -117,13 +120,17 @@ function Categories({}: Props) {
                   </TableCell>
                   <TableCell>{row.createdBy}</TableCell>
                   <TableCell align="right">
-                    <ButtonGroup>
-                      <IconButton aria-label="edit">
-                        <ModeEditOutlineOutlinedIcon color="info" />
-                      </IconButton>
-                      <IconButton aria-label="delete">
-                        <CheckOutlinedIcon color="success" />
-                      </IconButton>
+                    <ButtonGroup size="small">
+                      <Button
+                        color="info"
+                        variant="contained"
+                        onClick={() => router.push("/categories/edit/" + row.id)}
+                      >
+                        <ModeEditOutlineOutlinedIcon />
+                      </Button>
+                      <Button color="success" variant="contained">
+                        <CheckOutlinedIcon />
+                      </Button>
                     </ButtonGroup>
                   </TableCell>
                 </TableRow>
