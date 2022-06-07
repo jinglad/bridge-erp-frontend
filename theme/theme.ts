@@ -27,6 +27,7 @@ export const theme = createTheme({
       defaultProps: {
         variant: "standard",
         size: "small",
+        fullWidth: true,
       },
     },
   },
