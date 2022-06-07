@@ -1,7 +1,7 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Button, Collapse, IconButton } from "@mui/material";
+import { Collapse, IconButton, useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,22 +12,43 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import * as React from "react";
+import NextLink from "next/link";
+import React, { Fragment, ReactNode, useEffect, useState } from "react";
 import { hasChildren } from "../../utils/hasChildren";
 import LoginButton from "../Login/LoginButton";
 import { menu } from "./menu";
-import NextLink from "next/link";
 
 const drawerWidth = 240;
 
 interface LayoutProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export default function Layout({ children }: LayoutProps) {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
+  const matches = useMediaQuery("(min-width:600px)");
+  const [dVariant, setDVariant] = useState<"permanent" | "persistent" | "temporary" | undefined>("permanent");
+  console.log(matches);
+  const toggleDrawer = () => {
+    if (matches) {
+      if (dVariant === "permanent") {
+        setDVariant("temporary");
+      } else {
+        setDVariant("permanent");
+      }
+    } else {
+      setOpen(!open);
+    }
+  };
 
-  const toggleDrawer = () => setOpen(!open);
+  useEffect(() => {
+    setOpen(false);
+    if (matches) {
+      setDVariant("permanent");
+    } else {
+      setDVariant("temporary");
+    }
+  }, [matches]);
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -54,7 +75,7 @@ export default function Layout({ children }: LayoutProps) {
         </Toolbar>
       </AppBar>
       <Drawer
-        variant={open ? "permanent" : "temporary"}
+        variant={dVariant}
         open={open}
         sx={{
           width: drawerWidth,
@@ -96,14 +117,14 @@ const SingleLevel = ({ item }: any) => {
 
 const MultiLevel = ({ item }: any) => {
   const { items: children } = item;
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     setOpen((prev) => !prev);
   };
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ListItem button onClick={handleClick}>
         <ListItemIcon>{item.icon}</ListItemIcon>
         <ListItemText primary={item.title} />
@@ -116,6 +137,6 @@ const MultiLevel = ({ item }: any) => {
           ))}
         </List>
       </Collapse>
-    </React.Fragment>
+    </Fragment>
   );
 };
