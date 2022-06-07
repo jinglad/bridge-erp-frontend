@@ -63,20 +63,14 @@ function Categories({}: Props) {
             sx={{ flexGrow: 1 }}
             size="small"
             placeholder="Search Products"
+            variant="outlined"
             inputProps={{ "aria-label": "search products" }}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
             Search
           </Button>
-          <Button
-            variant="contained"
-            sx={{
-              textTransform: "none",
-            }}
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => router.push("/categories/create")}
-          >
+          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/categories/create")}>
             Add Category
           </Button>
         </Box>

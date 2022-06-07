@@ -65,19 +65,13 @@ function Products({}: Props) {
             size="small"
             placeholder="Search Products"
             inputProps={{ "aria-label": "search products" }}
+            variant="outlined"
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
             Search
           </Button>
-          <Button
-            onClick={() => router.push("/products/create")}
-            variant="contained"
-            sx={{
-              textTransform: "none",
-            }}
-            startIcon={<AddOutlinedIcon />}
-          >
+          <Button onClick={() => router.push("/products/create")} startIcon={<AddOutlinedIcon />}>
             Add Product
           </Button>
         </Box>

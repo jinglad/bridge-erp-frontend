@@ -60,6 +60,7 @@ function Suppliers({}: Props) {
           <TextField
             sx={{ flexGrow: 1 }}
             size="small"
+            variant="outlined"
             placeholder="Search Suppliers"
             inputProps={{ "aria-label": "search suppliers" }}
           />
@@ -67,14 +68,7 @@ function Suppliers({}: Props) {
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
             Search
           </Button>
-          <Button
-            variant="contained"
-            sx={{
-              textTransform: "none",
-            }}
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => router.push("/suppliers/create")}
-          >
+          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/suppliers/create")}>
             Add Supplier
           </Button>
         </Box>
