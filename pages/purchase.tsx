@@ -1,22 +1,19 @@
 import {
   Autocomplete,
-  Box,
   Button,
   ButtonGroup,
   Divider,
   Grid,
   Table,
   TableCell,
-  TableHead,
   TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import React from "react";
 import Layout from "../components/Layout/Layout";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import { DatePicker, DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 const Purchase = () => {
   const [value, setValue] = React.useState<Date | null>(new Date("2014-08-18T21:11:54"));
@@ -35,7 +32,7 @@ const Purchase = () => {
 
           <Grid container item spacing={3}>
             <Grid item xs={12}>
-              <TextField required id="invoice" name="invoice" label="Invoice" />
+              <TextField required id="invoice" name="invoice" label="Invoice" fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <Autocomplete
@@ -98,6 +95,7 @@ const Purchase = () => {
                 id="paidAmount"
                 name="paidAmount"
                 label="Paid Amount"
+                fullWidth
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -107,6 +105,7 @@ const Purchase = () => {
                 id="checkNo"
                 name="checkNo"
                 label="Check No ( Optional )"
+                fullWidth
               />
             </Grid>
             <Grid item xs={12} sm={6}>
@@ -116,7 +115,7 @@ const Purchase = () => {
                   label="Cheque Disposal Date ( Set if not Today )"
                   value={value}
                   onChange={handleChange}
-                  renderInput={(params) => <TextField {...params} />}
+                  renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </LocalizationProvider>
             </Grid>
