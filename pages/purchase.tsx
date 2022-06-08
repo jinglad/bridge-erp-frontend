@@ -129,10 +129,10 @@ const Purchase = () => {
         </Grid>
         <Grid item xs={12} sm={6}>
           <Typography variant="h6" gutterBottom>
-            ৫০০ নাম্বার ওয়ান লবন |
+            ৫০০ নাম্বার ওয়ান লবন
           </Typography>
           <Divider />
-          <Table>
+          <Table size="small">
             <TableRow>
               <TableCell sx={{ fontWeight: "bold" }}>Id:</TableCell>
               <TableCell>28</TableCell>
