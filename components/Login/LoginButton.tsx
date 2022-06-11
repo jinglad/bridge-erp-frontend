@@ -1,39 +1,28 @@
 import { Button } from "@mui/material";
-import React from "react";
-import { GoogleLoginResponse, useGoogleLogin } from "react-google-login";
+import { useRouter } from "next/router";
+import { useAuth } from "../../context/AuthContext";
 
 type Props = {};
 
 const LoginButton = (props: Props) => {
-  const { signIn, loaded } = useGoogleLogin({
-    clientId: `${process.env.NEXT_PUBLIC_GOOGLE_OAUTH2_CLIENT_ID}`,
-    isSignedIn: false,
-    uxMode: "popup",
-    scope: "profile email",
-    accessType: "online",
-    responseType: "token",
+  const router = useRouter();
+  const { googleLogin } = useAuth();
 
-    onAutoLoadFinished: () => {
-      var finished = "onAutoLoadFinished";
-    }, //console.log("onAutoLoadFinished")},
-    // @ts-ignore
-    onSuccess: async (loginResponse: GoogleLoginResponse) => {
-      console.log(loginResponse);
-    },
-    onFailure: (error) => {
-      // console.log("onFailure", error);
-      console.log(error);
-      if (error.error === "idpiframe_initialization_failed") {
-        console.log(error);
-      }
-    },
-  });
+  const handleLogin = async () => {
+    try {
+      await googleLogin();
+      router.push("/");
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <Button
       sx={{
         backgroundColor: "white",
         color: "black",
+        border: "2px solid",
         boxShadow: "none",
         textTransform: "none",
         "&:hover": {
@@ -41,7 +30,7 @@ const LoginButton = (props: Props) => {
         },
       }}
       variant="contained"
-      onClick={signIn}
+      onClick={() => handleLogin()}
       startIcon={
         <svg
           xmlns="http://www.w3.org/2000/svg"

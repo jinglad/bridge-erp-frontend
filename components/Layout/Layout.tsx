@@ -1,7 +1,7 @@
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Collapse, IconButton, useMediaQuery } from "@mui/material";
+import { Button, Collapse, IconButton, useMediaQuery } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,8 +12,10 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
+import Link from "next/link";
 import NextLink from "next/link";
 import React, { Fragment, ReactNode, useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { hasChildren } from "../../utils/hasChildren";
 import LoginButton from "../Login/LoginButton";
 import { menu } from "./menu";
@@ -28,7 +30,6 @@ export default function Layout({ children }: LayoutProps) {
   const [open, setOpen] = useState(true);
   const matches = useMediaQuery("(min-width:600px)");
   const [dVariant, setDVariant] = useState<"permanent" | "persistent" | "temporary" | undefined>("permanent");
-  console.log(matches);
   const toggleDrawer = () => {
     if (matches) {
       if (dVariant === "permanent") {
@@ -50,14 +51,18 @@ export default function Layout({ children }: LayoutProps) {
     }
   }, [matches]);
 
+  const { user, logout } = useAuth();
+
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
       <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
         <Toolbar>
-          <Typography variant="h6" fontWeight="bold" noWrap component="div">
-            Bridge ERP
-          </Typography>
+          <Link href="/">
+            <Typography variant="h6" fontWeight="bold" noWrap component="div">
+              Bridge ERP
+            </Typography>
+          </Link>
           <Box flexGrow={1}>
             <IconButton
               sx={{
@@ -71,7 +76,13 @@ export default function Layout({ children }: LayoutProps) {
               <MenuIcon />
             </IconButton>
           </Box>
-          <LoginButton />
+          {!user ? (
+            <LoginButton />
+          ) : (
+            <Button color="error" onClick={async () => await logout()}>
+              Logout
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
       <Drawer
