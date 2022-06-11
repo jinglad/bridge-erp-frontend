@@ -12,7 +12,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   console.log(user);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       console.log(user);
       if (user) {
         setUser({
@@ -20,7 +20,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
-          refreshToken: user.refreshToken,
+          jwt: await user.getIdToken(),
         });
       } else {
         setUser(null);
