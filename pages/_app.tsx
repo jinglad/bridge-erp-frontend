@@ -1,11 +1,17 @@
 import { ThemeProvider } from "@mui/material";
+
 import type { AppProps } from "next/app";
 import Head from "next/head";
 import { useRouter } from "next/router";
+
+import { QueryClient, QueryClientProvider } from "react-query";
+
 import ProtectedRoute from "../components/ProtectedRoute";
 import { AuthContextProvider } from "../context/AuthContext";
 import "../styles/globals.css";
 import { theme } from "../theme/theme";
+
+const queryClient = new QueryClient();
 
 function MyApp({ Component, pageProps }: AppProps) {
   const noAuthRequired = ["/login"];
@@ -16,17 +22,19 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Head>
         <title>Bridge Erp</title>
       </Head>
-      <AuthContextProvider>
-        <ThemeProvider theme={theme}>
-          {noAuthRequired.includes(router.pathname) ? (
-            <Component {...pageProps} />
-          ) : (
-            <ProtectedRoute>
+      <QueryClientProvider client={queryClient}>
+        <AuthContextProvider>
+          <ThemeProvider theme={theme}>
+            {noAuthRequired.includes(router.pathname) ? (
               <Component {...pageProps} />
-            </ProtectedRoute>
-          )}
-        </ThemeProvider>
-      </AuthContextProvider>
+            ) : (
+              <ProtectedRoute>
+                <Component {...pageProps} />
+              </ProtectedRoute>
+            )}
+          </ThemeProvider>
+        </AuthContextProvider>
+      </QueryClientProvider>
     </>
   );
 }
