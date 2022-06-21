@@ -1,7 +1,7 @@
-import { AxiosError } from "axios";
 import http from "./http-common";
 
-interface Product {
+export interface Product {
+  _id: string;
   name: string;
   reorder_limit: number;
   brand: string;
@@ -11,10 +11,38 @@ interface Product {
 
 export const createProduct = async (formData: any) => {
   try {
-    const { data } = await http.post("/products", formData);
-    return { data };
+    const { data } = await http.post<{ msg: string }>("/products", formData);
+    return data;
   } catch (error: any) {
-    console.log(error);
-    // throw Error(error.response.data.message);
+    throw Error(error.response.data.message);
+  }
+};
+
+export const getProducts = async () => {
+  try {
+    const { data } = await http.get<Product[]>("/products");
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};
+
+export const updateProduct = async ({ formData, id }: any) => {
+  try {
+    const { data } = await http.patch<{
+      msg: string;
+    }>("/products/" + id, formData);
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};
+
+export const deleteProduct = async (id: string) => {
+  try {
+    const { data } = await http.delete<{ msg: string }>("/products/" + id);
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
   }
 };

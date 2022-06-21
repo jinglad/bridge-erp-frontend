@@ -1,8 +1,10 @@
+import LoadingButton from "@mui/lab/LoadingButton";
 import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
+import { toast } from "react-toastify";
 import { createProduct } from "../../apis/product-service";
 import Layout from "../../components/Layout/Layout";
 
@@ -10,15 +12,14 @@ type Props = {};
 
 function Create({}: Props) {
   const { mutateAsync, isLoading } = useMutation("createProduct", createProduct, {
-    onSuccess: () => {},
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      reset();
+    },
   });
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm();
+  const { register, handleSubmit, reset } = useForm();
+
   const onSubmit = async (data: any) => {
     const formData = new FormData();
     formData.append("name", data.name);
@@ -41,16 +42,10 @@ function Create({}: Props) {
             <Grid item xs={12}>
               <TextField required id="productName" label="Product Name" fullWidth {...register("name")} />
             </Grid>
-            {/* <Grid item xs={12}>
-            <TextField required id="shortDescription" name="shortDescription" label="Short Description" fullWidth />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField required id="longDescription" name="longDescription" label="Long Description" fullWidth />
-          </Grid> */}
-
             <Grid item xs={12} sm={4}>
               <Autocomplete
                 disablePortal
+                defaultValue="Suzi"
                 options={["Ata", "Moyda", "Suzi"]}
                 renderInput={(params) => <TextField {...register("category")} {...params} label="Category" />}
               />
@@ -58,14 +53,11 @@ function Create({}: Props) {
             <Grid item xs={12} sm={4}>
               <Autocomplete
                 disablePortal
+                defaultValue="Apple"
                 options={["Apple", "Banana", "Orange", "Mango", "Lichi"]}
                 renderInput={(params) => <TextField {...register("brand")} {...params} label="Brand" />}
               />
             </Grid>
-
-            {/* <Grid item xs={12} sm={6}>
-            <TextField required id="barCode" name="barCode" label="BarCode" fullWidth />
-          </Grid> */}
             <Grid item xs={12} sm={4}>
               <TextField
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
@@ -79,15 +71,26 @@ function Create({}: Props) {
             </Grid>
             <Grid item xs={12} sm={6}>
               <Button fullWidth variant="contained" component="label">
-                Product Image
-                <input {...register("file")} type="file" hidden accept="image/*" />
+                <label htmlFor="files" style={{ width: "100%" }}>
+                  Please choose a image
+                </label>
+                <input
+                  id="files"
+                  style={{
+                    opacity: 0,
+                  }}
+                  {...register("file")}
+                  type="file"
+                  accept="image/*"
+                  required
+                />
               </Button>
             </Grid>
             <Grid item xs={12} sm={6}>
               <ButtonGroup>
-                <Button color="success" type="submit">
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
                   Submit
-                </Button>
+                </LoadingButton>
                 <Button color="error">
                   <Link href="/products">Cancel</Link>
                 </Button>

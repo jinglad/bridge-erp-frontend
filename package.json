@@ -12,6 +12,7 @@
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@mui/icons-material": "^5.8.2",
+    "@mui/lab": "^5.0.0-alpha.86",
     "@mui/material": "^5.8.2",
     "@mui/x-date-pickers": "^5.0.0-alpha.5",
     "axios": "^0.27.2",
@@ -23,7 +24,9 @@
     "react-dom": "18.1.0",
     "react-google-login": "^5.2.2",
     "react-hook-form": "^7.32.1",
-    "react-query": "^3.39.1"
+    "react-hot-toast": "^2.2.0",
+    "react-query": "^3.39.1",
+    "react-toastify": "^9.0.5"
   },
   "devDependencies": {
     "@types/node": "17.0.36",

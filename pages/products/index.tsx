@@ -5,7 +5,7 @@ import SearchIcon from "@mui/icons-material/Search";
 import {
   Button,
   ButtonGroup,
-  IconButton,
+  CircularProgress,
   Paper,
   Stack,
   Table,
@@ -18,35 +18,41 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import React from "react";
-import Layout from "../../components/Layout/Layout";
+import type { NextPage } from "next";
 import { useRouter } from "next/router";
+import React, { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import { deleteProduct, getProducts, Product } from "../../apis/product-service";
+import EditProductDialog from "../../components/EditProductDialog";
+import Layout from "../../components/Layout/Layout";
 
-type Props = {};
-
-function createData(id: number, createdBy: string, productDetails: string, category: string, image: string) {
-  return {
-    id,
-    createdBy,
-    productDetails,
-    category,
-    image,
-  };
-}
-
-function Products({}: Props) {
-  const rows = [
-    createData(0, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(1, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(2, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(3, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(4, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(5, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-    createData(6, "John Doe", "Product Details", "Category", "https://source.unsplash.com/random/400x200"),
-  ];
-
+const Products: NextPage = () => {
   const router = useRouter();
+  const [open, setOpen] = React.useState(false);
 
+  const [selected, setSelected] = useState<null | Product>(null);
+
+  const { isLoading, data } = useQuery("products", getProducts);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync } = useMutation("deleteProduct", deleteProduct, {
+    onSuccess: (data) => {
+      toast.success(data.msg, {
+        toastId: "delete-product" + selected?._id,
+      });
+      queryClient.invalidateQueries("products");
+    },
+  });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelected(null);
+  };
   return (
     <Layout>
       <Stack spacing={2}>
@@ -58,6 +64,7 @@ function Products({}: Props) {
           sx={{
             display: "flex",
             gap: 2,
+            flexDirection: ["column", "row", "row"],
           }}
         >
           <TextField
@@ -75,54 +82,73 @@ function Products({}: Props) {
             Add Product
           </Button>
         </Box>
-        <TableContainer
-          component={Paper}
-          sx={{
-            border: "1px solid #dee2e6",
-          }}
-        >
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
+          <Table sx={{ minWidth: 650 }}>
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                <TableCell>Name</TableCell>
                 <TableCell>Image</TableCell>
-                <TableCell>Product Details</TableCell>
+                <TableCell>Brand</TableCell>
                 <TableCell>Category</TableCell>
-                <TableCell>Created By</TableCell>
+                <TableCell>Re-order Limit</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell component="th" scope="row">
-                    {row.id}
-                  </TableCell>
+            {isLoading ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <TableRow>
                   <TableCell>
-                    {/* {row.image} */}
-                    <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box>
-                  </TableCell>
-                  <TableCell>{row.productDetails}</TableCell>
-                  <TableCell>{row.category}</TableCell>
-                  <TableCell>{row.createdBy}</TableCell>
-                  <TableCell align="right">
-                    <ButtonGroup size="small">
-                      <Button color="info" variant="contained" onClick={() => router.push(`/products/edit/${row.id}`)}>
-                        <ModeEditOutlineOutlinedIcon />
-                      </Button>
-                      <Button color="error" variant="contained">
-                        <DeleteOutlineOutlinedIcon />
-                      </Button>
-                    </ButtonGroup>
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableBody>
+            ) : (
+              <>
+                <TableBody>
+                  {data?.map((row: Product) => (
+                    <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableCell>{row.name}</TableCell>
+                      <TableCell>
+                        <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box>
+                      </TableCell>
+                      <TableCell>{row.brand}</TableCell>
+                      <TableCell>{row.category}</TableCell>
+                      <TableCell>{row.reorder_limit}</TableCell>
+                      <TableCell align="right">
+                        <ButtonGroup size="small">
+                          <Button
+                            color="info"
+                            variant="contained"
+                            onClick={() => {
+                              setSelected(row);
+                              handleClickOpen();
+                            }}
+                          >
+                            <ModeEditOutlineOutlinedIcon />
+                          </Button>
+                          <Button
+                            color="error"
+                            variant="contained"
+                            onClick={() => {
+                              mutateAsync(row._id);
+                            }}
+                          >
+                            <DeleteOutlineOutlinedIcon />
+                          </Button>
+                        </ButtonGroup>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </>
+            )}
           </Table>
         </TableContainer>
       </Stack>
+
+      {selected && <EditProductDialog onClose={handleClose} open={open} product={selected} key={selected._id} />}
     </Layout>
   );
-}
+};
 
 export default Products;

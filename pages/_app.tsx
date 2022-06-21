@@ -8,7 +8,11 @@ import { QueryClient, QueryClientProvider } from "react-query";
 
 import ProtectedRoute from "../components/ProtectedRoute";
 import { AuthContextProvider } from "../context/AuthContext";
+
+import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
+
+import { ToastContainer } from "react-toastify";
 import { theme } from "../theme/theme";
 
 const queryClient = new QueryClient();
@@ -32,6 +36,15 @@ function MyApp({ Component, pageProps }: AppProps) {
                 <Component {...pageProps} />
               </ProtectedRoute>
             )}
+            <ToastContainer
+              position="top-right"
+              autoClose={8000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              draggable={false}
+              closeOnClick
+              pauseOnHover
+            />
           </ThemeProvider>
         </AuthContextProvider>
       </QueryClientProvider>
