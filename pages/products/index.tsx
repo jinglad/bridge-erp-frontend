@@ -3,6 +3,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import {
+  Autocomplete,
   Button,
   ButtonGroup,
   CircularProgress,
@@ -53,6 +54,14 @@ const Products: NextPage = () => {
     setOpen(false);
     setSelected(null);
   };
+
+  const formatAutoCompleteData = (data2: Product[] | undefined) => {
+    const arr: any = [];
+
+    data2 && data2?.map((d) => arr.push({ label: d.name }));
+    return arr;
+  };
+
   return (
     <Layout>
       <Stack spacing={2}>
@@ -67,12 +76,13 @@ const Products: NextPage = () => {
             flexDirection: ["column", "row", "row"],
           }}
         >
-          <TextField
+          <Autocomplete
+            disablePortal
             sx={{ flexGrow: 1 }}
-            size="small"
-            placeholder="Search Products"
-            inputProps={{ "aria-label": "search products" }}
-            variant="outlined"
+            options={formatAutoCompleteData(data)}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Search Products" size="small" variant="outlined" />
+            )}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
