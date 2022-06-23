@@ -34,7 +34,11 @@ const Products: NextPage = () => {
 
   const [selected, setSelected] = useState<null | Product>(null);
 
-  const { isLoading, data } = useQuery("products", getProducts);
+  const { isLoading, data } = useQuery("products", getProducts, {
+    onSuccess: (data) => {
+      setRows(data);
+    },
+  });
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useMutation("deleteProduct", deleteProduct, {
@@ -55,12 +59,28 @@ const Products: NextPage = () => {
     setSelected(null);
   };
 
-  const formatAutoCompleteData = (data2: Product[] | undefined) => {
+  const formatAutoCompleteData = (products: Product[] | undefined) => {
     const arr: any = [];
 
-    data2 && data2?.map((d) => arr.push({ label: d.name }));
+    products && products?.map((d) => arr.push({ label: d.name }));
     return arr;
   };
+
+  const [rows, setRows] = useState<Product[]>([]);
+  const [searched, setSearched] = useState<string>("");
+
+  const requestSearch = (searchedVal: string) => {
+    if (data) {
+      const filteredRows = data?.filter((row) => {
+        return row.name.toLowerCase().includes(searchedVal.toLowerCase());
+      });
+      setRows(filteredRows);
+    }
+  };
+
+  function handleInputChange(event: any, value: any) {
+    requestSearch(value);
+  }
 
   return (
     <Layout>
@@ -80,9 +100,8 @@ const Products: NextPage = () => {
             disablePortal
             sx={{ flexGrow: 1 }}
             options={formatAutoCompleteData(data)}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Search Products" size="small" variant="outlined" />
-            )}
+            onInputChange={handleInputChange}
+            renderInput={(params) => <TextField placeholder="Search Products" variant="outlined" {...params} />}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
@@ -115,7 +134,7 @@ const Products: NextPage = () => {
             ) : (
               <>
                 <TableBody>
-                  {data?.map((row: Product) => (
+                  {rows.map((row: Product) => (
                     <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                       <TableCell>{row.name}</TableCell>
                       <TableCell>

@@ -34,7 +34,11 @@ function Categories({}: Props) {
 
   const [selected, setSelected] = useState<null | Category>(null);
 
-  const { isLoading, data } = useQuery("categories", getCategories);
+  const { isLoading, data } = useQuery("categories", getCategories, {
+    onSuccess: (data) => {
+      setRows(data);
+    },
+  });
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useMutation("deleteCategory", deleteCategory, {
@@ -62,6 +66,21 @@ function Categories({}: Props) {
     return arr;
   };
 
+  const [rows, setRows] = useState<Category[]>([]);
+
+  const requestSearch = (searchedVal: string) => {
+    if (data) {
+      const filteredRows = data?.filter((row) => {
+        return row.categorytitle.toLowerCase().includes(searchedVal.toLowerCase());
+      });
+      setRows(filteredRows);
+    }
+  };
+
+  function handleInputChange(event: any, value: any) {
+    requestSearch(value);
+  }
+
   return (
     <Layout>
       <Stack spacing={2}>
@@ -80,6 +99,7 @@ function Categories({}: Props) {
             disablePortal
             sx={{ flexGrow: 1 }}
             options={formatAutoCompleteData(data)}
+            onInputChange={handleInputChange}
             renderInput={(params) => (
               <TextField {...params} placeholder="Search category" size="small" variant="outlined" />
             )}
@@ -110,7 +130,7 @@ function Categories({}: Props) {
               </TableBody>
             ) : (
               <TableBody>
-                {data?.map((row) => (
+                {rows?.map((row) => (
                   <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                     <TableCell>{row.categorytitle}</TableCell>
                     <TableCell align="right">

@@ -15,7 +15,13 @@ import "../styles/globals.css";
 import { ToastContainer } from "react-toastify";
 import { theme } from "../theme/theme";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
   const noAuthRequired = ["/login"];

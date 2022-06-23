@@ -43,7 +43,11 @@ function Suppliers({}: Props) {
 
   const [selected, setSelected] = useState<null | Supplier>(null);
 
-  const { isLoading, data } = useQuery("suppliers", getSupplier);
+  const { isLoading, data } = useQuery("suppliers", getSupplier, {
+    onSuccess: (data) => {
+      setRows(data);
+    },
+  });
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useMutation("deleteSupplier", deleteSupplier, {
@@ -71,6 +75,21 @@ function Suppliers({}: Props) {
     return arr;
   };
 
+  const [rows, setRows] = useState<Supplier[]>([]);
+
+  const requestSearch = (searchedVal: string) => {
+    if (data) {
+      const filteredRows = data?.filter((row) => {
+        return row.name.toLowerCase().includes(searchedVal.toLowerCase());
+      });
+      setRows(filteredRows);
+    }
+  };
+
+  function handleInputChange(event: any, value: any) {
+    requestSearch(value);
+  }
+
   return (
     <Layout>
       <Stack spacing={2}>
@@ -89,6 +108,7 @@ function Suppliers({}: Props) {
             disablePortal
             sx={{ flexGrow: 1 }}
             options={formatAutoCompleteData(data)}
+            onInputChange={handleInputChange}
             renderInput={(params) => (
               <TextField {...params} placeholder="Search Products" size="small" variant="outlined" />
             )}
@@ -127,7 +147,7 @@ function Suppliers({}: Props) {
               </TableBody>
             ) : (
               <TableBody>
-                {data?.map((row) => (
+                {rows?.map((row) => (
                   <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{row.email}</TableCell>
