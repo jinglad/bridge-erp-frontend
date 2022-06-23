@@ -1,11 +1,11 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import CheckOutlinedIcon from "@mui/icons-material/CheckOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import {
+  Autocomplete,
   Button,
   ButtonGroup,
-  Chip,
+  CircularProgress,
   Paper,
   Stack,
   Table,
@@ -19,32 +19,48 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import { Category, deleteCategory, getCategories } from "../../apis/category-service";
+import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
 
 type Props = {};
 
-function createData(id: number, categoryName: string, expirable: boolean, warrantiable: boolean, createdBy: string) {
-  return {
-    id,
-    categoryName,
-    expirable,
-    warrantiable,
-    createdBy,
-  };
-}
-
 function Categories({}: Props) {
-  const rows = [
-    createData(0, "Category Name", true, true, "John Doe"),
-    createData(1, "Category Name", false, true, "John Doe"),
-    createData(2, "Category Name", true, false, "John Doe"),
-    createData(3, "Category Name", true, false, "John Doe"),
-    createData(4, "Category Name", false, true, "John Doe"),
-    createData(5, "Category Name", true, false, "John Doe"),
-  ];
-
   const router = useRouter();
+  const [open, setOpen] = React.useState(false);
+
+  const [selected, setSelected] = useState<null | Category>(null);
+
+  const { isLoading, data } = useQuery("categories", getCategories);
+  const queryClient = useQueryClient();
+
+  const { mutateAsync } = useMutation("deleteCategory", deleteCategory, {
+    onSuccess: (data) => {
+      toast.success(data.msg, {
+        toastId: "delete-product" + selected?._id,
+      });
+      queryClient.invalidateQueries("products");
+    },
+  });
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelected(null);
+  };
+
+  const formatAutoCompleteData = (data2: Category[] | undefined) => {
+    const arr: any = [];
+
+    data2 && data2?.map((d) => arr.push({ label: d.categorytitle }));
+    return arr;
+  };
 
   return (
     <Layout>
@@ -57,14 +73,16 @@ function Categories({}: Props) {
           sx={{
             display: "flex",
             gap: 2,
+            flexDirection: ["column", "row", "row"],
           }}
         >
-          <TextField
+          <Autocomplete
+            disablePortal
             sx={{ flexGrow: 1 }}
-            size="small"
-            placeholder="Search Products"
-            variant="outlined"
-            inputProps={{ "aria-label": "search products" }}
+            options={formatAutoCompleteData(data)}
+            renderInput={(params) => (
+              <TextField {...params} placeholder="Search category" size="small" variant="outlined" />
+            )}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
@@ -74,65 +92,53 @@ function Categories({}: Props) {
             Add Category
           </Button>
         </Box>
-        <TableContainer
-          component={Paper}
-          sx={{
-            border: "1px solid #dee2e6",
-          }}
-        >
+        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
                 <TableCell>Category Name </TableCell>
-                <TableCell>Expirable</TableCell>
-                <TableCell>Warrantiable</TableCell>
-                <TableCell>Created By</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow key={row.id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                  <TableCell component="th" scope="row">
-                    {row.id}
-                  </TableCell>
-                  <TableCell>{row.categoryName}</TableCell>
+            {isLoading ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <TableRow>
                   <TableCell>
-                    {row.expirable ? (
-                      <Chip label="Yes" size="small" color="success" />
-                    ) : (
-                      <Chip label="No" size="small" color="error" />
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {row.warrantiable ? (
-                      <Chip label="Yes" size="small" color="success" />
-                    ) : (
-                      <Chip label="No" size="small" color="error" />
-                    )}
-                  </TableCell>
-                  <TableCell>{row.createdBy}</TableCell>
-                  <TableCell align="right">
-                    <ButtonGroup size="small">
-                      <Button
-                        color="info"
-                        variant="contained"
-                        onClick={() => router.push("/categories/edit/" + row.id)}
-                      >
-                        <ModeEditOutlineOutlinedIcon />
-                      </Button>
-                      <Button color="success" variant="contained">
-                        <CheckOutlinedIcon />
-                      </Button>
-                    </ButtonGroup>
+                    <CircularProgress />
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
+              </TableBody>
+            ) : (
+              <TableBody>
+                {data?.map((row) => (
+                  <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                    <TableCell>{row.categorytitle}</TableCell>
+                    <TableCell align="right">
+                      <ButtonGroup size="small">
+                        <Button
+                          color="info"
+                          variant="contained"
+                          onClick={() => {
+                            setSelected(row);
+                            handleClickOpen();
+                          }}
+                        >
+                          <ModeEditOutlineOutlinedIcon />
+                        </Button>
+                        {/* <Button color="success" variant="contained">
+                          <CheckOutlinedIcon />
+                        </Button> */}
+                      </ButtonGroup>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            )}
           </Table>
         </TableContainer>
       </Stack>
+
+      {selected && <EditcategoryDialog onClose={handleClose} open={open} category={selected} key={selected._id} />}
     </Layout>
   );
 }

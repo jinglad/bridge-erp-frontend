@@ -1,56 +1,53 @@
-import {
-  Autocomplete,
-  Button,
-  ButtonGroup,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
+import { Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React from "react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { useMutation } from "react-query";
+import { toast } from "react-toastify";
+import { createCategory } from "../../apis/category-service";
 import Layout from "../../components/Layout/Layout";
 
 type Props = {};
 
 function Create({}: Props) {
+  const { mutateAsync, isLoading } = useMutation("createProduct", createCategory, {
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      reset();
+    },
+  });
+
+  const { register, handleSubmit, reset } = useForm();
+
+  const onSubmit = async (data: any) => {
+    await mutateAsync(data.categorytitle);
+  };
+
   return (
     <Layout>
       <Box maxWidth="800px">
         <Typography variant="h6" gutterBottom>
           Create New Category
         </Typography>
-        <Grid container spacing={3}>
-          <Grid item xs={12} sm={6}>
-            <TextField required id="CategoryName" name="CategoryName" label="Category Name" fullWidth />
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={6}>
+              <TextField required id="CategoryName" {...register("categorytitle")} label="Category Name" fullWidth />
+            </Grid>
+
+            <Grid item xs={12} sm={3}>
+              <ButtonGroup>
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                  Submit
+                </LoadingButton>
+                <Button color="error">
+                  <Link href="/categories">Cancel</Link>
+                </Button>
+              </ButtonGroup>
+            </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              disablePortal
-              options={["Apple", "Banana", "Orange", "Apple", "Banana", "Orange"]}
-              renderInput={(params) => <TextField {...params} label="Select Root Category" />}
-            />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel control={<Checkbox defaultChecked />} label="Expirable" />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel control={<Checkbox />} label="Warrantiable" />
-          </Grid>
-          <Grid item xs={12} sm={4}>
-            <FormControlLabel control={<Checkbox />} label="Status" />
-          </Grid>
-          <Grid item xs={12}>
-            <TextField required id="createdBy" name="createdBy" label="Created By" fullWidth />
-          </Grid>
-          <Grid item xs={12} sm={3}>
-            <ButtonGroup>
-              <Button color="success">Submit</Button>
-              <Button color="error">Cancel</Button>
-            </ButtonGroup>
-          </Grid>
-        </Grid>
+        </form>
       </Box>
     </Layout>
   );
