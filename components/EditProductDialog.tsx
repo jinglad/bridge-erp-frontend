@@ -27,6 +27,9 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
     onSuccess: (data) => {
       notify(data.msg);
       queryClient.invalidateQueries("products");
+
+      queryClient.refetchQueries("products");
+
       reset();
       onClose();
     },
