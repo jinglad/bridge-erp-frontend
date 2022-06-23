@@ -27,18 +27,25 @@ import { toast } from "react-toastify";
 import { deleteProduct, getProducts, Product } from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
+import { useInfiniteQuery } from "react-query";
+import { LoadingButton } from "@mui/lab";
 
 const Products: NextPage = () => {
+  const [page, setPage] = useState(0);
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
   const [selected, setSelected] = useState<null | Product>(null);
 
-  const { isLoading, data } = useQuery("products", getProducts, {
-    onSuccess: (data) => {
-      setRows(data);
-    },
-  });
+  const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
+    "products",
+    getProducts,
+    {
+      getNextPageParam: (lastPage, pages) => pages.length,
+      onSuccess: (data) => {},
+    }
+  );
+
   const queryClient = useQueryClient();
 
   const { mutateAsync } = useMutation("deleteProduct", deleteProduct, {
@@ -59,28 +66,8 @@ const Products: NextPage = () => {
     setSelected(null);
   };
 
-  const formatAutoCompleteData = (products: Product[] | undefined) => {
-    const arr: any = [];
-
-    products && products?.map((d) => arr.push({ label: d.name }));
-    return arr;
-  };
-
   const [rows, setRows] = useState<Product[]>([]);
   const [searched, setSearched] = useState<string>("");
-
-  const requestSearch = (searchedVal: string) => {
-    if (data) {
-      const filteredRows = data?.filter((row) => {
-        return row.name.toLowerCase().includes(searchedVal.toLowerCase());
-      });
-      setRows(filteredRows);
-    }
-  };
-
-  function handleInputChange(event: any, value: any) {
-    requestSearch(value);
-  }
 
   return (
     <Layout>
@@ -99,8 +86,7 @@ const Products: NextPage = () => {
           <Autocomplete
             disablePortal
             sx={{ flexGrow: 1 }}
-            options={formatAutoCompleteData(data)}
-            onInputChange={handleInputChange}
+            options={[]}
             renderInput={(params) => <TextField placeholder="Search Products" variant="outlined" {...params} />}
           />
 
@@ -111,6 +97,7 @@ const Products: NextPage = () => {
             Add Product
           </Button>
         </Box>
+
         <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
           <Table sx={{ minWidth: 650 }}>
             <TableHead>
@@ -123,7 +110,7 @@ const Products: NextPage = () => {
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            {isLoading ? (
+            {status === "loading" ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
                 <TableRow>
                   <TableCell>
@@ -133,46 +120,58 @@ const Products: NextPage = () => {
               </TableBody>
             ) : (
               <>
-                <TableBody>
-                  {rows.map((row: Product) => (
-                    <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                      <TableCell>{row.name}</TableCell>
-                      <TableCell>
-                        <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box>
-                      </TableCell>
-                      <TableCell>{row.brand}</TableCell>
-                      <TableCell>{row.category}</TableCell>
-                      <TableCell>{row.reorder_limit}</TableCell>
-                      <TableCell align="right">
-                        <ButtonGroup size="small">
-                          <Button
-                            color="info"
-                            variant="contained"
-                            onClick={() => {
-                              setSelected(row);
-                              handleClickOpen();
-                            }}
-                          >
-                            <ModeEditOutlineOutlinedIcon />
-                          </Button>
-                          <Button
-                            color="error"
-                            variant="contained"
-                            onClick={() => {
-                              mutateAsync(row._id);
-                            }}
-                          >
-                            <DeleteOutlineOutlinedIcon />
-                          </Button>
-                        </ButtonGroup>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.products.map((row) => (
+                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell>
+                          <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box>
+                        </TableCell>
+                        <TableCell>{row.brand}</TableCell>
+                        <TableCell>{row.category}</TableCell>
+                        <TableCell>{row.reorder_limit}</TableCell>
+                        <TableCell align="right">
+                          <ButtonGroup size="small">
+                            <Button
+                              color="info"
+                              variant="contained"
+                              onClick={() => {
+                                setSelected(row);
+                                handleClickOpen();
+                              }}
+                            >
+                              <ModeEditOutlineOutlinedIcon />
+                            </Button>
+                            <Button
+                              color="error"
+                              variant="contained"
+                              onClick={() => {
+                                mutateAsync(row._id);
+                              }}
+                            >
+                              <DeleteOutlineOutlinedIcon />
+                            </Button>
+                          </ButtonGroup>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                ))}
               </>
             )}
           </Table>
         </TableContainer>
+        <Box textAlign="center">
+          <LoadingButton
+            variant="contained"
+            // loading={isFetchingNextPage}
+            onClick={() => fetchNextPage()}
+            disabled={!hasNextPage || isFetchingNextPage}
+          >
+            {isFetchingNextPage ? "Loading more..." : hasNextPage ? "Load More" : "Nothing more to load"}
+          </LoadingButton>
+        </Box>
       </Stack>
 
       {selected && <EditProductDialog onClose={handleClose} open={open} product={selected} key={selected._id} />}

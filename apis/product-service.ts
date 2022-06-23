@@ -18,9 +18,13 @@ export const createProduct = async (formData: any) => {
   }
 };
 
-export const getProducts = async () => {
+export const getProducts = async ({ pageParam = 0 }) => {
   try {
-    const { data } = await http.get<Product[]>("/products");
+    const { data } = await http.get<{ products: Product[]; count: number }>("/products", {
+      params: {
+        page: pageParam,
+      },
+    });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
