@@ -2,6 +2,7 @@ import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import SearchIcon from "@mui/icons-material/Search";
+import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Button,
@@ -22,16 +23,13 @@ import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { deleteProduct, getProducts, Product } from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
-import { useInfiniteQuery } from "react-query";
-import { LoadingButton } from "@mui/lab";
 
 const Products: NextPage = () => {
-  const [page, setPage] = useState(0);
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
@@ -41,8 +39,14 @@ const Products: NextPage = () => {
     "products",
     getProducts,
     {
-      getNextPageParam: (lastPage, pages) => pages.length,
-      onSuccess: (data) => {},
+      getNextPageParam: (lastPage, pages) => {
+        if (15 * pages.length >= lastPage.count) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+      onSuccess: () => {},
     }
   );
 
