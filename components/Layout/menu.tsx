@@ -18,7 +18,7 @@ export const menu = [
         to: "/categories",
       },
       {
-        title: "Brand",
+        title: "Brands",
         to: "/brand",
       },
     ],
@@ -30,6 +30,10 @@ export const menu = [
       {
         title: "Suppliers",
         to: "/suppliers",
+      },
+      {
+        title: "Customers",
+        to: "/customers",
       },
     ],
   },
