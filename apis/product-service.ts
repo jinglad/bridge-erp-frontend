@@ -9,6 +9,15 @@ export interface Product {
   image: string;
 }
 
+export interface Products {
+  products: Product[];
+  count: number;
+  page: string;
+  size: number;
+  totalPages: number;
+  totalProducts: number;
+}
+
 export const createProduct = async (formData: any) => {
   try {
     const { data } = await http.post<{ msg: string }>("/products", formData);
@@ -20,7 +29,7 @@ export const createProduct = async (formData: any) => {
 
 export const getProducts = async ({ pageParam = 0 }) => {
   try {
-    const { data } = await http.get<{ products: Product[]; count: number }>("/products", {
+    const { data } = await http.get<Products>("/products", {
       params: {
         page: pageParam,
       },
