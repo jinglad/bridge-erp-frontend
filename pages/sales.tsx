@@ -1,5 +1,6 @@
 import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Button,
@@ -31,6 +32,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import React, { useState } from "react";
+import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 
 type Props = {};
@@ -60,7 +62,16 @@ function Sales({}: Props) {
     setCartItems([...cartItems, cartItem]);
   };
 
-  console.log(cartItems);
+  const deleteItemFromCart = (id: any) => {
+    const newCart = cartItems.filter((c: any) => c.id !== id);
+    setCartItems(newCart);
+  };
+
+  const [openAddCustomer, setOpenAddCustomer] = React.useState(false);
+
+  const addCustomerDialogToggle = () => {
+    setOpenAddCustomer(!openAddCustomer);
+  };
 
   return (
     <Layout>
@@ -118,14 +129,20 @@ function Sales({}: Props) {
           </Grid>
         </Grid>
         <Grid item xs={12} sm={5}>
-          <TextField
-            required
-            id="customerName"
-            name="customerName"
-            label="Customer Name"
-            variant="outlined"
-            fullWidth
-          />
+          <Stack spacing={2}>
+            <Autocomplete
+              disablePortal
+              sx={{ flexGrow: 1 }}
+              options={[{ label: "shibli" }, { label: "Jihan" }]}
+              renderInput={(params) => (
+                <TextField placeholder="Search Products" name="customerName" variant="outlined" {...params} />
+              )}
+            />
+
+            <LoadingButton variant="contained" onClick={addCustomerDialogToggle}>
+              Add Customer
+            </LoadingButton>
+          </Stack>
           <Box mt={5}>
             <Paper sx={{ width: "100%", overflow: "hidden" }}>
               <TableContainer sx={{ maxHeight: 440 }}>
@@ -146,7 +163,7 @@ function Sales({}: Props) {
                     {cartItems.map((product: any) => (
                       <TableRow key={product.id}>
                         <TableCell>
-                          <IconButton size="small">
+                          <IconButton size="small" onClick={() => deleteItemFromCart(product.id)}>
                             <DeleteIcon fontSize="inherit" />
                           </IconButton>
                         </TableCell>
@@ -281,6 +298,7 @@ function Sales({}: Props) {
           </Box>
         </Grid>
       </Grid>
+      <AddCustomerDialog onToggle={addCustomerDialogToggle} open={openAddCustomer} />
     </Layout>
   );
 }

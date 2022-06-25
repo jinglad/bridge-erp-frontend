@@ -76,7 +76,7 @@ function Customer({}: Props) {
             <TableHead>
               <TableRow>
                 <TableCell>customer Name </TableCell>
-                <TableCell align="right">Actions</TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
               </TableRow>
             </TableHead>
 
