@@ -17,11 +17,15 @@ export const menu = [
         title: "Categories",
         to: "/categories",
       },
+      {
+        title: "Brand",
+        to: "/brand",
+      },
     ],
   },
   {
     icon: <ContactsOutlinedIcon />,
-    title: "contacts",
+    title: "Contacts",
     items: [
       {
         title: "Suppliers",
