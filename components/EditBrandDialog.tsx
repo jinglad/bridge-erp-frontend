@@ -40,30 +40,28 @@ function EditBrandDialog({ onClose, open, brand }: EditBrandDialogProps) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} scroll="body" fullScreen>
-      <Container maxWidth="md">
-        <DialogTitle>Update Brand</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={3}>
-              <Grid item xs={12} sm={6}>
-                <TextField required id="BrandName" label="Brand Name" fullWidth {...register("brandtitle")} />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <ButtonGroup>
-                  <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
-                    Submit
-                  </LoadingButton>
-                  <Button color="error" onClick={onClose}>
-                    Cancel
-                  </Button>
-                </ButtonGroup>
-              </Grid>
+    <Dialog open={open} onClose={onClose} scroll="body">
+      <DialogTitle>Update Brand</DialogTitle>
+      <DialogContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={3}>
+            <Grid item xs={12} sm={12}>
+              <TextField required id="BrandName" label="Brand Name" fullWidth {...register("brandtitle")} />
             </Grid>
-          </form>
-        </DialogContent>
-      </Container>
+
+            <Grid item xs={12} sm={12}>
+              <ButtonGroup>
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                  Submit
+                </LoadingButton>
+                <Button color="error" onClick={onClose}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+            </Grid>
+          </Grid>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }
