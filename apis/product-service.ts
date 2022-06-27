@@ -8,8 +8,8 @@ export interface Product {
   category: string;
   image: string;
   qty: number;
-  sellPrice: number;
-  discount: number;
+  sell_price: number;
+  buy_price: number;
 }
 
 export interface Products {

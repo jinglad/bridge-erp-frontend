@@ -65,11 +65,11 @@ const PaymentDetailsDialog = ({ cartItems }: PaymentDetailsDialogProps) => {
                     <TableCell>{i + 1}</TableCell>
                     <TableCell>{product.name}</TableCell>
                     <TableCell>{product.qty}</TableCell>
-                    <TableCell>{product.sellPrice}</TableCell>
-                    <TableCell>{product.sellPrice * product.qty}</TableCell>
+                    <TableCell>{product.sell_price}</TableCell>
+                    <TableCell>{product.sell_price * product.qty}</TableCell>
                     <TableCell>0</TableCell>
-                    <TableCell>{product.sellPrice * product.qty}</TableCell>
-                    <TableCell>{product.sellPrice * product.qty}</TableCell>
+                    <TableCell>{product.sell_price * product.qty}</TableCell>
+                    <TableCell>{product.sell_price * product.qty}</TableCell>
                   </TableRow>
                 ))}
                 <TableRow>
@@ -93,8 +93,8 @@ const PaymentDetailsDialog = ({ cartItems }: PaymentDetailsDialogProps) => {
 
                   <TableCell colSpan={2}>GrandTotal : </TableCell>
                   <TableCell>0</TableCell>
-                  <TableCell>{cartItems.reduce((acc, curr) => acc + curr.sellPrice * curr.qty, 0)}</TableCell>
-                  <TableCell>{cartItems.reduce((acc, curr) => acc + curr.sellPrice * curr.qty, 0)}</TableCell>
+                  <TableCell>{cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</TableCell>
+                  <TableCell>{cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</TableCell>
                 </TableRow>
                 <TableRow>
                   <TableCell colSpan={2}>Discount :0</TableCell>
@@ -110,7 +110,7 @@ const PaymentDetailsDialog = ({ cartItems }: PaymentDetailsDialogProps) => {
                   <TableCell colSpan={2}>Net Total :</TableCell>
                   <TableCell colSpan={2}>&nbsp;</TableCell>
                   <TableCell id="netSalePrice">
-                    {cartItems.reduce((acc, curr) => acc + curr.sellPrice * curr.qty, 0)}
+                    {cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
                   </TableCell>
                 </TableRow>
               </TableBody>

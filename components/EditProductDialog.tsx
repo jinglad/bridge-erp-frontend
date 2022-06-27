@@ -46,6 +46,9 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
       category: product.category,
       reorder_limit: product.reorder_limit,
       file: "",
+      sell_price: product.sell_price,
+      buy_price: product.buy_price,
+      qty: product.qty,
     },
   });
 
@@ -56,6 +59,9 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
     formData.append("category", data.category);
     formData.append("reorder_limit", data.reorder_limit);
     formData.append("file", data.file[0]);
+    formData.append("sell_price", data.sell_price);
+    formData.append("buy_price", data.buy_price);
+    formData.append("qty", data.qty);
 
     await mutateAsync({
       formData,
@@ -100,6 +106,36 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   label="ReOrder Limit"
                   fullWidth
                   {...register("reorder_limit")}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  required
+                  type="number"
+                  label="Buy price"
+                  fullWidth
+                  {...register("buy_price")}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  required
+                  type="number"
+                  label="Sell price"
+                  fullWidth
+                  {...register("sell_price")}
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  required
+                  type="number"
+                  label="Qty"
+                  fullWidth
+                  {...register("qty")}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>

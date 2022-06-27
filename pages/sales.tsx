@@ -49,7 +49,7 @@ function Sales({}: Props) {
       return;
     }
 
-    setCartItems([...cartItems, { ...product, sellPrice: 20 }]);
+    setCartItems([...cartItems, { ...product, sell_price: product.sell_price ?? 20, qty: product.qty ?? 20 }]);
   };
 
   const deleteItemFromCart = (id: string) => {
@@ -150,11 +150,11 @@ function Sales({}: Props) {
                             value={product.qty}
                           />
                         </TableCell>
-                        <TableCell>{product.sellPrice ? product.sellPrice : "No"}</TableCell>
-                        <TableCell>{product.sellPrice * product.qty}</TableCell>
+                        <TableCell>{product.sell_price ? product.sell_price : "No"}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
                         <TableCell>0</TableCell>
-                        <TableCell>{product.sellPrice * product.qty}</TableCell>
-                        <TableCell>{product.sellPrice * product.qty}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
