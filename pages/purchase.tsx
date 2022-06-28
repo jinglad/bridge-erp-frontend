@@ -1,50 +1,81 @@
-import {
-  Autocomplete,
-  Button,
-  ButtonGroup,
-  Divider,
-  Grid,
-  Table,
-  TableCell,
-  TableRow,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import React from "react";
+import { LoadingButton } from "@mui/lab";
+import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
+import { toast } from "react-toastify";
+import { getAndSearchProduct, Products } from "../apis/product-service";
+import { createPurchase } from "../apis/purchase-service";
+import { getSupplier, Suppliers } from "../apis/supplier-service";
 import Layout from "../components/Layout/Layout";
-import DeleteIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import { Box } from "@mui/system";
 
 const Purchase = () => {
-  const [value, setValue] = React.useState<Date | null>(new Date());
-
-  const handleChange = (newValue: Date | null) => {
-    setValue(newValue);
-  };
-  const {
-    register,
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { register, control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
-      product: [{ name: undefined, quantity: 1, purchasePerUnit: 0, sellsPerUnit: 0 }],
-      invoice: undefined,
-      chequeDisposalDate: new Date(),
-      chequeNo: undefined,
-      amountToBePaid: undefined,
-      paidAmount: undefined,
+      products: [{ name: undefined, quantity: 1, purchasePerUnit: 0, sellsPerUnit: 0, _id: "" }],
+      supplier: "",
+      to_be_paid: 0,
+      paid: 0,
+      payment_method: "",
     },
     mode: "onBlur",
   });
+
+  const {
+    mutateAsync,
+    isLoading,
+    reset: resetQ,
+  } = useMutation("createPurchase", createPurchase, {
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.msg);
+    },
+  });
+
   const { fields, append, remove } = useFieldArray({
-    name: "product",
+    name: "products",
     control,
   });
-  const onSubmit = (data: any) => console.log(data);
+  const onSubmit = async (data: any) => {
+    await mutateAsync(data);
+  };
+
+  const [productName, setProductName] = useState("");
+
+  const { data, status } = useInfiniteQuery(["searchedProducts", productName], getAndSearchProduct, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
+
+  const [supplierName, setSupplierName] = useState("");
+
+  const { data: spData, status: spStatus } = useInfiniteQuery(["suppliers", supplierName], getSupplier, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
+
+  const getSupplierFormattedData = (data: InfiniteData<Suppliers> | undefined) => {
+    const brands = data?.pages.flatMap((page) => page.supplier.map((sp) => sp.name));
+    return [...new Set(brands)];
+  };
+
+  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const productName = data?.pages.flatMap((page) => page.products);
+    return productName || [];
+  };
 
   return (
     <Layout>
@@ -57,26 +88,41 @@ const Purchase = () => {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container item spacing={3}>
               <Grid item xs={12} sm={6}>
-                <TextField required id="invoice" label="Invoice" fullWidth {...register("invoice")} />
-              </Grid>
-              <Grid item xs={12} sm={6}>
                 <Autocomplete
-                  disablePortal
-                  options={["Shibli", "Jihan"]}
-                  renderInput={(params) => <TextField {...params} label="Supplier" />}
+                  loading={spStatus === "loading"}
+                  options={getSupplierFormattedData(spData)}
+                  onInputChange={(e, value) => {
+                    setSupplierName(value);
+                  }}
+                  renderInput={(params) => <TextField {...params} placeholder="suppliers" {...register(`supplier`)} />}
                 />
               </Grid>
               {fields.map((field, index) => {
                 return (
                   <Grid item container key={field.id} spacing={3}>
                     <Grid item xs={12} sm={12} md={12}>
-                      <TextField
-                        placeholder="name"
-                        {...register(`product.${index}.name` as const, {
-                          required: true,
-                        })}
-                        label="Product Name"
-                        fullWidth
+                      <Autocomplete
+                        loading={status === "loading"}
+                        options={getProductFormattedData(data)}
+                        getOptionLabel={(option) => option.name}
+                        onInputChange={(e, value) => {
+                          setProductName(value);
+                          setProductName("");
+                        }}
+                        onChange={(e, value) => {
+                          if (value) {
+                            setValue(`products.${index}._id`, value._id);
+                          }
+                        }}
+                        renderInput={(params) => (
+                          <TextField
+                            {...params}
+                            placeholder="search products"
+                            {...register(`products.${index}.name` as const, {
+                              required: true,
+                            })}
+                          />
+                        )}
                       />
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
@@ -84,7 +130,7 @@ const Purchase = () => {
                         placeholder="quantity"
                         label="Purchase Quantity"
                         type="number"
-                        {...register(`product.${index}.quantity` as const, {
+                        {...register(`products.${index}.quantity` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -96,7 +142,7 @@ const Purchase = () => {
                         placeholder="value"
                         type="number"
                         label="Purchase Per Unit"
-                        {...register(`product.${index}.purchasePerUnit` as const, {
+                        {...register(`products.${index}.purchasePerUnit` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -108,7 +154,7 @@ const Purchase = () => {
                         label="Sells Per Unit"
                         placeholder="value"
                         type="number"
-                        {...register(`product.${index}.sellsPerUnit` as const, {
+                        {...register(`products.${index}.sellsPerUnit` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -126,14 +172,15 @@ const Purchase = () => {
               <Grid item xs={12} sm={12} justifySelf="start">
                 <Button
                   variant="contained"
-                  onClick={() =>
+                  onClick={() => {
+                    setProductName("");
                     append({
                       name: undefined,
                       quantity: 0,
                       purchasePerUnit: 0,
                       sellsPerUnit: 0,
-                    })
-                  }
+                    });
+                  }}
                 >
                   ADD PRODUCT
                 </Button>
@@ -142,21 +189,21 @@ const Purchase = () => {
               <Grid item xs={12} sm={4}>
                 <TextField
                   fullWidth
-                  {...register("amountToBePaid")}
+                  {...register("to_be_paid")}
                   type="number"
                   required
-                  id="amountToBePaid"
+                  id="to_be_paid"
                   label="Amount to be paid"
                 />
               </Grid>
 
               <Grid item xs={12} sm={4}>
                 <TextField
-                  {...register("paidAmount")}
+                  {...register("paid")}
                   inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   required
                   type="number"
-                  id="paidAmount"
+                  id="paid"
                   label="Paid Amount"
                   fullWidth
                 />
@@ -164,89 +211,27 @@ const Purchase = () => {
               <Grid item xs={12} sm={4}>
                 <Autocomplete
                   disablePortal
+                  onInputChange={(e, value) => {
+                    setValue("payment_method", value);
+                  }}
                   options={["Bkash", "Rocket", "Nagad", "IIBL"]}
                   renderInput={(params) => <TextField {...params} label="Payment Method" />}
                 />
               </Grid>
 
               <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register("chequeNo")}
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                  type="number"
-                  label="Cheque No ( Optional )"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <LocalizationProvider dateAdapter={AdapterDateFns}>
-                  <DatePicker
-                    inputFormat="MM/dd/yyyy"
-                    label="Cheque Disposal Date ( Set if not Today )"
-                    value={value}
-                    {...register("chequeDisposalDate")}
-                    onChange={handleChange}
-                    renderInput={(params) => <TextField {...params} fullWidth />}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={12} sm={6}>
                 <ButtonGroup>
-                  <Button type="submit" color="success">
+                  <LoadingButton loading={isLoading} type="submit" variant="contained" color="success">
                     Submit
+                  </LoadingButton>
+                  <Button color="error" onClick={() => resetQ()}>
+                    Cancel
                   </Button>
-                  <Button color="error">Cancel</Button>
                 </ButtonGroup>
               </Grid>
             </Grid>
           </form>
         </Grid>
-        {/* <Grid item xs={12} md={12} lg={6} sm={12}>
-          <Typography variant="h6" gutterBottom>
-            ৫০০ নাম্বার ওয়ান লবন
-          </Typography>
-          <Divider />
-          <Table size="small">
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Id:</TableCell>
-              <TableCell>28</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Image :</TableCell>
-              <TableCell>
-                <img src="https://via.placeholder.com/30" alt="Product Image" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Product Name:</TableCell>
-              <TableCell>৫০০ নাম্বার ওয়ান লবন...</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Category : </TableCell>
-              <TableCell>লবণ</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Configuration : </TableCell>
-              <TableCell>Product</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Expirable ? </TableCell>
-              <TableCell>No</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>warrantable ? : </TableCell>
-              <TableCell>No</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Last Sold unit Price:</TableCell>
-              <TableCell>123</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ fontWeight: "bold" }}>Last Purchased unit Price:</TableCell>
-              <TableCell>710</TableCell>
-            </TableRow>
-          </Table>
-        </Grid> */}
       </Grid>
     </Layout>
   );

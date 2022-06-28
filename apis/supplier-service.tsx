@@ -8,6 +8,15 @@ export interface Supplier {
   address: string;
 }
 
+export interface Suppliers {
+  supplier: Supplier[];
+  count: number;
+  page: string;
+  size: number;
+  totalPages: number;
+  totalProducts: number;
+}
+
 export interface CreateSupplierProps {
   name: string;
   email: number;
@@ -24,9 +33,21 @@ export const createSupplier = async (sp: CreateSupplierProps) => {
   }
 };
 
-export const getSupplier = async () => {
+export const getSupplier = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+  const name = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
+
+  if (name) {
+    params.name = name;
+  }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
   try {
-    const { data } = await http.get<Supplier[]>("/supplier");
+    const { data } = await http.get<Suppliers>("/supplier", {
+      params: params,
+    });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
