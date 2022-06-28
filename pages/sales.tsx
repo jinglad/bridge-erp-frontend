@@ -234,12 +234,12 @@ function Sales({}: Props) {
                               {row.name}
                             </Typography>
                             <Stack direction="row" justifyContent="space-between">
-                              <Typography variant="h6">BDT 150</Typography>
-                              <Typography variant="h6">QTY : 210</Typography>
+                              <Typography variant="h6">BDT {row.sell_price}</Typography>
+                              <Typography variant="h6">QTY : {row.qty}</Typography>
                             </Stack>
                           </CardContent>
                           <CardActions>
-                            <Button size="small" onClick={() => addToCart({ ...row, qty: 1 })}>
+                            <Button disabled={row.qty === 0} size="small" onClick={() => addToCart({ ...row, qty: 1 })}>
                               Add
                             </Button>
                           </CardActions>
