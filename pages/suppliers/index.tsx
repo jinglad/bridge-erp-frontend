@@ -58,8 +58,6 @@ function Suppliers({}: Props) {
     setSelected(null);
   };
 
-  const [rows, setRows] = useState<Supplier[]>([]);
-
   const getSupplierFormattedData = (data: InfiniteData<Suppliers> | undefined) => {
     const brands = data?.pages.flatMap((page) => page.supplier.map((sp) => sp.name));
     return [...new Set(brands)];

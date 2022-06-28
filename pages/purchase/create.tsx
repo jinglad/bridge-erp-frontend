@@ -1,15 +1,16 @@
 import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
 import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
 import { toast } from "react-toastify";
-import { getAndSearchProduct, Products } from "../apis/product-service";
-import { createPurchase } from "../apis/purchase-service";
-import { getSupplier, Suppliers } from "../apis/supplier-service";
-import Layout from "../components/Layout/Layout";
+import { getAndSearchProduct, Products } from "../../apis/product-service";
+import { createPurchase } from "../../apis/purchase-service";
+import { getSupplier, Suppliers } from "../../apis/supplier-service";
+import Layout from "../../components/Layout/Layout";
 
-const Purchase = () => {
+const PurchaseCreate = () => {
   const { register, control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
       products: [{ name: undefined, qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
@@ -76,6 +77,8 @@ const Purchase = () => {
     const productName = data?.pages.flatMap((page) => page.products);
     return productName || [];
   };
+
+  const router = useRouter();
 
   return (
     <Layout>
@@ -224,7 +227,13 @@ const Purchase = () => {
                   <LoadingButton loading={isLoading} type="submit" variant="contained" color="success">
                     Submit
                   </LoadingButton>
-                  <Button color="error" onClick={() => resetQ()}>
+                  <Button
+                    color="error"
+                    onClick={() => {
+                      resetQ();
+                      router.push("/purchase");
+                    }}
+                  >
                     Cancel
                   </Button>
                 </ButtonGroup>
@@ -237,4 +246,4 @@ const Purchase = () => {
   );
 };
 
-export default Purchase;
+export default PurchaseCreate;
