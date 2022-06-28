@@ -12,7 +12,7 @@ import Layout from "../components/Layout/Layout";
 const Purchase = () => {
   const { register, control, handleSubmit, setValue, reset } = useForm({
     defaultValues: {
-      products: [{ name: undefined, quantity: 1, purchasePerUnit: 0, sellsPerUnit: 0, _id: "" }],
+      products: [{ name: undefined, qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
       supplier: "",
       to_be_paid: 0,
       paid: 0,
@@ -130,7 +130,7 @@ const Purchase = () => {
                         placeholder="quantity"
                         label="Purchase Quantity"
                         type="number"
-                        {...register(`products.${index}.quantity` as const, {
+                        {...register(`products.${index}.qty` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -142,7 +142,7 @@ const Purchase = () => {
                         placeholder="value"
                         type="number"
                         label="Purchase Per Unit"
-                        {...register(`products.${index}.purchasePerUnit` as const, {
+                        {...register(`products.${index}.buy_price` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -154,7 +154,7 @@ const Purchase = () => {
                         label="Sells Per Unit"
                         placeholder="value"
                         type="number"
-                        {...register(`products.${index}.sellsPerUnit` as const, {
+                        {...register(`products.${index}.sell_price` as const, {
                           valueAsNumber: true,
                           required: true,
                         })}
@@ -176,9 +176,9 @@ const Purchase = () => {
                     setProductName("");
                     append({
                       name: undefined,
-                      quantity: 0,
-                      purchasePerUnit: 0,
-                      sellsPerUnit: 0,
+                      qty: 0,
+                      sell_price: 0,
+                      buy_price: 0,
                     });
                   }}
                 >
