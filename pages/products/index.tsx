@@ -129,11 +129,11 @@ const Products: NextPage = () => {
                         </TableCell>
                         <TableCell>{row.brand}</TableCell>
                         <TableCell>{row.category}</TableCell>
-                        {row.reorder_limit < row.qty ? (
-                          <TableCell>{row.reorder_limit}</TableCell>
-                        ) : (
-                          <TableCell sx={{ color: "red" }}>{row.reorder_limit}</TableCell>
-                        )}
+                        <TableCell
+                          sx={{ color: Number(row.reorder_limit) < row.qty ? "black" : "red", fontWeight: "bold" }}
+                        >
+                          {row.reorder_limit}
+                        </TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button

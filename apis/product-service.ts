@@ -3,7 +3,7 @@ import http from "./http-common";
 export interface Product {
   _id: string;
   name: string;
-  reorder_limit: number;
+  reorder_limit: string;
   brand: string;
   category: string;
   image: string;
