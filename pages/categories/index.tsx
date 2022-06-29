@@ -35,7 +35,7 @@ function Categories({}: Props) {
   const [selected, setSelected] = useState<null | Category>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["searchedProducts", categoryName],
+    ["categories", categoryName],
     getCategories,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -52,9 +52,9 @@ function Categories({}: Props) {
   const { mutateAsync } = useMutation("deleteCategory", deleteCategory, {
     onSuccess: (data) => {
       toast.success(data.msg, {
-        toastId: "delete-product" + selected?._id,
+        toastId: "delete-categories" + selected?._id,
       });
-      queryClient.invalidateQueries("products");
+      queryClient.invalidateQueries("categories");
     },
   });
 
