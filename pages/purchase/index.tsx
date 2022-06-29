@@ -1,10 +1,13 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import {
   Box,
   Button,
   ButtonGroup,
   CircularProgress,
+  Input,
+  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -13,24 +16,28 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
 import router from "next/router";
 import { useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { getPurchases, Purchase } from "../../apis/purchase-service";
-import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
 import ViewPurchase from "../../components/ViewPurchaseDialog";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import moment from "moment";
+import CloseIcon from "@mui/icons-material/Close";
 
 type Props = {};
 
 const Purchase = (props: Props) => {
-  const [purchaseDate, setPurchaseDate] = useState("");
+  const [date, setDate] = useState<Date | null>(null);
+  const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | Purchase>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["purchases", purchaseDate],
+    ["purchases", createdDate],
     getPurchases,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -53,6 +60,13 @@ const Purchase = (props: Props) => {
     setSelected(null);
   };
 
+  const handleChange = (newValue: Date | null) => {
+    setDate(newValue);
+    if (newValue) {
+      setCreatedDate(moment(newValue).format("ddd MMM D YYYY"));
+    }
+  };
+
   return (
     <Layout>
       <Stack spacing={2}>
@@ -70,6 +84,35 @@ const Purchase = (props: Props) => {
           <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/purchase/create")}>
             New purchase
           </Button>
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+            }}
+          >
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DesktopDatePicker
+                label="Filter by date"
+                inputFormat="MM/dd/yyyy"
+                value={date}
+                onChange={handleChange}
+                // disableCloseOnSelect={true}
+                renderInput={(params) => <TextField variant="outlined" fullWidth {...params} />}
+              />
+            </LocalizationProvider>
+            {createdDate && (
+              <Button
+                color="error"
+                onClick={() => {
+                  setDate(null);
+                  setCreatedDate(null);
+                }}
+              >
+                clear
+                {/* <CloseIcon /> */}
+              </Button>
+            )}
+          </Box>
         </Box>
         <TableContainer component={Paper}>
           <Table aria-label="simple table">

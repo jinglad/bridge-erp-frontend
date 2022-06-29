@@ -16,6 +16,7 @@ export interface Purchase {
   to_be_paid: number;
   paid: number;
   payment_method: string;
+  createdDate: Date;
 }
 
 export interface Purchases {
@@ -34,12 +35,12 @@ export const createPurchase = async (formData: Purchase) => {
   return data;
 };
 
-export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
-  const purchaseDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
+  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 
-  if (purchaseDate) {
-    params.purchaseDate = purchaseDate;
+  if (createdDate) {
+    params.createdDate = createdDate;
   }
   if (pageParam) {
     params.page = pageParam;
