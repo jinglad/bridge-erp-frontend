@@ -1,14 +1,17 @@
 import CloseIcon from "@mui/icons-material/Close";
 import { LoadingButton } from "@mui/lab";
 import {
-  Autocomplete,
   Button,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
   Grid,
   IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Table,
   TableBody,
@@ -19,12 +22,14 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
+import { useReactToPrint } from "react-to-print";
 import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
 import { Product } from "../apis/product-service";
+import { OrderToPrint } from "./OrderToPrint";
 
 type PaymentDetailsDialogProps = {
   cartItems: Product[];
@@ -40,6 +45,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   const { mutateAsync, isLoading } = useMutation("createOrder", createOrder, {
     onSuccess: (data) => {
       toast.success(data.msg);
+      handlePrint();
       reset();
       onSuccess();
     },
@@ -48,8 +54,15 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     },
   });
 
-  const { register, handleSubmit, reset, setValue, getValues, watch } = useForm();
-  const watchDiscount = watch("discount", false); // you can supply default value as second argument
+  const { register, handleSubmit, reset, setValue, getValues, watch } = useForm({
+    defaultValues: {
+      payment_method: "cash",
+      discount: 0,
+      paid: 0,
+      to_be_paid: 0,
+    },
+  });
+  const watchDiscount = watch("discount"); // you can supply default value as second argument
 
   useEffect(() => {
     setValue("paid", cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount);
@@ -66,6 +79,18 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     });
     handleClose();
   };
+
+  const componentRef = useRef(null);
+
+  const reactToPrintContent = useCallback(() => {
+    return componentRef.current;
+  }, [componentRef]);
+
+  const handlePrint = useReactToPrint({
+    content: reactToPrintContent,
+    documentTitle: "AwesomeFileName",
+    removeAfterPrint: true,
+  });
 
   return (
     <>
@@ -121,21 +146,6 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                       <Grid container spacing={1}>
                         <Grid item xs={12} sm={6}>
                           <TextField
-                            type="number"
-                            label="Discount"
-                            variant="outlined"
-                            fullWidth
-                            required
-                            defaultValue={0}
-                            inputProps={{
-                              min: 0,
-                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
-                            }}
-                            {...register(`discount`)}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
                             {...register(`paid`)}
                             type="number"
                             label="Paid"
@@ -149,25 +159,38 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             }}
                           />
                         </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            type="number"
+                            label="Discount"
+                            variant="outlined"
+                            fullWidth
+                            required
+                            defaultValue={0}
+                            inputProps={{
+                              min: 0,
+                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                            }}
+                            {...register(`discount`)}
+                          />
+                        </Grid>
 
                         <Grid item xs={12} sm={6}>
-                          <Autocomplete
-                            onInputChange={(e, value) => {
-                              setValue("payment_method", value);
-                            }}
-                            fullWidth
-                            defaultValue={getValues("payment_method")}
-                            options={["Bkash", "Rocket", "Nagad", "IIBL"]}
-                            renderInput={(params) => (
-                              <TextField
-                                required
-                                {...params}
-                                {...register(`payment_method`)}
-                                label="Payment Method"
-                                variant="outlined"
-                              />
-                            )}
-                          />
+                          <FormControl fullWidth>
+                            <InputLabel>Payment Method</InputLabel>
+                            <Select
+                              {...register(`payment_method`)}
+                              defaultValue="Cash"
+                              size="small"
+                              label="Payment Method"
+                            >
+                              {["Cash", "Bkash", "Rocket", "Nagad", "IIBL"].map((method: string) => (
+                                <MenuItem key={method} value={method}>
+                                  {method}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
                         </Grid>
                       </Grid>
                     </TableCell>
@@ -192,6 +215,17 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                 </TableBody>
               </Table>
             </TableContainer>
+            <OrderToPrint
+              ref={componentRef}
+              payment_method={getValues("payment_method")}
+              discount={Number(getValues("discount"))}
+              paid={Number(getValues("paid"))}
+              to_be_paid={
+                cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid"))
+              }
+              products={cartItems}
+              customer={customerName}
+            />
           </DialogContent>
           <DialogActions>
             <LoadingButton loading={isLoading} autoFocus type="submit" variant="contained">
