@@ -40,7 +40,7 @@ const Products: NextPage = () => {
     getProducts,
     {
       getNextPageParam: (lastPage, pages) => {
-        if (15 * pages.length >= lastPage.count) {
+        if (pages.length === lastPage.totalPages) {
           return undefined;
         } else {
           return pages.length;
@@ -167,14 +167,16 @@ const Products: NextPage = () => {
           </Table>
         </TableContainer>
         <Box textAlign="center">
-          <LoadingButton
-            variant="contained"
-            // loading={isFetchingNextPage}
-            onClick={() => fetchNextPage()}
-            disabled={!hasNextPage || isFetchingNextPage}
-          >
-            {isFetchingNextPage ? "Loading more..." : hasNextPage ? "Load More" : "Nothing more to load"}
-          </LoadingButton>
+          {hasNextPage && (
+            <LoadingButton
+              variant="contained"
+              loading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              Load More
+            </LoadingButton>
+          )}
         </Box>
       </Stack>
 

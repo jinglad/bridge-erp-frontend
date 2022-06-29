@@ -3,20 +3,20 @@ import { Button, ButtonGroup, Container, Dialog, DialogContent, DialogTitle, Gri
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { Category, updateCategory } from "../apis/category-service";
+import { Brand, updateBrand } from "../apis/brand-service";
 
-interface EditCategoryDialogProps {
-  category: Category;
+interface EditBrandDialogProps {
+  brand: Brand;
   open: boolean;
   onClose: () => void;
 }
 
-function EditcategoryDialog({ onClose, open, category }: EditCategoryDialogProps) {
+function EditBrandDialog({ onClose, open, brand }: EditBrandDialogProps) {
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation(updateCategory, {
+  const { mutateAsync, isLoading } = useMutation(updateBrand, {
     onSuccess: (data) => {
       notify(data.msg);
-      queryClient.invalidateQueries("categories");
+      queryClient.invalidateQueries("brand");
       reset();
       onClose();
     },
@@ -26,27 +26,27 @@ function EditcategoryDialog({ onClose, open, category }: EditCategoryDialogProps
     toast.success(msg);
   };
 
-  const { register, handleSubmit, reset } = useForm({
+  const { register, handleSubmit, reset, getValues } = useForm({
     defaultValues: {
-      categorytitle: category.categorytitle,
+      brandtitle: brand.brandtitle,
     },
   });
 
   const onSubmit = async (data: any) => {
     await mutateAsync({
-      id: category._id,
-      categorytitle: data.categorytitle,
+      id: brand._id,
+      brandtitle: data.brandtitle,
     });
   };
 
   return (
     <Dialog open={open} onClose={onClose} scroll="body">
-      <DialogTitle>Update category</DialogTitle>
+      <DialogTitle>Update Brand</DialogTitle>
       <DialogContent>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
-              <TextField required id="categorytitle" label="Category Title" fullWidth {...register("categorytitle")} />
+              <TextField required id="BrandName" label="Brand Name" fullWidth {...register("brandtitle")} />
             </Grid>
 
             <Grid item xs={12} sm={12}>
@@ -66,4 +66,4 @@ function EditcategoryDialog({ onClose, open, category }: EditCategoryDialogProps
   );
 }
 
-export default EditcategoryDialog;
+export default EditBrandDialog;

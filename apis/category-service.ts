@@ -23,11 +23,11 @@ export const getCategories = async () => {
   }
 };
 
-export const updateCategory = async ({ id, categoryTitle }: any) => {
+export const updateCategory = async ({ id, categorytitle }: any) => {
   try {
     const { data } = await http.patch<{
       msg: string;
-    }>("/category/" + id, { categoryTitle });
+    }>("/category/" + id, { categorytitle });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);

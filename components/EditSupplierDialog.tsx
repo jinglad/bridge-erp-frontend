@@ -50,44 +50,42 @@ function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps
   };
 
   return (
-    <Dialog open={open} onClose={onClose} scroll="body" fullScreen>
-      <Container maxWidth="md">
-        <DialogTitle>Update Supplier</DialogTitle>
-        <DialogContent>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <TextField required id="Supplier" {...register("name")} label="Supplier Name" fullWidth />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField required id="emailAddress" {...register("email")} label="Email Address" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField required {...register("phone")} id="contactNo" label="Contact No" fullWidth />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  {...register("address")}
-                  required
-                  id="addressInformation"
-                  label="Address Information"
-                  fullWidth
-                />
-              </Grid>
-              <Grid item xs={12} sm={3}>
-                <ButtonGroup>
-                  <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
-                    Submit
-                  </LoadingButton>
-                  <Button color="error" onClick={onClose}>
-                    Cancel
-                  </Button>
-                </ButtonGroup>
-              </Grid>
+    <Dialog open={open} onClose={onClose} scroll="body">
+      <DialogTitle>Update Supplier</DialogTitle>
+      <DialogContent>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <Grid container spacing={3}>
+            <Grid item xs={12}>
+              <TextField required id="Supplier" {...register("name")} label="Supplier Name" fullWidth />
             </Grid>
-          </form>
-        </DialogContent>
-      </Container>
+            <Grid item xs={12}>
+              <TextField required id="emailAddress" {...register("email")} label="Email Address" fullWidth />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField required {...register("phone")} id="contactNo" label="Contact No" fullWidth />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                {...register("address")}
+                required
+                id="addressInformation"
+                label="Address Information"
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={12} sm={3}>
+              <ButtonGroup>
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                  Submit
+                </LoadingButton>
+                <Button color="error" onClick={onClose}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+            </Grid>
+          </Grid>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 }

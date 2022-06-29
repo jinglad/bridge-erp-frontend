@@ -13,121 +13,195 @@ import {
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import React from "react";
+import { useFieldArray, useForm } from "react-hook-form";
 import Layout from "../components/Layout/Layout";
+import DeleteIcon from "@mui/icons-material/DeleteOutlineOutlined";
+import { Box } from "@mui/system";
 
 const Purchase = () => {
-  const [value, setValue] = React.useState<Date | null>(new Date("2014-08-18T21:11:54"));
+  const [value, setValue] = React.useState<Date | null>(new Date());
 
   const handleChange = (newValue: Date | null) => {
     setValue(newValue);
   };
+  const {
+    register,
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      product: [{ name: undefined, quantity: 1, purchasePerUnit: 0, sellsPerUnit: 0 }],
+      invoice: undefined,
+      chequeDisposalDate: new Date(),
+      chequeNo: undefined,
+      amountToBePaid: undefined,
+      paidAmount: undefined,
+    },
+    mode: "onBlur",
+  });
+  const { fields, append, remove } = useFieldArray({
+    name: "product",
+    control,
+  });
+  const onSubmit = (data: any) => console.log(data);
 
   return (
     <Layout>
-      <Grid container spacing={3}>
-        <Grid item xs={12} sm={6}>
+      <Grid container spacing={3} columns={12}>
+        <Grid item xs={12} sm={12} lg={6} md={12}>
           <Typography variant="h6" gutterBottom>
             Purchase Product From Here
           </Typography>
 
-          <Grid container item spacing={3}>
-            <Grid item xs={12}>
-              <TextField required id="invoice" name="invoice" label="Invoice" fullWidth />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Autocomplete
-                disablePortal
-                options={["Apple", "Banana", "Orange", "Apple", "Banana", "Orange"]}
-                renderInput={(params) => <TextField {...params} label="Supplier" />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Autocomplete
-                disablePortal
-                options={["Apple", "Banana", "Orange", "Apple", "Banana", "Orange"]}
-                renderInput={(params) => <TextField {...params} label="Products" />}
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                type="number"
-                required
-                id="purchaseQuantity"
-                name="purchaseQuantity"
-                label="Purchase Quantity"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                type="number"
-                required
-                id="purchasePerUnitPrice"
-                name="purchasePerUnitPrice"
-                label="Purchase per Unit Price"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField
-                type="number"
-                required
-                id="sellsPerUnitPrice"
-                name="sellsPerUnitPrice"
-                label="Sells per Unit Price"
-              />
-            </Grid>
-            <Grid item xs={12} sm={3}>
-              <TextField type="number" required id="amountToBePaid" name="amountToBePaid" label="Amount to be paid" />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <Autocomplete
-                disablePortal
-                options={["Bkash", "Rocket", "Nagad", "IIBL"]}
-                renderInput={(params) => <TextField {...params} label="Payment Method" />}
-              />
-            </Grid>
-
-            <Grid item xs={12} sm={6}>
-              <TextField
-                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                required
-                type="number"
-                id="paidAmount"
-                name="paidAmount"
-                label="Paid Amount"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <TextField
-                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                type="number"
-                id="checkNo"
-                name="checkNo"
-                label="Check No ( Optional )"
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker
-                  inputFormat="MM/dd/yyyy"
-                  label="Cheque Disposal Date ( Set if not Today )"
-                  value={value}
-                  onChange={handleChange}
-                  renderInput={(params) => <TextField {...params} fullWidth />}
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Grid container item spacing={3}>
+              <Grid item xs={12} sm={6}>
+                <TextField required id="invoice" label="Invoice" fullWidth {...register("invoice")} />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <Autocomplete
+                  disablePortal
+                  options={["Shibli", "Jihan"]}
+                  renderInput={(params) => <TextField {...params} label="Supplier" />}
                 />
-              </LocalizationProvider>
+              </Grid>
+              {fields.map((field, index) => {
+                return (
+                  <Grid item container key={field.id} spacing={3}>
+                    <Grid item xs={12} sm={12} md={12}>
+                      <TextField
+                        placeholder="name"
+                        {...register(`product.${index}.name` as const, {
+                          required: true,
+                        })}
+                        label="Product Name"
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2} md={3}>
+                      <TextField
+                        placeholder="quantity"
+                        label="Purchase Quantity"
+                        type="number"
+                        {...register(`product.${index}.quantity` as const, {
+                          valueAsNumber: true,
+                          required: true,
+                        })}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2} md={3}>
+                      <TextField
+                        placeholder="value"
+                        type="number"
+                        label="Purchase Per Unit"
+                        {...register(`product.${index}.purchasePerUnit` as const, {
+                          valueAsNumber: true,
+                          required: true,
+                        })}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2} md={3}>
+                      <TextField
+                        label="Sells Per Unit"
+                        placeholder="value"
+                        type="number"
+                        {...register(`product.${index}.sellsPerUnit` as const, {
+                          valueAsNumber: true,
+                          required: true,
+                        })}
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={2} md={3}>
+                      <Button fullWidth color="error" variant="contained" onClick={() => remove(index)}>
+                        Delete
+                      </Button>
+                    </Grid>
+                  </Grid>
+                );
+              })}
+              <Grid item xs={12} sm={12} justifySelf="start">
+                <Button
+                  variant="contained"
+                  onClick={() =>
+                    append({
+                      name: undefined,
+                      quantity: 0,
+                      purchasePerUnit: 0,
+                      sellsPerUnit: 0,
+                    })
+                  }
+                >
+                  ADD PRODUCT
+                </Button>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  fullWidth
+                  {...register("amountToBePaid")}
+                  type="number"
+                  required
+                  id="amountToBePaid"
+                  label="Amount to be paid"
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  {...register("paidAmount")}
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  required
+                  type="number"
+                  id="paidAmount"
+                  label="Paid Amount"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Autocomplete
+                  disablePortal
+                  options={["Bkash", "Rocket", "Nagad", "IIBL"]}
+                  renderInput={(params) => <TextField {...params} label="Payment Method" />}
+                />
+              </Grid>
+
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  {...register("chequeNo")}
+                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+                  type="number"
+                  label="Cheque No ( Optional )"
+                  fullWidth
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                  <DatePicker
+                    inputFormat="MM/dd/yyyy"
+                    label="Cheque Disposal Date ( Set if not Today )"
+                    value={value}
+                    {...register("chequeDisposalDate")}
+                    onChange={handleChange}
+                    renderInput={(params) => <TextField {...params} fullWidth />}
+                  />
+                </LocalizationProvider>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <ButtonGroup>
+                  <Button type="submit" color="success">
+                    Submit
+                  </Button>
+                  <Button color="error">Cancel</Button>
+                </ButtonGroup>
+              </Grid>
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <ButtonGroup>
-                <Button color="success">Submit</Button>
-                <Button color="error">Cancel</Button>
-              </ButtonGroup>
-            </Grid>
-          </Grid>
+          </form>
         </Grid>
-        <Grid item xs={12} sm={6}>
+        {/* <Grid item xs={12} md={12} lg={6} sm={12}>
           <Typography variant="h6" gutterBottom>
             ৫০০ নাম্বার ওয়ান লবন
           </Typography>
@@ -172,7 +246,7 @@ const Purchase = () => {
               <TableCell>710</TableCell>
             </TableRow>
           </Table>
-        </Grid>
+        </Grid> */}
       </Grid>
     </Layout>
   );
