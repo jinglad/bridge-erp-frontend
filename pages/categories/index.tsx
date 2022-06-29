@@ -1,5 +1,3 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
@@ -20,11 +18,13 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import { Categories, Category, deleteCategory, getCategories } from "../../apis/category-service";
+import { InfiniteData, useInfiniteQuery } from "react-query";
+import { Categories, Category, getCategories } from "../../apis/category-service";
 import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
+
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 
 type Props = {};
 
@@ -47,16 +47,6 @@ function Categories({}: Props) {
       },
     }
   );
-  const queryClient = useQueryClient();
-
-  const { mutateAsync } = useMutation("deleteCategory", deleteCategory, {
-    onSuccess: (data) => {
-      toast.success(data.msg, {
-        toastId: "delete-categories" + selected?._id,
-      });
-      queryClient.invalidateQueries("categories");
-    },
-  });
 
   const handleClickOpen = () => {
     setOpen(true);
