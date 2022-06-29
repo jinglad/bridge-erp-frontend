@@ -23,11 +23,8 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
+import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
 import { Customers, getCustomers } from "../apis/customer-service";
-import { createOrder } from "../apis/order-service";
 import { getAndSearchProduct, Product, Products } from "../apis/product-service";
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
@@ -277,7 +274,11 @@ function Sales({}: Props) {
                             </Stack>
                           </CardContent>
                           <CardActions>
-                            <Button disabled={row.qty === 0} size="small" onClick={() => addToCart({ ...row, qty: 1 })}>
+                            <Button
+                              disabled={Number(row.qty) <= 0}
+                              size="small"
+                              onClick={() => addToCart({ ...row, qty: 1 })}
+                            >
                               Add
                             </Button>
                           </CardActions>

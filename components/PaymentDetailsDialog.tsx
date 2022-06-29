@@ -19,7 +19,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
@@ -51,8 +51,19 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   const { register, handleSubmit, reset, setValue, getValues, watch } = useForm();
   const watchDiscount = watch("discount", false); // you can supply default value as second argument
 
+  useEffect(() => {
+    setValue("paid", cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount);
+  }, [watchDiscount, cartItems, setValue]);
+
   const onSubmit = async (data: any) => {
-    await mutateAsync({ ...data, products: cartItems, customer: customerName });
+    await mutateAsync({
+      payment_method: data.payment_method,
+      discount: Number(data.discount),
+      paid: Number(data.paid),
+      to_be_paid: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(data.paid),
+      products: cartItems,
+      customer: customerName,
+    });
     handleClose();
   };
 
@@ -116,29 +127,26 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             fullWidth
                             required
                             defaultValue={0}
+                            inputProps={{
+                              min: 0,
+                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                            }}
                             {...register(`discount`)}
                           />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <TextField
+                            {...register(`paid`)}
                             type="number"
-                            defaultValue={cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
                             label="Paid"
                             variant="outlined"
                             fullWidth
                             required
-                            {...register(`paid`)}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            defaultValue={cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
-                            type="number"
-                            label="To be paid"
-                            variant="outlined"
-                            fullWidth
-                            {...register(`to_be_paid`)}
-                            required
+                            inputProps={{
+                              defaultValue: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                              min: 0,
+                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount,
+                            }}
                           />
                         </Grid>
 
