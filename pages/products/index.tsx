@@ -1,7 +1,6 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
@@ -25,7 +24,7 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { deleteProduct, getAndSearchProduct, getProducts, Product, Products } from "../../apis/product-service";
+import { deleteProduct, getAndSearchProduct, Product, Products } from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
 
@@ -73,6 +72,7 @@ const Products: NextPage = () => {
     const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
     return [...new Set(productName)];
   };
+
   return (
     <Layout>
       <Stack spacing={2}>
