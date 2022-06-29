@@ -1,8 +1,3 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import {
   Autocomplete,
   Button,
@@ -22,31 +17,36 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import { Brand, deleteBrand, getBrands } from "../../apis/brand-service";
+import { InfiniteData, useInfiniteQuery } from "react-query";
+import { Brand, Brands, getBrands } from "../../apis/brand-service";
 import EditBrandDialog from "../../components/EditBrandDialog";
 import Layout from "../../components/Layout/Layout";
+
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 
 type Props = {};
 
 function Brand({}: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-
+  const [brandName, setBrandName] = useState("");
   const [selected, setSelected] = useState<null | Brand>(null);
 
-  const { isLoading, data } = useQuery("brand", getBrands);
-  const queryClient = useQueryClient();
-
-  const { mutateAsync } = useMutation("deleteBrand", deleteBrand, {
-    onSuccess: (data) => {
-      toast.success(data.msg, {
-        toastId: "delete-brand" + selected?._id,
-      });
-      queryClient.invalidateQueries("brand");
-    },
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
+    ["brands", brandName],
+    getBrands,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -55,6 +55,11 @@ function Brand({}: Props) {
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
+  };
+
+  const getBrandFormattedData = (data: InfiniteData<Brands> | undefined) => {
+    const brandName = data?.pages.flatMap((page) => page.brands.map((brand) => brand.brandtitle));
+    return [...new Set(brandName)];
   };
 
   return (
@@ -72,12 +77,13 @@ function Brand({}: Props) {
           }}
         >
           <Autocomplete
-            disablePortal
-            sx={{ flexGrow: 1 }}
-            options={[]}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Search Brand" size="small" variant="outlined" />
-            )}
+            sx={{ flex: 1 }}
+            loading={status === "loading"}
+            options={getBrandFormattedData(data)}
+            onInputChange={(e, value) => {
+              setBrandName(value);
+            }}
+            renderInput={(params) => <TextField {...params} placeholder="search brands" variant="outlined" />}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
@@ -95,45 +101,36 @@ function Brand({}: Props) {
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            {isLoading ? (
+            {status === "loading" ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <TableRow>
-                  <TableCell>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
+                <CircularProgress />
               </TableBody>
             ) : (
-              <TableBody>
-                {data?.map((row) => (
-                  <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                    <TableCell>{row.brandtitle}</TableCell>
-                    <TableCell align="right">
-                      <ButtonGroup size="small">
-                        <Button
-                          color="info"
-                          variant="contained"
-                          onClick={() => {
-                            setSelected(row);
-                            handleClickOpen();
-                          }}
-                        >
-                          <ModeEditOutlineOutlinedIcon />
-                        </Button>
-                        {/* <Button
-                          color="error"
-                          variant="contained"
-                          onClick={() => {
-                            mutateAsync(row._id);
-                          }}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </Button> */}
-                      </ButtonGroup>
-                    </TableCell>
-                  </TableRow>
+              <>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.brands.map((row) => (
+                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                        <TableCell>{row.brandtitle}</TableCell>
+                        <TableCell align="right">
+                          <ButtonGroup size="small">
+                            <Button
+                              color="info"
+                              variant="contained"
+                              onClick={() => {
+                                setSelected(row);
+                                handleClickOpen();
+                              }}
+                            >
+                              <ModeEditOutlineOutlinedIcon />
+                            </Button>
+                          </ButtonGroup>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
                 ))}
-              </TableBody>
+              </>
             )}
           </Table>
         </TableContainer>
