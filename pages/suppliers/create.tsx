@@ -57,7 +57,7 @@ function Create({}: Props) {
                   Submit
                 </LoadingButton>
                 <Button color="error">
-                  <Link href="/supplier">Cancel</Link>
+                  <Link href="/suppliers">Cancel</Link>
                 </Button>
               </ButtonGroup>
             </Grid>

@@ -1,7 +1,6 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
@@ -23,21 +22,21 @@ import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { deleteProduct, getProducts, Product } from "../../apis/product-service";
+import { deleteProduct, getAndSearchProduct, Product, Products } from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
 
 const Products: NextPage = () => {
   const router = useRouter();
+  const [productName, setProductName] = useState("");
   const [open, setOpen] = React.useState(false);
-
   const [selected, setSelected] = useState<null | Product>(null);
 
-  const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
-    "products",
-    getProducts,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
+    ["searchedProducts", productName],
+    getAndSearchProduct,
     {
       getNextPageParam: (lastPage, pages) => {
         if (pages.length === lastPage.totalPages) {
@@ -46,7 +45,6 @@ const Products: NextPage = () => {
           return pages.length;
         }
       },
-      onSuccess: () => {},
     }
   );
 
@@ -70,8 +68,10 @@ const Products: NextPage = () => {
     setSelected(null);
   };
 
-  const [rows, setRows] = useState<Product[]>([]);
-  const [searched, setSearched] = useState<string>("");
+  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+    return [...new Set(productName)];
+  };
 
   return (
     <Layout>
@@ -88,15 +88,14 @@ const Products: NextPage = () => {
           }}
         >
           <Autocomplete
-            disablePortal
-            sx={{ flexGrow: 1 }}
-            options={[]}
-            renderInput={(params) => <TextField placeholder="Search Products" variant="outlined" {...params} />}
+            sx={{ flex: 1 }}
+            loading={status === "loading"}
+            options={getProductFormattedData(data)}
+            onInputChange={(e, value) => {
+              setProductName(value);
+            }}
+            renderInput={(params) => <TextField {...params} placeholder="search products" variant="outlined" />}
           />
-
-          <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
-            Search
-          </Button>
           <Button onClick={() => router.push("/products/create")} startIcon={<AddOutlinedIcon />}>
             Add Product
           </Button>
@@ -116,11 +115,7 @@ const Products: NextPage = () => {
             </TableHead>
             {status === "loading" ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <TableRow>
-                  <TableCell>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
+                <CircularProgress />
               </TableBody>
             ) : (
               <>
@@ -134,7 +129,11 @@ const Products: NextPage = () => {
                         </TableCell>
                         <TableCell>{row.brand}</TableCell>
                         <TableCell>{row.category}</TableCell>
-                        <TableCell>{row.reorder_limit}</TableCell>
+                        <TableCell
+                          sx={{ color: Number(row.reorder_limit) < row.qty ? "black" : "red", fontWeight: "bold" }}
+                        >
+                          {row.reorder_limit}
+                        </TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button

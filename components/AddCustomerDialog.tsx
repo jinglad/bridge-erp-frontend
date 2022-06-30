@@ -10,24 +10,20 @@ import {
   Stack,
   TextField,
 } from "@mui/material";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createCustomer } from "../apis/customer-service";
 
-interface AddCustomerDialogProps {
-  open: boolean;
-  onToggle: () => void;
-}
-
-function AddCustomerDialog({ onToggle, open }: AddCustomerDialogProps) {
+function AddCustomerDialog({}) {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation("add-customer", createCustomer, {
     onSuccess: (data) => {
       notify(data.msg);
       queryClient.invalidateQueries("customers");
       reset();
-      onToggle();
+      addCustomerDialogToggle();
     },
   });
 
@@ -41,25 +37,36 @@ function AddCustomerDialog({ onToggle, open }: AddCustomerDialogProps) {
     await mutateAsync(data.customerName);
   };
 
+  const [openAddCustomer, setOpenAddCustomer] = useState(false);
+
+  const addCustomerDialogToggle = () => {
+    setOpenAddCustomer(!openAddCustomer);
+  };
+
   return (
-    <Dialog maxWidth="sm" fullWidth open={open} onClose={onToggle}>
-      <DialogTitle>Update Customer</DialogTitle>
-      <DialogContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Stack spacing={4}>
-            <TextField required id="CustomerName" label="Customer Name" fullWidth {...register("customerName")} />
-            <ButtonGroup>
-              <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
-                Submit
-              </LoadingButton>
-              <Button color="error" onClick={onToggle}>
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </Stack>
-        </form>
-      </DialogContent>
-    </Dialog>
+    <>
+      <Button variant="contained" onClick={addCustomerDialogToggle}>
+        Add Customer
+      </Button>
+      <Dialog maxWidth="sm" fullWidth open={openAddCustomer} onClose={addCustomerDialogToggle}>
+        <DialogTitle>Update Customer</DialogTitle>
+        <DialogContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Stack spacing={4}>
+              <TextField required id="CustomerName" label="Customer Name" fullWidth {...register("customerName")} />
+              <ButtonGroup>
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                  Submit
+                </LoadingButton>
+                <Button color="error" onClick={addCustomerDialogToggle}>
+                  Cancel
+                </Button>
+              </ButtonGroup>
+            </Stack>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

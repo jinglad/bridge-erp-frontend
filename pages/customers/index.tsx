@@ -1,5 +1,3 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import SearchIcon from "@mui/icons-material/Search";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
@@ -18,16 +16,20 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import { useInfiniteQuery } from "react-query";
-import { getCustomers } from "../../apis/customer-service";
+import { useState } from "react";
+import { InfiniteData, useInfiniteQuery } from "react-query";
+import { Customers, getCustomers } from "../../apis/customer-service";
 import Layout from "../../components/Layout/Layout";
 
-type Props = {};
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 
-function Customer({}: Props) {
+function Customer() {
   const router = useRouter();
-  const { data, error, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
-    "customers",
+  const [customerName, setCustomerName] = useState("");
+
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
+    ["customers", customerName],
     getCustomers,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -37,9 +39,13 @@ function Customer({}: Props) {
           return pages.length;
         }
       },
-      onSuccess: () => {},
     }
   );
+
+  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
+    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+    return [...new Set(customers)];
+  };
 
   return (
     <Layout>
@@ -56,12 +62,13 @@ function Customer({}: Props) {
           }}
         >
           <Autocomplete
-            disablePortal
-            sx={{ flexGrow: 1 }}
-            options={[]}
-            renderInput={(params) => (
-              <TextField {...params} placeholder="Search customer" size="small" variant="outlined" />
-            )}
+            sx={{ flex: 1 }}
+            loading={status === "loading"}
+            options={getCustomerFormattedData(data)}
+            onInputChange={(e, value) => {
+              setCustomerName(value);
+            }}
+            renderInput={(params) => <TextField {...params} placeholder="search customer" variant="outlined" />}
           />
 
           <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
@@ -71,22 +78,17 @@ function Customer({}: Props) {
             Add customer
           </Button>
         </Box>
-        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>customer Name </TableCell>
-                {/* <TableCell align="right">Actions</TableCell> */}
               </TableRow>
             </TableHead>
 
             {status === "loading" ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <TableRow>
-                  <TableCell>
-                    <CircularProgress />
-                  </TableCell>
-                </TableRow>
+                <CircularProgress />
               </TableBody>
             ) : (
               <>

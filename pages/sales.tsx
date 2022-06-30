@@ -1,25 +1,16 @@
-import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Button,
-  ButtonGroup,
   Card,
   CardActions,
   CardContent,
   CardMedia,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
+  CircularProgress,
   Grid,
   IconButton,
-  InputLabel,
-  MenuItem,
   Paper,
-  Select,
   Stack,
   Table,
   TableBody,
@@ -31,120 +22,92 @@ import {
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
+import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
+import { getAndSearchProduct, Product, Products } from "../apis/product-service";
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
+import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 
 type Props = {};
 
 function Sales({}: Props) {
-  const products = Array.from(Array(20).keys());
-  const [cartItems, setCartItems] = useState<any>([]);
+  const [cartItems, setCartItems] = useState<Product[]>([]);
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const [productName, setProductName] = useState("");
+  const [brandName, setBrandName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
 
-  const addToCart = (id: number) => {
-    let cartItem = {
-      id: id,
-      name: "Product 1",
-      price: 69,
-      qty: 1,
-    };
+  const addToCart = (product: Product) => {
+    const item = cartItems.findIndex((item) => item._id === product._id);
 
-    const item = cartItems.find((item: any) => item.id === cartItem.id);
+    if (item !== -1) {
+      const newCartItems = [...cartItems];
+      newCartItems[item].qty += 1;
+      setCartItems(newCartItems);
 
-    if (item) {
       return;
     }
 
-    setCartItems([...cartItems, cartItem]);
+    setCartItems([...cartItems, { ...product, sell_price: product.sell_price ?? 20, qty: product.qty ?? 20 }]);
   };
 
-  const deleteItemFromCart = (id: any) => {
-    const newCart = cartItems.filter((c: any) => c.id !== id);
+  const deleteItemFromCart = (id: string) => {
+    const newCart = cartItems.filter((c) => c._id !== id);
     setCartItems(newCart);
   };
 
-  const [openAddCustomer, setOpenAddCustomer] = React.useState(false);
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
+    ["searchedProducts", productName, brandName, categoryName],
+    getAndSearchProduct,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
 
-  const addCustomerDialogToggle = () => {
-    setOpenAddCustomer(!openAddCustomer);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.refetchQueries("searchedProducts", { active: true });
+  }, [queryClient, productName, brandName, categoryName]);
+
+  const getBrandFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const brands = data?.pages.flatMap((page) => page.products.map((product) => product.brand));
+    return [...new Set(brands)];
+  };
+
+  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+    return [...new Set(productName)];
+  };
+
+  const getCategoryFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const categoryName = data?.pages.flatMap((page) => page.products.map((product) => product.category));
+    return [...new Set(categoryName)];
   };
 
   return (
     <Layout>
       <Grid container spacing={3}>
-        <Grid item container spacing={3} xs={12} sm={7}>
-          <Grid item xs={12} sm={6}>
-            <ButtonGroup fullWidth>
-              <Button>Brand</Button>
-              <Button>Category</Button>
-              <Button>All</Button>
-            </ButtonGroup>
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <Autocomplete
-              disablePortal
-              options={["Apple", "Banana", "Orange", "Apple", "Banana", "Orange"]}
-              renderInput={(params) => <TextField {...params} label="Search Product" variant="outlined" />}
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Typography variant="h6" gutterBottom>
-              Sales Product
-            </Typography>
-          </Grid>
-          <Grid item container spacing={3} xs={12}>
-            {products.map((product, i) => (
-              <Grid key={product} item xs={12} sm={3}>
-                <Card
-                  sx={{
-                    boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-                  }}
-                >
-                  <CardMedia
-                    component="img"
-                    height="200"
-                    image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80"
-                  />
-                  <CardContent>
-                    <Typography gutterBottom variant="h6" component="div">
-                      ১কেজি নাম্বার ওয়ান লবন
-                    </Typography>
-                    <Stack direction="row" justifyContent="space-between">
-                      <Typography variant="h6">BDT 150</Typography>
-                      <Typography variant="h6">QTY : 210</Typography>
-                    </Stack>
-                  </CardContent>
-                  <CardActions>
-                    <Button size="small" onClick={() => addToCart(i)}>
-                      Add
-                    </Button>
-                  </CardActions>
-                </Card>
-              </Grid>
-            ))}
-          </Grid>
-        </Grid>
         <Grid item xs={12} sm={5}>
           <Stack spacing={2}>
             <Autocomplete
-              disablePortal
               sx={{ flexGrow: 1 }}
               options={[{ label: "shibli" }, { label: "Jihan" }]}
               renderInput={(params) => (
-                <TextField placeholder="Search Products" name="customerName" variant="outlined" {...params} />
+                <TextField placeholder="search customer" name="customerName" variant="outlined" {...params} />
               )}
             />
-
-            <LoadingButton variant="contained" onClick={addCustomerDialogToggle}>
-              Add Customer
-            </LoadingButton>
+            <AddCustomerDialog />
           </Stack>
           <Box mt={5}>
-            <Paper sx={{ width: "100%", overflow: "hidden" }}>
+            <Paper sx={{ width: "100%", overflow: "hidden", maxWidth: "100%" }}>
               <TableContainer sx={{ maxHeight: 440 }}>
                 <Table size="small" stickyHeader>
                   <TableHead>
@@ -160,10 +123,10 @@ function Sales({}: Props) {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {cartItems.map((product: any) => (
-                      <TableRow key={product.id}>
+                    {cartItems.map((product) => (
+                      <TableRow key={product._id}>
                         <TableCell>
-                          <IconButton size="small" onClick={() => deleteItemFromCart(product.id)}>
+                          <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
                             <DeleteIcon fontSize="inherit" />
                           </IconButton>
                         </TableCell>
@@ -171,11 +134,10 @@ function Sales({}: Props) {
                         <TableCell>
                           <TextField
                             onChange={(e) => {
-                              console.log(e.target.value);
                               setCartItems(
-                                cartItems.map((item: any) => {
-                                  if (item.id === product.id) {
-                                    item.qty = e.target.value;
+                                cartItems.map((item) => {
+                                  if (item._id === product._id) {
+                                    item.qty = Number(e.target.value);
                                   }
                                   return item;
                                 })
@@ -185,120 +147,131 @@ function Sales({}: Props) {
                             variant="outlined"
                             type="number"
                             defaultValue={product.qty}
+                            value={product.qty}
                           />
                         </TableCell>
-                        <TableCell>{product.price}</TableCell>
-                        <TableCell>{product.price * product.qty}</TableCell>
+                        <TableCell>{product.sell_price ? product.sell_price : "No"}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
                         <TableCell>0</TableCell>
-                        <TableCell>{product.price * product.qty}</TableCell>
-                        <TableCell>{product.price * product.qty}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
+                        <TableCell>{product.sell_price * product.qty}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-              <Button onClick={handleOpen} fullWidth disabled={cartItems.length === 0}>
-                Pay Now
-              </Button>
-              <Dialog maxWidth="md" onClose={handleClose} fullWidth open={open}>
-                <DialogTitle>
-                  <Stack direction="row" justifyContent="space-between">
-                    <Typography variant="h6">Payment Details</Typography>
-                    <IconButton color="error" onClick={handleClose}>
-                      <CloseIcon fontSize="inherit" />
-                    </IconButton>
-                  </Stack>
-                </DialogTitle>
-                <DialogContent dividers>
-                  <TableContainer sx={{ maxHeight: 440 }}>
-                    <Table size="small" stickyHeader>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell>ID</TableCell>
-                          <TableCell>SKU</TableCell>
-                          <TableCell>Qty</TableCell>
-                          <TableCell>Price</TableCell>
-                          <TableCell>Cost</TableCell>
-                          <TableCell>Dis</TableCell>
-                          <TableCell>Sub</TableCell>
-                          <TableCell>LP</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        {cartItems.map((product: any) => (
-                          <TableRow key={product.id}>
-                            <TableCell>{product.id}</TableCell>
-                            <TableCell>{product.name}</TableCell>
-                            <TableCell>{product.qty}</TableCell>
-                            <TableCell>{product.price}</TableCell>
-                            <TableCell>{product.price * product.qty}</TableCell>
-                            <TableCell>0</TableCell>
-                            <TableCell>{product.price * product.qty}</TableCell>
-                            <TableCell>{product.price * product.qty}</TableCell>
-                          </TableRow>
-                        ))}
-                        <TableRow>
-                          <TableCell colSpan={3} rowSpan={4}>
-                            <FormControl fullWidth>
-                              <InputLabel id="paymentMethod">Payment Method</InputLabel>
-                              <Select
-                                size="small"
-                                labelId="paymentMethod"
-                                id="demo-simple-select"
-                                label="Payment Method"
-                                defaultValue={10}
-                                // onChange={handleChange}
-                              >
-                                <MenuItem value={10}>BKASH</MenuItem>
-                                <MenuItem value={20}>ROCKET</MenuItem>
-                                <MenuItem value={30}>NAGAD</MenuItem>
-                                <MenuItem value={40}>CASH</MenuItem>
-                              </Select>
-                            </FormControl>
-                            {/* <TextField
-                              size="small"
-                              fullWidth
-                              label="Amount"
-                              sx={{ marginTop: "4px" }}
-                              variant="outlined"
-                            /> */}
-                          </TableCell>
-
-                          <TableCell colSpan={2}>GrandTotal : </TableCell>
-                          <TableCell>7105.5</TableCell>
-                          <TableCell>0</TableCell>
-                          <TableCell>7105.5</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell colSpan={2}>Discount :0</TableCell>
-                          <TableCell colSpan={2}>&nbsp;</TableCell>
-                          <TableCell>0</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell colSpan={2}>TAX @ 0 :</TableCell>
-                          <TableCell colSpan={2}>&nbsp;</TableCell>
-                          <TableCell>0</TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell colSpan={2}>Net Total :</TableCell>
-                          <TableCell colSpan={2}>&nbsp;</TableCell>
-                          <TableCell id="netSalePrice">7105.5</TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </DialogContent>
-                <DialogActions>
-                  <Button autoFocus onClick={handleClose}>
-                    Complete Transaction
-                  </Button>
-                </DialogActions>
-              </Dialog>
+              <PaymentDetailsDialog cartItems={cartItems} />
             </Paper>
           </Box>
         </Grid>
+        <Grid item container spacing={1} xs={12} sm={7}>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
+            <Autocomplete
+              loading={status === "loading"}
+              options={getProductFormattedData(data)}
+              onInputChange={(e, value) => {
+                setProductName(value);
+              }}
+              renderInput={(params) => <TextField {...params} placeholder="search products" variant="outlined" />}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
+            <Autocomplete
+              loading={status === "loading"}
+              options={getCategoryFormattedData(data)}
+              onInputChange={(e, value) => {
+                setCategoryName(value);
+              }}
+              renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
+            />
+          </Grid>
+          <Grid item xs={12} sm={12} md={6} lg={4}>
+            <Autocomplete
+              loading={status === "loading"}
+              options={getBrandFormattedData(data)}
+              onInputChange={(e, value) => {
+                setBrandName(value);
+              }}
+              renderInput={(params) => <TextField {...params} placeholder="search brand" variant="outlined" />}
+            />
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Sales Product
+            </Typography>
+          </Grid>
+          <Grid item container spacing={1} xs={12}>
+            {status === "loading" ? (
+              <Grid item xs={12}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              </Grid>
+            ) : (
+              <Fragment>
+                {data?.pages.map((group, i) => (
+                  <Fragment key={i}>
+                    {group?.products.map((row) => (
+                      <Grid key={row._id} item xs={12} sm={12} md={12} lg={6} xl={4}>
+                        <Card
+                          sx={{
+                            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+                          }}
+                        >
+                          <CardMedia
+                            component="img"
+                            height="200"
+                            image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80"
+                          />
+                          <CardContent>
+                            <Typography gutterBottom variant="h6" component="div">
+                              {row.name}
+                            </Typography>
+                            <Stack direction="row" justifyContent="space-between">
+                              <Typography variant="h6">BDT {row.sell_price}</Typography>
+                              <Typography variant="h6">QTY : {row.qty}</Typography>
+                            </Stack>
+                          </CardContent>
+                          <CardActions>
+                            <Button disabled={row.qty === 0} size="small" onClick={() => addToCart({ ...row, qty: 1 })}>
+                              Add
+                            </Button>
+                          </CardActions>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Fragment>
+                ))}
+              </Fragment>
+            )}
+            <Grid
+              item
+              xs={12}
+              container
+              sx={{
+                justifyContent: "center",
+              }}
+            >
+              {hasNextPage && (
+                <LoadingButton
+                  variant="contained"
+                  loading={isFetchingNextPage}
+                  onClick={() => fetchNextPage()}
+                  disabled={!hasNextPage || isFetchingNextPage}
+                >
+                  Load More
+                </LoadingButton>
+              )}
+            </Grid>
+          </Grid>
+        </Grid>
       </Grid>
-      <AddCustomerDialog onToggle={addCustomerDialogToggle} open={openAddCustomer} />
     </Layout>
   );
 }

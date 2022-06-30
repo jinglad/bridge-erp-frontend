@@ -5,6 +5,14 @@ export interface Category {
   categorytitle: string;
 }
 
+export interface Categories {
+  categories: Category[];
+  page: string;
+  size: number;
+  totalPages: number;
+  totalCategories: number;
+}
+
 export const createCategory = async (categorytitle: string) => {
   try {
     const { data } = await http.post<{ msg: string }>("/category", { categorytitle });
@@ -14,13 +22,21 @@ export const createCategory = async (categorytitle: string) => {
   }
 };
 
-export const getCategories = async () => {
-  try {
-    const { data } = await http.get<Category[]>("/category");
-    return data;
-  } catch (error: any) {
-    throw Error(error.response.data.message);
+export const getCategories = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+  const categorytitle = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
+
+  if (categorytitle) {
+    params.categorytitle = categorytitle;
   }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<Categories>("/category", {
+    params: params,
+  });
+  return data;
 };
 
 export const updateCategory = async ({ id, categorytitle }: any) => {

@@ -3,10 +3,13 @@ import http from "./http-common";
 export interface Product {
   _id: string;
   name: string;
-  reorder_limit: number;
+  reorder_limit: string;
   brand: string;
   category: string;
   image: string;
+  qty: number;
+  sell_price: number;
+  buy_price: number;
 }
 
 export interface Products {
@@ -38,6 +41,31 @@ export const getProducts = async ({ pageParam = 0 }) => {
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
+};
+
+export const getAndSearchProduct = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+  const name = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const brand = queryKey[2]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const category = queryKey[3]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
+
+  if (name) {
+    params.name = name;
+  }
+  if (brand) {
+    params.brand = brand;
+  }
+  if (category) {
+    params.category = category;
+  }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<Products>("/search-product", {
+    params: params,
+  });
+  return data;
 };
 
 export const updateProduct = async ({ formData, id }: any) => {
