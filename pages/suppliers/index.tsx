@@ -20,7 +20,7 @@ import {
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import React, { useState } from "react";
+import React, { Fragment, useState } from "react";
 import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { deleteSupplier, getSupplier, Supplier, Suppliers } from "../../apis/supplier-service";
@@ -65,7 +65,7 @@ function Suppliers({}: Props) {
 
   return (
     <Layout>
-      <Stack spacing={2}>
+      <Stack spacing={2} sx={{ width: "100%" }}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
           All Suppliers
         </Typography>
@@ -91,18 +91,13 @@ function Suppliers({}: Props) {
             Add Supplier
           </Button>
         </Box>
-        <TableContainer
-          component={Paper}
-          sx={{
-            border: "1px solid #dee2e6",
-          }}
-        >
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer sx={{ width: "100%", overflow: "hidden" }} component={Paper}>
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Supplier Name</TableCell>
                 <TableCell>Email </TableCell>
-                <TableCell>Contact No.</TableCell>
+                <TableCell sx={{ minWidth: "200px" }}>Contact No.</TableCell>
                 <TableCell>Full Address</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
@@ -112,11 +107,11 @@ function Suppliers({}: Props) {
                 <CircularProgress />
               </TableBody>
             ) : (
-              <>
+              <Fragment>
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.supplier.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow key={row._id}>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>{row.email}</TableCell>
                         <TableCell>{row.phone}</TableCell>
@@ -139,12 +134,11 @@ function Suppliers({}: Props) {
                     ))}
                   </TableBody>
                 ))}
-              </>
+              </Fragment>
             )}
           </Table>
         </TableContainer>
-
-        {hasNextPage && (
+        {data?.pages[0].totalProducts !== 0 && hasNextPage && (
           <LoadingButton
             variant="contained"
             loading={isFetchingNextPage}

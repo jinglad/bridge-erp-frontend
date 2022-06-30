@@ -85,16 +85,12 @@ function Brand({}: Props) {
             }}
             renderInput={(params) => <TextField {...params} placeholder="search brands" variant="outlined" />}
           />
-
-          <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
-            Search
-          </Button>
           <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/brand/create")}>
-            Add Brand
+            Add Brands
           </Button>
         </Box>
-        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>Brand Name </TableCell>
@@ -110,7 +106,7 @@ function Brand({}: Props) {
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.brands.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow key={row._id}>
                         <TableCell>{row.brandtitle}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">

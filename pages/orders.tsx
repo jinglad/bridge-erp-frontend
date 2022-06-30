@@ -41,7 +41,6 @@ const Order = (props: Props) => {
           return pages.length;
         }
       },
-      onSuccess: () => {},
     }
   );
 
@@ -65,7 +64,7 @@ const Order = (props: Props) => {
     <Layout>
       <Stack spacing={2}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
-          All Categories
+          All Orders
         </Typography>
 
         <Box
@@ -150,7 +149,7 @@ const Order = (props: Props) => {
           </Table>
         </TableContainer>
         <Box textAlign="center">
-          {hasNextPage && (
+          {data?.pages[0].totalOrder !== 0 && hasNextPage && (
             <LoadingButton
               variant="contained"
               loading={isFetchingNextPage}

@@ -51,7 +51,7 @@ function Customer() {
     <Layout>
       <Stack spacing={2}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
-          All customer
+          All customers
         </Typography>
 
         <Box
@@ -71,9 +71,6 @@ function Customer() {
             renderInput={(params) => <TextField {...params} placeholder="search customer" variant="outlined" />}
           />
 
-          <Button type="submit" variant="outlined" startIcon={<SearchIcon />}>
-            Search
-          </Button>
           <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/customers/create")}>
             Add customer
           </Button>
@@ -95,7 +92,7 @@ function Customer() {
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.customer.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow key={row._id} >
                         <TableCell>{row.customerName}</TableCell>
                       </TableRow>
                     ))}
