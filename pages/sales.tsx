@@ -10,17 +10,18 @@ import {
   CircularProgress,
   Grid,
   IconButton,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
@@ -141,62 +142,63 @@ function Sales({}: Props) {
 
             <AddCustomerDialog />
           </Stack>
-          <Box mt={5}>
-            <Paper sx={{ width: "100%", overflow: "hidden", maxWidth: "100%" }}>
-              <TableContainer sx={{ maxHeight: 440 }}>
-                <Table size="small" stickyHeader>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>#</TableCell>
-                      <TableCell>SKU</TableCell>
-                      <TableCell>Qty</TableCell>
-                      <TableCell>Price</TableCell>
-                      <TableCell>Cost</TableCell>
-                      <TableCell>Dis</TableCell>
-                      <TableCell>Sub</TableCell>
-                      <TableCell>LP</TableCell>
+          <Box mt={5} sx={{ width: "100%" }}>
+            <TableContainer sx={{ maxHeight: 440 }} component={Paper}>
+              <Table size="small" stickyHeader aria-label="caption table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell align="center">#</TableCell>
+                    <TableCell>SKU</TableCell>
+                    <TableCell>Qty</TableCell>
+                    <TableCell>Price</TableCell>
+                    <TableCell>Cost</TableCell>
+                    {/* <TableCell>Dis</TableCell> */}
+                    <TableCell>Sub</TableCell>
+                    {/* <TableCell>LP</TableCell> */}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {cartItems.map((product) => (
+                    <TableRow key={product._id} hover>
+                      <TableCell align="left">
+                        <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
+                          <DeleteIcon fontSize="inherit" />
+                        </IconButton>
+                      </TableCell>
+                      <TableCell>{product.name}</TableCell>
+                      <TableCell>
+                        <TextField
+                          onChange={(e) => {
+                            setCartItems(
+                              cartItems.map((item) => {
+                                if (item._id === product._id) {
+                                  item.qty = Number(e.target.value);
+                                }
+                                return item;
+                              })
+                            );
+                          }}
+                          sx={{ maxWidth: "100px", minWidth: "70px" }}
+                          inputProps={{
+                            min: 1,
+                          }}
+                          variant="outlined"
+                          type="number"
+                          defaultValue={product.qty}
+                          value={product.qty}
+                        />
+                      </TableCell>
+                      <TableCell>{product.sell_price ? product.sell_price : "No"}</TableCell>
+                      <TableCell>{product.sell_price * product.qty}</TableCell>
+                      {/* <TableCell>0</TableCell> */}
+                      <TableCell>{product.sell_price * product.qty}</TableCell>
+                      {/* <TableCell>{product.sell_price * product.qty}</TableCell> */}
                     </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {cartItems.map((product) => (
-                      <TableRow key={product._id}>
-                        <TableCell>
-                          <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
-                            <DeleteIcon fontSize="inherit" />
-                          </IconButton>
-                        </TableCell>
-                        <TableCell>{product.name}</TableCell>
-                        <TableCell>
-                          <TextField
-                            onChange={(e) => {
-                              setCartItems(
-                                cartItems.map((item) => {
-                                  if (item._id === product._id) {
-                                    item.qty = Number(e.target.value);
-                                  }
-                                  return item;
-                                })
-                              );
-                            }}
-                            sx={{ width: "100px" }}
-                            variant="outlined"
-                            type="number"
-                            defaultValue={product.qty}
-                            value={product.qty}
-                          />
-                        </TableCell>
-                        <TableCell>{product.sell_price ? product.sell_price : "No"}</TableCell>
-                        <TableCell>{product.sell_price * product.qty}</TableCell>
-                        <TableCell>0</TableCell>
-                        <TableCell>{product.sell_price * product.qty}</TableCell>
-                        <TableCell>{product.sell_price * product.qty}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-              <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
-            </Paper>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
           </Box>
         </Grid>
         <Grid item container spacing={1} xs={12} sm={7}>

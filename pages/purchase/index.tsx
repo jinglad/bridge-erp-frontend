@@ -71,7 +71,7 @@ const Purchase = (props: Props) => {
     <Layout>
       <Stack spacing={2}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
-          All Categories
+          All Purchase
         </Typography>
 
         <Box
@@ -160,7 +160,7 @@ const Purchase = (props: Props) => {
           </Table>
         </TableContainer>
         <Box textAlign="center">
-          {hasNextPage && (
+          {data?.pages[0].totalPurchase !== 0 && hasNextPage && (
             <LoadingButton
               variant="contained"
               loading={isFetchingNextPage}

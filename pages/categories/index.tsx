@@ -90,8 +90,8 @@ function Categories({}: Props) {
             Add Category
           </Button>
         </Box>
-        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>Category Name </TableCell>
@@ -107,7 +107,7 @@ function Categories({}: Props) {
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.categories.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow key={row._id}>
                         <TableCell>{row.categorytitle}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">

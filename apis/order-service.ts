@@ -26,7 +26,7 @@ export interface Orders {
   page: string;
   size: number;
   totalPages: number;
-  totalPurchase: number;
+  totalOrder: number;
 }
 
 export const createOrder = async (order: CreateOrderProps) => {

@@ -25,7 +25,7 @@ export interface Purchases {
   page: string;
   size: number;
   totalPages: number;
-  totalProducts: number;
+  totalPurchase: number;
 }
 
 export const createPurchase = async (formData: Purchase) => {

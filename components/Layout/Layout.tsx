@@ -28,7 +28,7 @@ interface LayoutProps {
 
 export default function Layout({ children }: LayoutProps) {
   const [open, setOpen] = useState(true);
-  const matches = useMediaQuery("(min-width:600px)");
+  const matches = useMediaQuery("(min-width:1024px)");
   const [dVariant, setDVariant] = useState<"permanent" | "persistent" | "temporary" | undefined>("permanent");
   const toggleDrawer = () => {
     if (matches) {
@@ -101,7 +101,7 @@ export default function Layout({ children }: LayoutProps) {
           ))}
         </Box>
       </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
         <Toolbar />
 
         {children}

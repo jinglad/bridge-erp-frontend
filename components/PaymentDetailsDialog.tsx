@@ -95,6 +95,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   return (
     <>
       <Button
+        sx={{ marginTop: ".5rem" }}
         onClick={() => {
           if (!customerName) {
             toast.error("Please select a customer");
