@@ -2,6 +2,7 @@ import ContactsOutlinedIcon from "@mui/icons-material/ContactsOutlined";
 import InventoryOutlinedIcon from "@mui/icons-material/InventoryOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import TrendingUpOutlinedIcon from "@mui/icons-material/TrendingUpOutlined";
+import SellIcon from "@mui/icons-material/Sell";
 import React from "react";
 
 export const menu = [
@@ -46,5 +47,10 @@ export const menu = [
     icon: <TrendingUpOutlinedIcon />,
     title: "Sales Point",
     to: "/sales",
+  },
+  {
+    icon: <SellIcon />,
+    title: "Orders",
+    to: "/orders",
   },
 ];
