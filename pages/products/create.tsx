@@ -84,7 +84,7 @@ function Create({}: Props) {
                 onInputChange={(e, value) => {
                   setCategoryName(value);
                 }}
-                renderInput={(params) => <TextField {...params} label="search category" />}
+                renderInput={(params) => <TextField {...params} label="search category" required />}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
@@ -94,7 +94,7 @@ function Create({}: Props) {
                 onInputChange={(e, value) => {
                   setBrandName(value);
                 }}
-                renderInput={(params) => <TextField {...params} label="search brand" />}
+                renderInput={(params) => <TextField {...params} label="search brand" required />}
               />
             </Grid>
 
