@@ -26,10 +26,7 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   const { mutateAsync, isLoading } = useMutation(updateProduct, {
     onSuccess: (data) => {
       notify(data.msg);
-      queryClient.invalidateQueries("products");
-
-      queryClient.refetchQueries("products");
-
+      queryClient.refetchQueries("searchedProducts");
       reset();
       onClose();
     },
