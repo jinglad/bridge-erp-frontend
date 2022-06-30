@@ -14,6 +14,8 @@ import Layout from "../../components/Layout/Layout";
 type Props = {};
 
 function Create({}: Props) {
+  const [brandName, setBrandName] = useState("");
+  const [categoryName, setCategoryName] = useState("");
   const { mutateAsync, isLoading } = useMutation("createProduct", createProduct, {
     onSuccess: (data) => {
       toast.success(data.msg);
@@ -26,16 +28,13 @@ function Create({}: Props) {
   const onSubmit = async (data: any) => {
     const formData = new FormData();
     formData.append("name", data.name);
-    formData.append("brand", data.brand);
-    formData.append("category", data.category);
+    formData.append("brand", brandName);
+    formData.append("category", categoryName);
     formData.append("reorder_limit", data.reorder_limit);
     formData.append("file", data.file[0]);
 
     await mutateAsync(formData);
   };
-
-  const [brandName, setBrandName] = useState("");
-  const [categoryName, setCategoryName] = useState("");
 
   const { data, status } = useInfiniteQuery(["brands", brandName], getBrands, {
     getNextPageParam: (lastPage, pages) => {
