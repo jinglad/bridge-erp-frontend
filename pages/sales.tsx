@@ -24,6 +24,7 @@ import {
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
+import { Customers, getCustomers } from "../apis/customer-service";
 import { getAndSearchProduct, Product, Products } from "../apis/product-service";
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
@@ -92,18 +93,52 @@ function Sales({}: Props) {
     return [...new Set(categoryName)];
   };
 
+  const [customerName, setCustomerName] = useState("");
+
+  const { data: customerData, status: customerStatus } = useInfiniteQuery(["customers", customerName], getCustomers, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
+
+  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
+    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+    return [...new Set(customers)];
+  };
+
+  const onPaymentSuccess = () => {
+    setCartItems([]);
+    setCustomerName("");
+    queryClient.refetchQueries("searchedProducts", { active: true });
+    queryClient.refetchQueries("customers", { active: true });
+  };
+
   return (
     <Layout>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={5}>
           <Stack spacing={2}>
             <Autocomplete
-              sx={{ flexGrow: 1 }}
-              options={[{ label: "shibli" }, { label: "Jihan" }]}
+              sx={{ flex: 1 }}
+              loading={customerStatus === "loading"}
+              options={getCustomerFormattedData(customerData)}
+              onInputChange={(e, value) => {
+                setCustomerName(value);
+              }}
               renderInput={(params) => (
-                <TextField placeholder="search customer" name="customerName" variant="outlined" {...params} />
+                <TextField
+                  {...params}
+                  value={customerName.toLowerCase()}
+                  placeholder="search customer"
+                  variant="outlined"
+                />
               )}
             />
+
             <AddCustomerDialog />
           </Stack>
           <Box mt={5}>
@@ -160,7 +195,7 @@ function Sales({}: Props) {
                   </TableBody>
                 </Table>
               </TableContainer>
-              <PaymentDetailsDialog cartItems={cartItems} />
+              <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
             </Paper>
           </Box>
         </Grid>
@@ -227,7 +262,7 @@ function Sales({}: Props) {
                           <CardMedia
                             component="img"
                             height="200"
-                            image="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cHJvZHVjdHxlbnwwfHwwfHw%3D&w=1000&q=80"
+                            image={`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/${row.image}`}
                           />
                           <CardContent>
                             <Typography gutterBottom variant="h6" component="div">
@@ -239,7 +274,11 @@ function Sales({}: Props) {
                             </Stack>
                           </CardContent>
                           <CardActions>
-                            <Button disabled={row.qty === 0} size="small" onClick={() => addToCart({ ...row, qty: 1 })}>
+                            <Button
+                              disabled={Number(row.qty) <= 0}
+                              size="small"
+                              onClick={() => addToCart({ ...row, qty: 1 })}
+                            >
                               Add
                             </Button>
                           </CardActions>

@@ -1,13 +1,9 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { DesktopDatePicker, LoadingButton, LocalizationProvider } from "@mui/lab";
 import {
   Box,
   Button,
   ButtonGroup,
   CircularProgress,
-  Input,
-  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -19,26 +15,24 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import router from "next/router";
-import { useState } from "react";
-import { useInfiniteQuery } from "react-query";
-import { getPurchases, Purchase } from "../../apis/purchase-service";
-import Layout from "../../components/Layout/Layout";
-import ViewPurchase from "../../components/ViewPurchaseDialog";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import moment from "moment";
-import CloseIcon from "@mui/icons-material/Close";
+import { useState } from "react";
+import { useInfiniteQuery } from "react-query";
+import { getOrders, Order } from "../apis/order-service";
+import Layout from "../components/Layout/Layout";
+import ViewOrder from "../components/ViewOrderDialog";
 
 type Props = {};
 
-const Purchase = (props: Props) => {
+const Order = (props: Props) => {
   const [date, setDate] = useState<Date | null>(null);
   const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<null | Purchase>(null);
+  const [selected, setSelected] = useState<null | Order>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["purchases", createdDate],
-    getPurchases,
+    ["orders", createdDate],
+    getOrders,
     {
       getNextPageParam: (lastPage, pages) => {
         if (pages.length === lastPage.totalPages) {
@@ -81,9 +75,6 @@ const Purchase = (props: Props) => {
             flexDirection: ["column", "row", "row"],
           }}
         >
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/purchase/create")}>
-            New purchase
-          </Button>
           <Box
             sx={{
               display: "flex",
@@ -109,7 +100,6 @@ const Purchase = (props: Props) => {
                 }}
               >
                 clear
-                {/* <CloseIcon /> */}
               </Button>
             )}
           </Box>
@@ -132,9 +122,9 @@ const Purchase = (props: Props) => {
               <>
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
-                    {group?.purchase.map((row) => (
+                    {group?.orders.map((row) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                        <TableCell>{row.supplier}</TableCell>
+                        <TableCell>{row.customer}</TableCell>
                         <TableCell>{row.paid}</TableCell>
                         <TableCell>{row.to_be_paid}</TableCell>
                         <TableCell align="right">
@@ -173,9 +163,9 @@ const Purchase = (props: Props) => {
         </Box>
       </Stack>
 
-      {selected && <ViewPurchase onClose={handleClose} open={open} purchase={selected} key={selected._id} />}
+      {selected && <ViewOrder onClose={handleClose} open={open} order={selected} key={selected._id} />}
     </Layout>
   );
 };
 
-export default Purchase;
+export default Order;

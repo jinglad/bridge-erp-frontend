@@ -106,9 +106,11 @@ const Products: NextPage = () => {
             <TableHead>
               <TableRow>
                 <TableCell>Name</TableCell>
-                <TableCell>Image</TableCell>
+                <TableCell>Sell Price</TableCell>
+                <TableCell>Buy Price</TableCell>
                 <TableCell>Brand</TableCell>
                 <TableCell>Category</TableCell>
+                <TableCell>Qty</TableCell>
                 <TableCell>Re-order Limit</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
@@ -125,10 +127,13 @@ const Products: NextPage = () => {
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.name}</TableCell>
                         <TableCell>
-                          <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box>
+                          {/* <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box> */}
+                          {row.sell_price}
                         </TableCell>
+                        <TableCell>{row.buy_price}</TableCell>
                         <TableCell>{row.brand}</TableCell>
                         <TableCell>{row.category}</TableCell>
+                        <TableCell>{row.qty}</TableCell>
                         <TableCell
                           sx={{ color: Number(row.reorder_limit) < row.qty ? "black" : "red", fontWeight: "bold" }}
                         >
