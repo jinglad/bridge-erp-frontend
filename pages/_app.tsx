@@ -1,26 +1,59 @@
-import "../styles/globals.css";
+import { ThemeProvider } from "@mui/material";
+
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import Script from "next/script";
+import { useRouter } from "next/router";
+
+import { QueryClient, QueryClientProvider } from "react-query";
+
+import ProtectedRoute from "../components/ProtectedRoute";
+import { AuthContextProvider } from "../context/AuthContext";
+
+import "react-toastify/dist/ReactToastify.css";
+import "../styles/globals.css";
+
+import { ToastContainer } from "react-toastify";
+import { theme } from "../theme/theme";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 function MyApp({ Component, pageProps }: AppProps) {
+  const noAuthRequired = ["/login"];
+  const router = useRouter();
+
   return (
     <>
       <Head>
-        <link
-          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
-          crossOrigin="anonymous"
-        />
-        <title>Bridge-Erp</title>
+        <title>Bridge Erp</title>
       </Head>
-      <Script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
-        crossOrigin="anonymous"
-      ></Script>
-      <Component {...pageProps} />
+      <QueryClientProvider client={queryClient}>
+        <AuthContextProvider>
+          <ThemeProvider theme={theme}>
+            {noAuthRequired.includes(router.pathname) ? (
+              <Component {...pageProps} />
+            ) : (
+              <ProtectedRoute>
+                <Component {...pageProps} />
+              </ProtectedRoute>
+            )}
+            <ToastContainer
+              position="top-right"
+              autoClose={8000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              draggable={false}
+              closeOnClick
+              pauseOnHover
+            />
+          </ThemeProvider>
+        </AuthContextProvider>
+      </QueryClientProvider>
     </>
   );
 }
