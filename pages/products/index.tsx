@@ -55,7 +55,7 @@ const Products: NextPage = () => {
       toast.success(data.msg, {
         toastId: "delete-product" + selected?._id,
       });
-      queryClient.invalidateQueries("products");
+      queryClient.invalidateQueries("searchedProducts");
     },
   });
 
