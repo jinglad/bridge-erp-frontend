@@ -41,7 +41,11 @@ const PurchaseCreate = () => {
     control,
   });
   const onSubmit = async (data: any) => {
-    await mutateAsync(data);
+    await mutateAsync({
+      ...data,
+      to_be_paid: Number(data.to_be_paid),
+      paid: Number(data.paid),
+    });
   };
 
   const [productName, setProductName] = useState("");
