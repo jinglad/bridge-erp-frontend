@@ -45,7 +45,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   const { mutateAsync, isLoading } = useMutation("createOrder", createOrder, {
     onSuccess: (data) => {
       toast.success(data.msg);
-      handlePrint();
+      // handlePrint();
       reset();
       onSuccess();
     },
