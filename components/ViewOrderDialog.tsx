@@ -15,7 +15,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import { useCallback, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
 import { Order } from "../apis/order-service";
+import { OrderToPrint } from "./OrderToPrint";
 
 interface ViewOrderProps {
   order: Order;
@@ -24,6 +27,26 @@ interface ViewOrderProps {
 }
 
 function ViewOrder({ onClose, open, order }: ViewOrderProps) {
+  const componentRef = useRef(null);
+
+  const pageStyle = `
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+`;
+
+  const reactToPrintContent = useCallback(() => {
+    return componentRef.current;
+  }, [componentRef]);
+
+  const handlePrint = useReactToPrint({
+    content: reactToPrintContent,
+    documentTitle: "AwesomeFileName",
+    removeAfterPrint: true,
+    pageStyle: pageStyle,
+  });
+
   return (
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
       <DialogTitle>
@@ -88,11 +111,21 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
         </TableContainer>
 
         <DialogActions>
+          <Button onClick={() => handlePrint()}>Print</Button>
           <Button color="error" onClick={onClose}>
             close
           </Button>
         </DialogActions>
       </DialogContent>
+      <OrderToPrint
+        ref={componentRef}
+        payment_method={order.payment_method}
+        discount={Number(order.discount)}
+        paid={Number(order.paid)}
+        to_be_paid={order.to_be_paid}
+        products={order.products}
+        customer={order.customer}
+      />
     </Dialog>
   );
 }

@@ -4,7 +4,7 @@ import { Box } from "@mui/system";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { Brands, getBrands } from "../../apis/brand-service";
 import { Categories, getCategories } from "../../apis/category-service";
@@ -16,10 +16,12 @@ type Props = {};
 function Create({}: Props) {
   const [brandName, setBrandName] = useState("");
   const [categoryName, setCategoryName] = useState("");
+  const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation("createProduct", createProduct, {
     onSuccess: (data) => {
       toast.success(data.msg);
       reset();
+      queryClient.invalidateQueries("searchedProducts");
     },
   });
 
@@ -31,7 +33,10 @@ function Create({}: Props) {
     formData.append("brand", brandName);
     formData.append("category", categoryName);
     formData.append("reorder_limit", data.reorder_limit);
-    formData.append("file", data.file[0]);
+
+    if (data.file) {
+      formData.append("file", data.file[0]);
+    }
 
     await mutateAsync(formData);
   };
@@ -122,7 +127,6 @@ function Create({}: Props) {
                   {...register("file")}
                   type="file"
                   accept="image/*"
-                  required
                 />
               </Button>
             </Grid>

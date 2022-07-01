@@ -51,7 +51,7 @@ function Sales({}: Props) {
       return;
     }
 
-    setCartItems([...cartItems, { ...product, sell_price: product.sell_price ?? 20, qty: product.qty ?? 20 }]);
+    setCartItems([...cartItems, { ...product }]);
   };
 
   const deleteItemFromCart = (id: string) => {
@@ -151,10 +151,7 @@ function Sales({}: Props) {
                     <TableCell>SKU</TableCell>
                     <TableCell>Qty</TableCell>
                     <TableCell>Price</TableCell>
-                    <TableCell>Cost</TableCell>
-                    {/* <TableCell>Dis</TableCell> */}
                     <TableCell>Sub</TableCell>
-                    {/* <TableCell>LP</TableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -181,6 +178,7 @@ function Sales({}: Props) {
                           sx={{ maxWidth: "100px", minWidth: "70px" }}
                           inputProps={{
                             min: 1,
+                            max: product.available,
                           }}
                           variant="outlined"
                           type="number"
@@ -188,11 +186,29 @@ function Sales({}: Props) {
                           value={product.qty}
                         />
                       </TableCell>
-                      <TableCell>{product.sell_price ? product.sell_price : "No"}</TableCell>
+                      <TableCell>
+                        <TextField
+                          onChange={(e) => {
+                            setCartItems(
+                              cartItems.map((item) => {
+                                if (item._id === product._id) {
+                                  item.sell_price = Number(e.target.value);
+                                }
+                                return item;
+                              })
+                            );
+                          }}
+                          sx={{ maxWidth: "100px", minWidth: "70px" }}
+                          inputProps={{
+                            min: 1,
+                          }}
+                          variant="outlined"
+                          type="number"
+                          defaultValue={product.sell_price}
+                          value={product.sell_price}
+                        />
+                      </TableCell>
                       <TableCell>{product.sell_price * product.qty}</TableCell>
-                      {/* <TableCell>0</TableCell> */}
-                      <TableCell>{product.sell_price * product.qty}</TableCell>
-                      {/* <TableCell>{product.sell_price * product.qty}</TableCell> */}
                     </TableRow>
                   ))}
                 </TableBody>
@@ -259,31 +275,28 @@ function Sales({}: Props) {
                         <Card
                           sx={{
                             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+                            cursor: row.qty === 0 ? "not-allowed" : "pointer",
                           }}
+                          onClick={() => row.qty && addToCart({ ...row, qty: 1, available: row.qty })}
                         >
                           <CardMedia
                             component="img"
                             height="200"
                             image={`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/${row.image}`}
                           />
-                          <CardContent>
-                            <Typography gutterBottom variant="h6" component="div">
+                          <CardContent sx={{ padding: "8px" }}>
+                            <Typography variant="h6" component="div">
                               {row.name}
                             </Typography>
                             <Stack direction="row" justifyContent="space-between">
-                              <Typography variant="h6">BDT {row.sell_price}</Typography>
-                              <Typography variant="h6">QTY : {row.qty}</Typography>
+                              <Typography sx={{ lineHeight: 1 }} variant="h6">
+                                ৳{row.sell_price}
+                              </Typography>
+                              <Typography sx={{ lineHeight: 1 }} variant="h6">
+                                Qty {row.qty}
+                              </Typography>
                             </Stack>
                           </CardContent>
-                          <CardActions>
-                            <Button
-                              disabled={Number(row.qty) <= 0}
-                              size="small"
-                              onClick={() => addToCart({ ...row, qty: 1 })}
-                            >
-                              Add
-                            </Button>
-                          </CardActions>
                         </Card>
                       </Grid>
                     ))}

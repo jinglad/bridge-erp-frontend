@@ -10,6 +10,7 @@ export interface Product {
   qty: number;
   sell_price: number;
   buy_price: number;
+  available: number;
 }
 
 export interface Products {

@@ -1,10 +1,7 @@
-import React, { forwardRef } from "react";
-import { Order } from "../apis/order-service";
-import { Product } from "../apis/product-service";
-import { visuallyHidden } from "@mui/utils";
-import { Box } from "@mui/system";
 import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
-import moment from "moment";
+import { Box } from "@mui/system";
+import React, { forwardRef } from "react";
+import { Product } from "../apis/product-service";
 
 interface OrderToPrintProps {
   payment_method: string;
@@ -23,10 +20,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
       <Box
         ref={ref}
         sx={{
+          padding: "20px 6px",
           display: "flex",
           flexDirection: "column",
-          //   width: "100%",
-          maxWidth: "400px",
+          width: "100%",
+          maxWidth: "80mm",
           alignItems: "center",
           justifyContent: "center",
           position: "fixed",
@@ -34,48 +32,73 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           "@media screen ": {
             visibility: "hidden",
           },
+          "*": {
+            fontSize: "14px",
+          },
         }}
       >
-        <Typography>Date : {moment(new Date()).format("LL")}</Typography>
-        <Typography>Customer Name : {customer}</Typography>
-
-        <Table size="small" stickyHeader>
+        <Typography>নিউ আমজাদিয়া ভান্ডার</Typography>
+        <Typography>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Typography>
+        <Typography>Customer name : {customer}</Typography>
+        <Box sx={{ borderTop: "1px dashed black", width: "100%", padding: "1px 0", marginTop: "10px" }} />
+        <Box sx={{ borderTop: "1px dashed black", width: "100%" }} />
+        <Table
+          size="small"
+          sx={{
+            "tr, td, th": {
+              padding: "8px",
+            },
+          }}
+        >
           <TableHead>
             <TableRow>
-              <TableCell>#SL</TableCell>
               <TableCell>Product Name</TableCell>
               <TableCell>Qty</TableCell>
-              <TableCell align="right">Sub Total</TableCell>
+              <TableCell align="right">Sub total</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {products.map((product, i) => (
               <TableRow key={product._id}>
-                <TableCell>{i + 1}</TableCell>
                 <TableCell>
                   <Typography>{product.name}</Typography>
-                  <Typography>[{product.sell_price}/=]</Typography>
+                  <Typography>
+                    {product.qty} X ৳{product.sell_price}
+                  </Typography>
                 </TableCell>
                 <TableCell>{product.qty}</TableCell>
-                <TableCell align="right">{product.sell_price * product.qty}</TableCell>
+                <TableCell align="right">৳{product.sell_price * product.qty}</TableCell>
               </TableRow>
             ))}
+          </TableBody>
+        </Table>
+        <Table
+          size="small"
+          sx={{
+            "tr, td, th": {
+              padding: "8px",
+            },
+          }}
+        >
+          <TableBody>
             <TableRow>
-              <TableCell colSpan={3}>
-                <Typography>Grand Total</Typography>
-              </TableCell>
-              <TableCell align="right">{products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</TableCell>
+              <TableCell colSpan={3}>Discount</TableCell>
+              <TableCell align="right">৳{discount}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell colSpan={1}>Paid Amount</TableCell>
-              <TableCell colSpan={2}>Received by {payment_method}</TableCell>
-              <TableCell align="right">{paid}</TableCell>
+              <TableCell colSpan={3}>Total</TableCell>
+              <TableCell align="right">
+                ৳{products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
+              </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell colSpan={3}>
-                <Typography>Amount Due</Typography>
-              </TableCell>
-              <TableCell align="right">{to_be_paid}</TableCell>
+              <TableCell colSpan={2}>Paid </TableCell>
+              <TableCell colSpan={1}>Received by {payment_method}</TableCell>
+              <TableCell align="right">৳{paid}</TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell colSpan={3}>Due</TableCell>
+              <TableCell align="right">৳{to_be_paid}</TableCell>
             </TableRow>
           </TableBody>
         </Table>

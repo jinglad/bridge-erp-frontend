@@ -82,6 +82,13 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
   const componentRef = useRef(null);
 
+  const pageStyle = `
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+`;
+
   const reactToPrintContent = useCallback(() => {
     return componentRef.current;
   }, [componentRef]);
@@ -90,6 +97,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     content: reactToPrintContent,
     documentTitle: "AwesomeFileName",
     removeAfterPrint: true,
+    pageStyle: pageStyle,
   });
 
   return (
