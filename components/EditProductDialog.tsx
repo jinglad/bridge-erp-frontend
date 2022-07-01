@@ -55,7 +55,7 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
     formData.append("brand", data.brand);
     formData.append("category", data.category);
     formData.append("reorder_limit", data.reorder_limit);
-    formData.append("file", data.file[0]);
+    data.file && formData.append("file", data.file[0]);
     formData.append("sell_price", data.sell_price);
     formData.append("buy_price", data.buy_price);
     formData.append("qty", data.qty);
@@ -148,7 +148,6 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                     {...register("file")}
                     type="file"
                     accept="image/*"
-                    required
                   />
                 </Button>
               </Grid>
