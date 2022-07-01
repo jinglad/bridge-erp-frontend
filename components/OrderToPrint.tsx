@@ -20,7 +20,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
       <Box
         ref={ref}
         sx={{
-          padding: "20px 6px",
+          padding: "5px",
           display: "flex",
           flexDirection: "column",
           width: "100%",
@@ -33,27 +33,27 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            fontSize: "12px",
+            fontSize: "5px",
           },
         }}
       >
         <Typography>নিউ আমজাদিয়া ভান্ডার</Typography>
         <Typography>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Typography>
-        <Typography>Customer name : {customer}</Typography>
+        <Typography>{customer}</Typography>
         <Box sx={{ borderTop: "1px dashed black", width: "100%", padding: "1px 0", marginTop: "10px" }} />
         <Box sx={{ borderTop: "1px dashed black", width: "100%" }} />
         <Table
           size="small"
           sx={{
             "tr, td, th": {
-              padding: "8px",
+              padding: "1px",
             },
           }}
         >
           <TableHead>
             <TableRow>
               <TableCell>Product Name</TableCell>
-              <TableCell>Qty</TableCell>
+              {/* <TableCell>Qty</TableCell> */}
               <TableCell align="right">Sub total</TableCell>
             </TableRow>
           </TableHead>
@@ -62,11 +62,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
               <TableRow key={product._id}>
                 <TableCell>
                   <Typography>{product.name}</Typography>
-                  <Typography>
+                  <Typography sx={{ paddingLeft: "3mm" }}>
                     {product.qty} X ৳{product.sell_price}
                   </Typography>
                 </TableCell>
-                <TableCell>{product.qty}</TableCell>
+                {/* <TableCell>{product.qty}</TableCell> */}
                 <TableCell align="right">৳{product.sell_price * product.qty}</TableCell>
               </TableRow>
             ))}
@@ -76,7 +76,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           size="small"
           sx={{
             "tr, td, th": {
-              padding: "8px",
+              padding: "1px",
             },
           }}
         >
