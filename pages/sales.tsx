@@ -279,11 +279,15 @@ function Sales({}: Props) {
                           }}
                           onClick={() => row.qty && addToCart({ ...row, qty: 1, available: row.qty })}
                         >
-                          <CardMedia
-                            component="img"
-                            height="200"
-                            image={`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/${row.image}`}
-                          />
+                          {row.image ? (
+                            <CardMedia
+                              component="img"
+                              height="200"
+                              image={`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/${row.image}`}
+                            />
+                          ) : (
+                            <CardMedia component="img" height="200" image="/placeholder-image.png" />
+                          )}
                           <CardContent sx={{ padding: "8px" }}>
                             <Typography variant="h6" component="div">
                               {row.name}
