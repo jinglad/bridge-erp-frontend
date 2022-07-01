@@ -33,6 +33,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
   @page {
     size: 80mm auto;
     margin: 0;
+    padding: 0;
   }
 `;
 
