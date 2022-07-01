@@ -86,6 +86,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   @page {
     size: 80mm auto;
     margin: 0;
+    padding: 0;
   }
 `;
 
