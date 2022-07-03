@@ -34,7 +34,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            fontSize: "7px",
+            fontSize: "7px !important",
             fontWeight: "medium !important",
             fontFamily: "Poppins",
           },
