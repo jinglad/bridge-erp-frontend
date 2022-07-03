@@ -1,5 +1,5 @@
 import { Typography } from "@mui/material";
-import { Box } from "@mui/system";
+import { Box, styled } from "@mui/system";
 import React, { forwardRef, Fragment } from "react";
 import { Product } from "../apis/product-service";
 
@@ -16,7 +16,18 @@ interface OrderToPrintProps {
 
 // eslint-disable-next-line react/display-name
 export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
-  ({ customer, paid, discount, payment_method, products, to_be_paid, createdDate }, ref) => {
+  (
+    {
+      customer,
+      paid,
+      discount,
+      payment_method,
+      products,
+      to_be_paid,
+      createdDate,
+    },
+    ref
+  ) => {
     return (
       <Box
         ref={ref}
@@ -34,7 +45,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            fontSize: "7px !important",
+            // fontSize: "8px",
             fontWeight: "medium !important",
             fontFamily: "Poppins",
           },
@@ -45,35 +56,81 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         <Box sx={{ fontSize: "9px !important" }}>{customer}</Box>
         <DoubleDivider />
         {products.map((product, i) => (
-          <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }} key={product._id}>
-            <div>
-              <Typography>{product.name}</Typography>
-              <Typography sx={{ paddingLeft: "3mm" }}>
+          <Box
+            sx={{
+              width: "100%",
+              display: "flex",
+              justifyContent: "space-between",
+              p: "0px 12px",
+            }}
+            key={product._id}
+          >
+            <Box>
+              <Box sx={{ fontSize: "8px !important" }}>{product.name}</Box>
+              <Box sx={{ fontSize: "8px !important" }}>
                 {product.qty} X ৳{product.sell_price}
-              </Typography>
-            </div>
-            <div>৳{product.sell_price * product.qty}</div>
+              </Box>
+            </Box>
+            <Box sx={{ fontSize: "8px !important" }}>৳{product.sell_price * product.qty}</Box>
           </Box>
         ))}
         <DoubleDivider />
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "8px!important",
+            p: "3px 12px",
+          }}
+        >
           <Box>Discount</Box>
           <Box>৳{discount}</Box>
         </Box>
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "8px!important",
+            p: "3px 12px",
+          }}
+        >
           <Box>Total</Box>
-          <Box>৳{products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</Box>
+          <Box>
+            ৳
+            {products.reduce(
+              (acc, curr) => acc + curr.sell_price * curr.qty,
+              0
+            )}
+          </Box>
         </Box>
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "8px!important",
+            p: "3px 12px",
+          }}
+        >
           <Box>{payment_method}</Box>
           <Box>৳{paid}</Box>
         </Box>
-        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "8px!important",
+            p: "3px 12px",
+          }}
+        >
           <Box>Due</Box>
           <Box>৳{to_be_paid}</Box>
         </Box>
         <DoubleDivider />
-        <Box sx={{ fontSize: "6px !important" }}>{createdDate}</Box>
+        <Box sx={{ fontSize: "7px !important" }}>{createdDate}</Box>
       </Box>
     );
   }
@@ -82,8 +139,21 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
 const DoubleDivider = () => {
   return (
     <Fragment>
-      <Box sx={{ borderTop: "1px dashed black", width: "100%", padding: "1px 0", marginTop: "10px" }} />
-      <Box sx={{ borderTop: "1px dashed black", width: "100%", paddingBottom: "4px" }} />
+      <Box
+        sx={{
+          borderTop: "1px dashed black",
+          width: "100%",
+          padding: "1px 0",
+          marginTop: "10px",
+        }}
+      />
+      <Box
+        sx={{
+          borderTop: "1px dashed black",
+          width: "100%",
+          paddingBottom: "4px",
+        }}
+      />
     </Fragment>
   );
 };
