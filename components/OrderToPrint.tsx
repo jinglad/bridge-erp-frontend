@@ -1,6 +1,6 @@
-import { Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Typography } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { forwardRef } from "react";
+import React, { forwardRef, Fragment } from "react";
 import { Product } from "../apis/product-service";
 
 interface OrderToPrintProps {
@@ -11,20 +11,21 @@ interface OrderToPrintProps {
   products: Product[];
   customer: string;
   ref: React.RefObject<HTMLDivElement>;
+  createdDate: string;
 }
 
 // eslint-disable-next-line react/display-name
 export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
-  ({ customer, paid, discount, payment_method, products, to_be_paid }, ref) => {
+  ({ customer, paid, discount, payment_method, products, to_be_paid, createdDate }, ref) => {
     return (
       <Box
         ref={ref}
         sx={{
-          padding: "5px",
+          padding: "2mm .6mm",
           display: "flex",
           flexDirection: "column",
           width: "100%",
-          maxWidth: "80mm",
+          maxWidth: "78mm",
           alignItems: "center",
           justifyContent: "center",
           position: "fixed",
@@ -33,76 +34,56 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            fontSize: "9px !important",
+            fontSize: "7px",
+            fontWeight: "medium !important",
+            fontFamily: "Poppins",
           },
         }}
       >
-        <Typography>নিউ আমজাদিয়া ভান্ডার</Typography>
-        <Typography>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Typography>
-        <Typography>{customer}</Typography>
-        <Box sx={{ borderTop: "1px dashed black", width: "100%", padding: "1px 0", marginTop: "10px" }} />
-        <Box sx={{ borderTop: "1px dashed black", width: "100%" }} />
-        <Table
-          size="small"
-          sx={{
-            "tr, td, th": {
-              padding: "1px",
-            },
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <TableCell>Product Name</TableCell>
-              {/* <TableCell>Qty</TableCell> */}
-              <TableCell align="right">Sub total</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {products.map((product, i) => (
-              <TableRow key={product._id}>
-                <TableCell>
-                  <Typography>{product.name}</Typography>
-                  <Typography sx={{ paddingLeft: "3mm" }}>
-                    {product.qty} X ৳{product.sell_price}
-                  </Typography>
-                </TableCell>
-                {/* <TableCell>{product.qty}</TableCell> */}
-                <TableCell align="right">৳{product.sell_price * product.qty}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-        <Table
-          size="small"
-          sx={{
-            "tr, td, th": {
-              padding: "1px",
-            },
-          }}
-        >
-          <TableBody>
-            <TableRow>
-              <TableCell colSpan={3}>Discount</TableCell>
-              <TableCell align="right">৳{discount}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell align="right">
-                ৳{products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={2}>Paid </TableCell>
-              <TableCell colSpan={1}>Received by {payment_method}</TableCell>
-              <TableCell align="right">৳{paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell colSpan={3}>Due</TableCell>
-              <TableCell align="right">৳{to_be_paid}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        <Box sx={{ fontSize: "9px !important" }}>নিউ আমজাদিয়া ভান্ডার</Box>
+        <Box sx={{ fontSize: "9px !important" }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
+        <Box sx={{ fontSize: "9px !important" }}>{customer}</Box>
+        <DoubleDivider />
+        {products.map((product, i) => (
+          <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }} key={product._id}>
+            <div>
+              <Typography>{product.name}</Typography>
+              <Typography sx={{ paddingLeft: "3mm" }}>
+                {product.qty} X ৳{product.sell_price}
+              </Typography>
+            </div>
+            <div>৳{product.sell_price * product.qty}</div>
+          </Box>
+        ))}
+        <DoubleDivider />
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+          <Box>Discount</Box>
+          <Box>৳{discount}</Box>
+        </Box>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+          <Box>Total</Box>
+          <Box>৳{products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</Box>
+        </Box>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+          <Box>{payment_method}</Box>
+          <Box>৳{paid}</Box>
+        </Box>
+        <Box sx={{ width: "100%", display: "flex", justifyContent: "space-between" }}>
+          <Box>Due</Box>
+          <Box>৳{to_be_paid}</Box>
+        </Box>
+        <DoubleDivider />
+        <Box sx={{ fontSize: "6px !important" }}>{createdDate}</Box>
       </Box>
     );
   }
 );
+
+const DoubleDivider = () => {
+  return (
+    <Fragment>
+      <Box sx={{ borderTop: "1px dashed black", width: "100%", padding: "1px 0", marginTop: "10px" }} />
+      <Box sx={{ borderTop: "1px dashed black", width: "100%", paddingBottom: "4px" }} />
+    </Fragment>
+  );
+};
