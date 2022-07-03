@@ -22,6 +22,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import moment from "moment";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
@@ -235,6 +236,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
               }
               products={cartItems}
               customer={customerName}
+              createdDate={moment(new Date()).format("ddd MMM D YYYY")}
             />
           </DialogContent>
           <DialogActions>

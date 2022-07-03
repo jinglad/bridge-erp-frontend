@@ -15,6 +15,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import moment from "moment";
 import { useCallback, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Order } from "../apis/order-service";
@@ -126,6 +127,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
         to_be_paid={order.to_be_paid}
         products={order.products}
         customer={order.customer}
+        createdDate={moment(order.createdDate).format("ddd MMM D YYYY")}
       />
     </Dialog>
   );
