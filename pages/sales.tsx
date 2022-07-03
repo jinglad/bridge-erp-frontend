@@ -2,9 +2,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
-  Button,
   Card,
-  CardActions,
   CardContent,
   CardMedia,
   CircularProgress,
@@ -116,6 +114,16 @@ function Sales({}: Props) {
     setCustomerName("");
     queryClient.refetchQueries("searchedProducts", { active: true });
     queryClient.refetchQueries("customers", { active: true });
+  };
+
+  const isAvailable = (product: Product) => {
+    const c = cartItems.find((item) => item._id === product._id);
+
+    if (c) {
+      return c.qty < product.qty;
+    }
+
+    return true;
   };
 
   return (
@@ -275,9 +283,15 @@ function Sales({}: Props) {
                         <Card
                           sx={{
                             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-                            cursor: row.qty === 0 ? "not-allowed" : "pointer",
+                            cursor: row.qty <= 0 ? "not-allowed" : !isAvailable(row) ? "not-allowed" : "pointer",
                           }}
-                          onClick={() => row.qty && addToCart({ ...row, qty: 1, available: row.qty })}
+                          onClick={() =>
+                            row.qty <= 0
+                              ? null
+                              : !isAvailable(row)
+                              ? null
+                              : addToCart({ ...row, qty: 1, available: row.qty })
+                          }
                         >
                           {row.image ? (
                             <CardMedia

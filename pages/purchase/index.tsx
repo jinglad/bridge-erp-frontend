@@ -1,13 +1,10 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import { DesktopDatePicker, LoadingButton, LocalizationProvider } from "@mui/lab";
 import {
   Box,
   Button,
   ButtonGroup,
   CircularProgress,
-  Input,
-  InputAdornment,
   Paper,
   Stack,
   Table,
@@ -19,15 +16,13 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import router from "next/router";
 import { useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { getPurchases, Purchase } from "../../apis/purchase-service";
 import Layout from "../../components/Layout/Layout";
 import ViewPurchase from "../../components/ViewPurchaseDialog";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import moment from "moment";
-import CloseIcon from "@mui/icons-material/Close";
 
 type Props = {};
 
@@ -63,7 +58,7 @@ const Purchase = (props: Props) => {
   const handleChange = (newValue: Date | null) => {
     setDate(newValue);
     if (newValue) {
-      setCreatedDate(moment(newValue).format("ddd MMM D YYYY"));
+      setCreatedDate(newValue.toDateString());
     }
   };
 
