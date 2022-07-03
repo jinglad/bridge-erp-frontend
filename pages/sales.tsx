@@ -52,8 +52,6 @@ function Sales({}: Props) {
     setCartItems([...cartItems, { ...product }]);
   };
 
-  console.log(cartItems);
-
   const deleteItemFromCart = (id: string) => {
     const newCart = cartItems.filter((c) => c._id !== id);
     setCartItems(newCart);
