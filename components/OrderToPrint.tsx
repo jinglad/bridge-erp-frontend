@@ -20,7 +20,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
       <Box
         ref={ref}
         sx={{
-          padding: "20px 6px",
+          padding: "20px 10px",
           display: "flex",
           flexDirection: "column",
           width: "100%",
@@ -33,7 +33,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            fontSize: "12px",
+            fontSize: "7px",
           },
         }}
       >
@@ -73,7 +73,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </TableBody>
         </Table>
         <Table
-          size="small"
+          size="medium"
           sx={{
             "tr, td, th": {
               padding: "8px",
