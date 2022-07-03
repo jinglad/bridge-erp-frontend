@@ -47,12 +47,6 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
     documentTitle: "AwesomeFileName",
     removeAfterPrint: true,
     pageStyle: pageStyle,
-    fonts: [
-      {
-        family: "Roboto",
-        source: "https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap",
-      },
-    ],
   });
 
   return (
