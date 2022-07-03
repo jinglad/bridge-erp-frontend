@@ -16,7 +16,6 @@ import {
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import moment from "moment";
 import { useState } from "react";
 import { useInfiniteQuery } from "react-query";
 import { getOrders, Order } from "../apis/order-service";
@@ -56,7 +55,7 @@ const Order = (props: Props) => {
   const handleChange = (newValue: Date | null) => {
     setDate(newValue);
     if (newValue) {
-      setCreatedDate(moment(newValue).format("ddd MMM D YYYY"));
+      setCreatedDate(newValue.toDateString());
     }
   };
 
