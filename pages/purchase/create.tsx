@@ -15,8 +15,8 @@ const PurchaseCreate = () => {
     defaultValues: {
       products: [{ name: undefined, qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
       supplier: "",
-      to_be_paid: 0,
-      paid: 0,
+      to_be_paid: undefined,
+      paid: undefined,
       payment_method: "",
     },
     mode: "onBlur",
@@ -101,7 +101,9 @@ const PurchaseCreate = () => {
                   onInputChange={(e, value) => {
                     setSupplierName(value);
                   }}
-                  renderInput={(params) => <TextField {...params} placeholder="suppliers" {...register(`supplier`)} />}
+                  renderInput={(params) => (
+                    <TextField {...params} placeholder="suppliers" {...register(`supplier`)} required />
+                  )}
                 />
               </Grid>
               {fields.map((field, index) => {
@@ -125,9 +127,8 @@ const PurchaseCreate = () => {
                           <TextField
                             {...params}
                             placeholder="search products"
-                            {...register(`products.${index}.name` as const, {
-                              required: true,
-                            })}
+                            {...register(`products.${index}.name`)}
+                            required
                           />
                         )}
                       />
@@ -235,7 +236,7 @@ const PurchaseCreate = () => {
                     setValue("payment_method", value);
                   }}
                   options={["Bkash", "Rocket", "Nagad", "IIBL"]}
-                  renderInput={(params) => <TextField {...params} label="Payment Method" />}
+                  renderInput={(params) => <TextField {...params} label="Payment Method" required />}
                 />
               </Grid>
 
