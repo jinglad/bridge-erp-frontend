@@ -66,7 +66,10 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   const watchDiscount = watch("discount"); // you can supply default value as second argument
 
   useEffect(() => {
-    setValue("paid", cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount);
+    setValue(
+      "paid",
+      Number((cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount).toFixed(2))
+    );
   }, [watchDiscount, cartItems, setValue]);
 
   const onSubmit = async (data: any) => {
@@ -168,11 +171,10 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             fullWidth
                             required
                             inputProps={{
-                              // defaultValue: parseFloat(
-                              //   cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()
-                              // ).toFixed(2),
                               min: 0,
-                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount,
+                              max: Math.ceil(
+                                cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
+                              ),
                               step: "any",
                             }}
                           />
@@ -236,9 +238,6 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                           : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)
                         ).toString()
                       ).toFixed(2)}
-                      {/* {watchDiscount
-                        ? cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
-                        : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)} */}
                     </TableCell>
                   </TableRow>
                 </TableBody>

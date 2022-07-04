@@ -16,18 +16,7 @@ interface OrderToPrintProps {
 
 // eslint-disable-next-line react/display-name
 export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
-  (
-    {
-      customer,
-      paid,
-      discount,
-      payment_method,
-      products,
-      to_be_paid,
-      createdDate,
-    },
-    ref
-  ) => {
+  ({ customer, paid, discount, payment_method, products, to_be_paid, createdDate }, ref) => {
     return (
       <Box
         ref={ref}
@@ -71,7 +60,9 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
                 {product.qty} X ৳{product.sell_price}
               </Box>
             </Box>
-            <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>৳{product.sell_price * product.qty}</Box>
+            <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>
+              ৳{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}
+            </Box>
           </Box>
         ))}
         <DoubleDivider />
@@ -86,7 +77,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           }}
         >
           <Box>Discount</Box>
-          <Box>৳{discount}</Box>
+          <Box>৳{parseFloat(discount.toString()).toFixed(2)}</Box>
         </Box>
         <Box
           sx={{
@@ -95,16 +86,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
-            fontWeight: 700
+            fontWeight: 700,
           }}
         >
           <Box>Total</Box>
           <Box>
-            ৳
-            {products.reduce(
-              (acc, curr) => acc + curr.sell_price * curr.qty,
-              0
-            )}
+            ৳{parseFloat(products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()).toFixed(2)}
           </Box>
         </Box>
         <Box
@@ -114,11 +101,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
-            fontWeight: 700
+            fontWeight: 700,
           }}
         >
           <Box>{payment_method}</Box>
-          <Box>৳{paid}</Box>
+          <Box>৳{parseFloat(paid.toString()).toFixed(2)}</Box>
         </Box>
         <Box
           sx={{
@@ -127,11 +114,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
-            fontWeight: 700
+            fontWeight: 700,
           }}
         >
           <Box>Due</Box>
-          <Box>৳{to_be_paid}</Box>
+          <Box>৳{parseFloat(to_be_paid.toString()).toFixed(2)}</Box>
         </Box>
         <DoubleDivider />
         <Box sx={{ fontSize: "7px !important", fontWeight: 700 }}>{createdDate}</Box>
