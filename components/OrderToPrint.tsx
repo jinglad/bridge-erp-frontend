@@ -51,9 +51,9 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           },
         }}
       >
-        <Box sx={{ fontSize: "9px !important" }}>নিউ আমজাদিয়া ভান্ডার</Box>
-        <Box sx={{ fontSize: "9px !important" }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
-        <Box sx={{ fontSize: "9px !important" }}>{customer}</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>নিউ আমজাদিয়া ভান্ডার</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>{customer}</Box>
         <DoubleDivider />
         {products.map((product, i) => (
           <Box
@@ -66,12 +66,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             key={product._id}
           >
             <Box>
-              <Box sx={{ fontSize: "8px !important" }}>{product.name}</Box>
-              <Box sx={{ fontSize: "8px !important" }}>
+              <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>{product.name}</Box>
+              <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>
                 {product.qty} X ৳{product.sell_price}
               </Box>
             </Box>
-            <Box sx={{ fontSize: "8px !important" }}>৳{product.sell_price * product.qty}</Box>
+            <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>৳{product.sell_price * product.qty}</Box>
           </Box>
         ))}
         <DoubleDivider />
@@ -81,6 +81,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             display: "flex",
             justifyContent: "space-between",
             fontSize: "8px!important",
+            fontWeight: 700,
             p: "3px 12px",
           }}
         >
@@ -94,6 +95,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
+            fontWeight: 700
           }}
         >
           <Box>Total</Box>
@@ -112,6 +114,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
+            fontWeight: 700
           }}
         >
           <Box>{payment_method}</Box>
@@ -124,13 +127,14 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             p: "3px 12px",
+            fontWeight: 700
           }}
         >
           <Box>Due</Box>
           <Box>৳{to_be_paid}</Box>
         </Box>
         <DoubleDivider />
-        <Box sx={{ fontSize: "7px !important" }}>{createdDate}</Box>
+        <Box sx={{ fontSize: "7px !important", fontWeight: 700 }}>{createdDate}</Box>
       </Box>
     );
   }
