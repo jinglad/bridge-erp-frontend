@@ -137,11 +137,13 @@ const PurchaseCreate = () => {
                         placeholder="quantity"
                         label="Purchase Quantity"
                         type="number"
-                        {...register(`products.${index}.qty` as const, {
-                          valueAsNumber: true,
-                          required: true,
-                        })}
+                        required
+                        {...register(`products.${index}.qty`)}
                         fullWidth
+                        inputProps={{
+                          step: "any",
+                          min: 1,
+                        }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
@@ -149,11 +151,13 @@ const PurchaseCreate = () => {
                         placeholder="value"
                         type="number"
                         label="Purchase Per Unit"
-                        {...register(`products.${index}.buy_price` as const, {
-                          valueAsNumber: true,
-                          required: true,
-                        })}
+                        required
+                        {...register(`products.${index}.buy_price`)}
                         fullWidth
+                        inputProps={{
+                          step: "any",
+                          min: 0,
+                        }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
@@ -161,11 +165,13 @@ const PurchaseCreate = () => {
                         label="Sells Per Unit"
                         placeholder="value"
                         type="number"
-                        {...register(`products.${index}.sell_price` as const, {
-                          valueAsNumber: true,
-                          required: true,
-                        })}
+                        required
+                        {...register(`products.${index}.sell_price`)}
                         fullWidth
+                        inputProps={{
+                          step: "any",
+                          min: 0,
+                        }}
                       />
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
@@ -200,6 +206,10 @@ const PurchaseCreate = () => {
                   type="number"
                   required
                   id="to_be_paid"
+                  inputProps={{
+                    step: "any",
+                    min: 0,
+                  }}
                   label="Amount to be paid"
                 />
               </Grid>
@@ -207,12 +217,15 @@ const PurchaseCreate = () => {
               <Grid item xs={12} sm={4}>
                 <TextField
                   {...register("paid")}
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
                   required
                   type="number"
                   id="paid"
                   label="Paid Amount"
                   fullWidth
+                  inputProps={{
+                    step: "any",
+                    min: 0,
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
