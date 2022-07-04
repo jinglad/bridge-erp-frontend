@@ -40,9 +40,9 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           },
         }}
       >
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>নিউ আমজাদিয়া ভান্ডার</Box>
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>{customer}</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>নিউ আমজাদিয়া ভান্ডার</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>{customer}</Box>
         <DoubleDivider />
         {products.map((product, i) => (
           <Box
@@ -55,12 +55,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             key={product._id}
           >
             <Box>
-              <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>{product.name}</Box>
-              <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>
+              <Box sx={{ fontSize: "8px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>{product.name}</Box>
+              <Box sx={{ fontSize: "8px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>
                 {product.qty} X ৳{product.sell_price}
               </Box>
             </Box>
-            <Box sx={{ fontSize: "8px !important", fontWeight: 700 }}>
+            <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>
               ৳{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}
             </Box>
           </Box>
@@ -73,11 +73,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             justifyContent: "space-between",
             fontSize: "8px!important",
             fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
             p: "3px 12px",
           }}
         >
           <Box>Discount</Box>
-          <Box>৳{parseFloat(discount.toString()).toFixed(2)}</Box>
+          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(discount.toString()).toFixed(2)}</Box>
         </Box>
         <Box
           sx={{
@@ -87,10 +88,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontSize: "8px!important",
             p: "3px 12px",
             fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box>Total</Box>
-          <Box>
+          <Box sx={{fontSize: "9px!important"}}>
             ৳{parseFloat(products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()).toFixed(2)}
           </Box>
         </Box>
@@ -102,10 +104,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontSize: "8px!important",
             p: "3px 12px",
             fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box>{payment_method}</Box>
-          <Box>৳{parseFloat(paid.toString()).toFixed(2)}</Box>
+          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(paid.toString()).toFixed(2)}</Box>
         </Box>
         <Box
           sx={{
@@ -115,10 +118,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontSize: "8px!important",
             p: "3px 12px",
             fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box>Due</Box>
-          <Box>৳{parseFloat(to_be_paid.toString()).toFixed(2)}</Box>
+          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(to_be_paid.toString()).toFixed(2)}</Box>
         </Box>
         <DoubleDivider />
         <Box sx={{ fontSize: "7px !important", fontWeight: 700 }}>{createdDate}</Box>
