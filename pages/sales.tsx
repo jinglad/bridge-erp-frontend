@@ -216,7 +216,7 @@ function Sales({}: Props) {
                           value={product.sell_price}
                         />
                       </TableCell>
-                      <TableCell>{product.sell_price * product.qty}</TableCell>
+                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

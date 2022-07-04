@@ -73,8 +73,12 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     await mutateAsync({
       payment_method: data.payment_method,
       discount: Number(data.discount),
-      paid: Number(data.paid),
-      to_be_paid: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(data.paid),
+      paid: Number(parseFloat(data.paid).toFixed(2)),
+      to_be_paid: Number(
+        parseFloat(
+          (cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(data.paid)).toString()
+        ).toFixed(2)
+      ),
       products: cartItems,
       customer: customerName,
     });
@@ -148,8 +152,8 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                       <TableCell>{product.name}</TableCell>
                       <TableCell>{product.qty}</TableCell>
                       <TableCell>{product.sell_price}</TableCell>
-                      <TableCell>{product.sell_price * product.qty}</TableCell>
-                      <TableCell>{product.sell_price * product.qty}</TableCell>
+                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
+                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
@@ -164,9 +168,12 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             fullWidth
                             required
                             inputProps={{
-                              defaultValue: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                              // defaultValue: parseFloat(
+                              //   cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()
+                              // ).toFixed(2),
                               min: 0,
                               max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount,
+                              step: "any",
                             }}
                           />
                         </Grid>
@@ -181,6 +188,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             inputProps={{
                               min: 0,
                               max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                              step: "any",
                             }}
                             {...register(`discount`)}
                           />
@@ -208,7 +216,11 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
                     <TableCell colSpan={2}>GrandTotal : </TableCell>
 
-                    <TableCell>{cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}</TableCell>
+                    <TableCell>
+                      {parseFloat(
+                        cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()
+                      ).toFixed(2)}
+                    </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={2}>Discount:</TableCell>
@@ -218,9 +230,15 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                   <TableRow>
                     <TableCell colSpan={2}>Net Total :</TableCell>
                     <TableCell id="netSalePrice">
-                      {watchDiscount
+                      {parseFloat(
+                        (watchDiscount
+                          ? cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
+                          : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)
+                        ).toString()
+                      ).toFixed(2)}
+                      {/* {watchDiscount
                         ? cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
-                        : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)}
+                        : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)} */}
                     </TableCell>
                   </TableRow>
                 </TableBody>
