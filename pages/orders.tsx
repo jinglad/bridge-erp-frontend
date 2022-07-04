@@ -123,8 +123,8 @@ const Order = (props: Props) => {
                     {group?.orders.map((row) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.customer}</TableCell>
-                        <TableCell>{row.paid}</TableCell>
-                        <TableCell>{row.to_be_paid}</TableCell>
+                        <TableCell>{parseFloat(row.paid.toString()).toFixed(2)}</TableCell>
+                        <TableCell>{parseFloat(row.to_be_paid.toString()).toFixed(2)}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
