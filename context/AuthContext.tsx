@@ -13,15 +13,18 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
+        const jwt = await user.getIdToken();
         setUser({
           uid: user.uid,
           email: user.email,
           displayName: user.displayName,
           photoURL: user.photoURL,
-          jwt: await user.getIdToken(),
+          jwt: jwt,
         });
+        localStorage.setItem("token", JSON.stringify(jwt));
       } else {
         setUser(null);
+        localStorage.removeItem("token");
       }
       setLoading(false);
     });
@@ -37,6 +40,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const logout = async () => {
     setUser(null);
     await signOut(auth);
+    localStorage.removeItem("token");
   };
 
   return <AuthContext.Provider value={{ user, logout, googleLogin }}>{loading ? null : children}</AuthContext.Provider>;
