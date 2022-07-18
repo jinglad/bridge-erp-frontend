@@ -13,15 +13,23 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          jwt: await user.getIdToken(),
-        });
+        const idToken = await user.getIdTokenResult();
+        if (idToken.claims.admin) {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            jwt: idToken.token,
+          });
+          localStorage.setItem("token", JSON.stringify(idToken.token));
+        } else {
+          setUser(null);
+          // await signOut(auth);
+        }
       } else {
         setUser(null);
+        localStorage.removeItem("token");
       }
       setLoading(false);
     });
@@ -31,12 +39,19 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
   const googleLogin = () => {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    const user = signInWithPopup(auth, provider);
+    //update user data on the server
+    user.then((user) => {
+      auth.updateCurrentUser(user.user);
+    });
+
+    return user;
   };
 
   const logout = async () => {
     setUser(null);
     await signOut(auth);
+    localStorage.removeItem("token");
   };
 
   return <AuthContext.Provider value={{ user, logout, googleLogin }}>{loading ? null : children}</AuthContext.Provider>;
