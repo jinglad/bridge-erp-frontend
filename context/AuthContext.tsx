@@ -13,15 +13,20 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        const jwt = await user.getIdToken();
-        setUser({
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          jwt: jwt,
-        });
-        localStorage.setItem("token", JSON.stringify(jwt));
+        const idToken = await user.getIdTokenResult();
+        if (idToken.claims.admin) {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            jwt: idToken.token,
+          });
+          localStorage.setItem("token", JSON.stringify(idToken.token));
+        } else {
+          setUser(null);
+          // await signOut(auth);
+        }
       } else {
         setUser(null);
         localStorage.removeItem("token");
@@ -34,7 +39,13 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
 
   const googleLogin = () => {
     const provider = new GoogleAuthProvider();
-    return signInWithPopup(auth, provider);
+    const user = signInWithPopup(auth, provider);
+    //update user data on the server
+    user.then((user) => {
+      auth.updateCurrentUser(user.user);
+    });
+
+    return user;
   };
 
   const logout = async () => {
