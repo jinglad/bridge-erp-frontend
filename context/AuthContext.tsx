@@ -9,12 +9,26 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState(false);
+
+  // useEffect(() => {
+  //   const unsubscribed: any = onAuthStateChanged(auth, (user) => {
+  //     if (user?.email) {
+  //       setUser(user);
+  //       user.getIdToken().then((token) => localStorage.setItem("token", token));
+  //     } else {
+  //       setUser({});
+  //     }
+  //   });
+
+  //   return () => unsubscribed;
+  // }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const idToken = await user.getIdTokenResult();
-        if (idToken.claims.admin) {
+        if (idToken) {
           setUser({
             uid: user.uid,
             email: user.email,
@@ -23,6 +37,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
             jwt: idToken.token,
           });
           localStorage.setItem("token", JSON.stringify(idToken.token));
+          // localStorage.setItem("token", idToken.token);
         } else {
           setUser(null);
           // await signOut(auth);
@@ -43,6 +58,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     //update user data on the server
     user.then((user) => {
       auth.updateCurrentUser(user.user);
+      setUser(user.user);
     });
 
     return user;
@@ -54,5 +70,5 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     localStorage.removeItem("token");
   };
 
-  return <AuthContext.Provider value={{ user, logout, googleLogin }}>{loading ? null : children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{ user, logout, googleLogin, admin }}>{loading ? null : children}</AuthContext.Provider>;
 };
