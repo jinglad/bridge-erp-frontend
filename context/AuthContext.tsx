@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { GoogleAuthProvider, onAuthStateChanged, onIdTokenChanged, signInWithPopup, signOut } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../config/firebase";
 
@@ -11,18 +11,31 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState(false);
 
-  // useEffect(() => {
-  //   const unsubscribed: any = onAuthStateChanged(auth, (user) => {
-  //     if (user?.email) {
-  //       setUser(user);
-  //       user.getIdToken().then((token) => localStorage.setItem("token", token));
-  //     } else {
-  //       setUser({});
-  //     }
-  //   });
+  useEffect(() => {
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        if (idToken) {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            jwt: idToken,
+          });
+          localStorage.setItem("token", JSON.stringify(idToken));
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem("token");
+      }
+      setLoading(false);
+    });
 
-  //   return () => unsubscribed;
-  // }, []);
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -70,5 +83,9 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     localStorage.removeItem("token");
   };
 
-  return <AuthContext.Provider value={{ user, logout, googleLogin, admin }}>{loading ? null : children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, logout, googleLogin, admin }}>
+      {loading ? null : children}
+    </AuthContext.Provider>
+  );
 };
