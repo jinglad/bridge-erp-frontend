@@ -14,6 +14,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import Link from "next/link";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
 import React, { Fragment, ReactNode, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { hasChildren } from "../../utils/hasChildren";
@@ -52,6 +53,35 @@ export default function Layout({ children }: LayoutProps) {
   }, [matches]);
 
   const { user, logout } = useAuth();
+  const [admin, setAdmin] = useState<boolean | undefined>();
+  const router = useRouter();
+  
+
+  useEffect(() => {
+    if(admin !== true && user?.email) {
+      fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${user?.email}`, {
+        method: "POST",
+        headers: {
+          "content-type":"application/json"
+        }
+      })
+      .then(res => {
+        if(res.status === 200) {
+          return res.json();
+        }
+      })
+      .then(data => {
+        if(data) {
+          setAdmin(true);
+        } else {
+          logout();
+          setAdmin(false);
+          localStorage.removeItem("token");
+        }
+      })
+      .catch()
+    }
+  },[user]);  
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -76,10 +106,10 @@ export default function Layout({ children }: LayoutProps) {
               <MenuIcon />
             </IconButton>
           </Box>
-          {!user ? (
+          {(!user && !admin) ? (
             <LoginButton />
           ) : (
-            <Button color="error" onClick={async () => await logout()}>
+            <Button color="error" onClick={logout}>
               Logout
             </Button>
           )}

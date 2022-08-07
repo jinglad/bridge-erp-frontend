@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { GoogleAuthProvider, onAuthStateChanged, onIdTokenChanged, signInWithPopup, signOut } from "firebase/auth";
 import { createContext, useContext, useEffect, useState } from "react";
 import { auth } from "../config/firebase";
 
@@ -9,12 +9,39 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [admin, setAdmin] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onIdTokenChanged(auth, async (user) => {
+      if (user) {
+        const idToken = await user.getIdToken();
+        if (idToken) {
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName: user.displayName,
+            photoURL: user.photoURL,
+            jwt: idToken,
+          });
+          localStorage.setItem("token", JSON.stringify(idToken));
+        } else {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
+        localStorage.removeItem("token");
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const idToken = await user.getIdTokenResult();
-        if (idToken.claims.admin) {
+        if (idToken) {
           setUser({
             uid: user.uid,
             email: user.email,
@@ -23,6 +50,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
             jwt: idToken.token,
           });
           localStorage.setItem("token", JSON.stringify(idToken.token));
+          // localStorage.setItem("token", idToken.token);
         } else {
           setUser(null);
           // await signOut(auth);
@@ -43,6 +71,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     //update user data on the server
     user.then((user) => {
       auth.updateCurrentUser(user.user);
+      setUser(user.user);
     });
 
     return user;
@@ -54,5 +83,9 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     localStorage.removeItem("token");
   };
 
-  return <AuthContext.Provider value={{ user, logout, googleLogin }}>{loading ? null : children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, logout, googleLogin, admin }}>
+      {loading ? null : children}
+    </AuthContext.Provider>
+  );
 };

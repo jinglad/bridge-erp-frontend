@@ -20,7 +20,7 @@ export const deleteAdmin = async (uid: string) => {
 
 export const createAdmin = async (email: string) => {
   try {
-    const { data } = await http.post<{ msg: string }>("/create-admin", { email });
+    const { data } = await http.post<{ msg: string }>("/admin", { email });
     return data;
   } catch (error: any) {
     return error.response.data.message;

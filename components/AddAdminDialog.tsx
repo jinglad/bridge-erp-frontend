@@ -17,12 +17,12 @@ import { toast } from "react-toastify";
 import { createAdmin } from "../apis/admin-service";
 import { createCustomer } from "../apis/customer-service";
 
-function AddAdminDialog() {
+function AddAdminDialog({setEmail}:any) {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation("add-admin", createAdmin, {
     onSuccess: (data) => {
       notify(data.msg);
-      queryClient.invalidateQueries("admins");
+      // queryClient.invalidateQueries("admins");
       reset();
       addAdminDialogToggle();
     },
