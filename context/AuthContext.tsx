@@ -10,6 +10,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [admin, setAdmin] = useState(false);
+  const [token, setToken] = useState<any>(null);
 
   useEffect(() => {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
@@ -24,6 +25,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
             jwt: idToken,
           });
           localStorage.setItem("token", JSON.stringify(idToken));
+          setToken(idToken)
         } else {
           setUser(null);
         }
@@ -51,6 +53,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
           });
           localStorage.setItem("token", JSON.stringify(idToken.token));
           // localStorage.setItem("token", idToken.token);
+          setToken(idToken)
         } else {
           setUser(null);
           // await signOut(auth);
@@ -84,7 +87,7 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   };
 
   return (
-    <AuthContext.Provider value={{ user, logout, googleLogin, admin }}>
+    <AuthContext.Provider value={{ user, logout, googleLogin, token }}>
       {loading ? null : children}
     </AuthContext.Provider>
   );

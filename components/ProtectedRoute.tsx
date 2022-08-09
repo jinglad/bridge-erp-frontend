@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, logout } = useAuth();
+  const { user, logout, token } = useAuth();
   const router = useRouter();
   const [admin, setAdmin] = useState<boolean | undefined>();
 
 
   useEffect(() => {
+    // const adminToken = localStorage.getItem("token");
     if (admin !== true && user?.email) {
       fetch(
         `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${user?.email}`,
@@ -16,6 +17,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
           method: "POST",
           headers: {
             "content-type": "application/json",
+            "authorization": `Bearer ${token}`
           },
         }
       )
@@ -35,7 +37,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         })
         .catch();
     }
-  }, [user]);
+  }, [user, token]);
 
   useEffect(() => {
     if (!user && !admin) {
