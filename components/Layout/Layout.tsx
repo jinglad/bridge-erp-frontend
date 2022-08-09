@@ -55,37 +55,8 @@ export default function Layout({ children }: LayoutProps) {
   }, [matches]);
 
   const { user, logout } = useAuth();
-  const [admin, setAdmin] = useState<boolean | undefined>();
-  const router = useRouter();
 
-  useEffect(() => {
-    if (admin !== true && user?.email) {
-      fetch(
-        `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${user?.email}`,
-        {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-        }
-      )
-        .then((res) => {
-          if (res.status === 200) {
-            return res.json();
-          }
-        })
-        .then((data) => {
-          if (data) {
-            setAdmin(true);
-          } else {
-            logout();
-            setAdmin(false);
-            localStorage.removeItem("token");
-          }
-        })
-        .catch();
-    }
-  }, [user]);
+  const router = useRouter();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -113,7 +84,7 @@ export default function Layout({ children }: LayoutProps) {
               <MenuIcon />
             </IconButton>
           </Box>
-          {!user && !admin ? (
+          {!user ? (
             <LoginButton />
           ) : (
             <Button color="error" onClick={logout}>
@@ -141,13 +112,12 @@ export default function Layout({ children }: LayoutProps) {
           ))}
         </Box>
       </Drawer>
-      {admin && (
-        <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
-          <Toolbar />
 
-          {children}
-        </Box>
-      )}
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
+        <Toolbar />
+
+        {children}
+      </Box>
     </Box>
   );
 }
