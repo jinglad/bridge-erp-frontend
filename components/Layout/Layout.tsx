@@ -30,7 +30,9 @@ interface LayoutProps {
 export default function Layout({ children }: LayoutProps) {
   const [open, setOpen] = useState(true);
   const matches = useMediaQuery("(min-width:1024px)");
-  const [dVariant, setDVariant] = useState<"permanent" | "persistent" | "temporary" | undefined>("permanent");
+  const [dVariant, setDVariant] = useState<
+    "permanent" | "persistent" | "temporary" | undefined
+  >("permanent");
   const toggleDrawer = () => {
     if (matches) {
       if (dVariant === "permanent") {
@@ -53,40 +55,16 @@ export default function Layout({ children }: LayoutProps) {
   }, [matches]);
 
   const { user, logout } = useAuth();
-  const [admin, setAdmin] = useState<boolean | undefined>();
-  const router = useRouter();
-  
 
-  useEffect(() => {
-    if(admin !== true && user?.email) {
-      fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${user?.email}`, {
-        method: "POST",
-        headers: {
-          "content-type":"application/json"
-        }
-      })
-      .then(res => {
-        if(res.status === 200) {
-          return res.json();
-        }
-      })
-      .then(data => {
-        if(data) {
-          setAdmin(true);
-        } else {
-          logout();
-          setAdmin(false);
-          localStorage.removeItem("token");
-        }
-      })
-      .catch()
-    }
-  },[user]);  
+  const router = useRouter();
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}>
+      <AppBar
+        position="fixed"
+        sx={{ zIndex: (theme) => theme.zIndex.drawer + 1 }}
+      >
         <Toolbar>
           <Link href="/">
             <Typography variant="h6" fontWeight="bold" noWrap component="div">
@@ -106,7 +84,7 @@ export default function Layout({ children }: LayoutProps) {
               <MenuIcon />
             </IconButton>
           </Box>
-          {(!user && !admin) ? (
+          {!user ? (
             <LoginButton />
           ) : (
             <Button color="error" onClick={logout}>
@@ -121,7 +99,10 @@ export default function Layout({ children }: LayoutProps) {
         sx={{
           width: drawerWidth,
           flexShrink: 0,
-          [`& .MuiDrawer-paper`]: { width: drawerWidth, boxSizing: "border-box" },
+          [`& .MuiDrawer-paper`]: {
+            width: drawerWidth,
+            boxSizing: "border-box",
+          },
         }}
       >
         <Toolbar />
@@ -131,6 +112,7 @@ export default function Layout({ children }: LayoutProps) {
           ))}
         </Box>
       </Drawer>
+
       <Box component="main" sx={{ flexGrow: 1, p: 3, width: "100%" }}>
         <Toolbar />
 
