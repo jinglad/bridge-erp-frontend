@@ -6,18 +6,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, logout, token } = useAuth();
   const router = useRouter();
   const [admin, setAdmin] = useState<boolean | undefined>();
+  const accessToken = typeof window !== "undefined" && localStorage.getItem("token");
 
 
   useEffect(() => {
-    // const adminToken = localStorage.getItem("token");
-    if (admin !== true && user?.email) {
+    if (admin !== true && user?.email && accessToken) {
       fetch(
         `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${user?.email}`,
         {
           method: "POST",
           headers: {
             "content-type": "application/json",
-            "authorization": `Bearer ${token}`
+            "authorization": `Bearer ${accessToken}`
           },
         }
       )
@@ -37,14 +37,14 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
         })
         .catch();
     }
-  }, [user, token]);
+  }, [user, accessToken]);
 
   useEffect(() => {
-    if (!user && !admin) {
+    if (!user && !admin && accessToken) {
       router.push("/login");
     }
-  }, [router, user]);
+  }, [router, user, accessToken]);
 
-  return <>{(user && admin) ? children : null}</>;
+  return <>{(user && admin && accessToken) ? children : null}</>;
 };
 export default ProtectedRoute;
