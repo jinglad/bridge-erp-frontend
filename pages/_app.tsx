@@ -35,7 +35,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>
           <ThemeProvider theme={theme}>
-            {noAuthRequired.includes(router.pathname) ? (
+            {router.pathname === "/login" ? (
               <Component {...pageProps} />
             ) : (
               <ProtectedRoute>
