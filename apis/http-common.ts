@@ -12,7 +12,7 @@ const authFetch = axios.create({
 
 authFetch.interceptors.request.use((config) => {
   if (jwtToken) {
-    config.headers!.Authorization = `Bearer ${JSON.parse(jwtToken)}`;
+    config.headers!.Authorization = `Bearer ${jwtToken}`;
   }
   return config;
 });
