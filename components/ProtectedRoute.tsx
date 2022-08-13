@@ -40,7 +40,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }, [user, accessToken]);
 
   useEffect(() => {
-    if (!user && !admin && accessToken) {
+    if (!user && !admin && !accessToken) {
       router.push("/login");
     }
   }, [router, user, accessToken]);
