@@ -14,53 +14,10 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const [token, setToken] = useState<any>(null);
   const router = useRouter();
 
-  // useEffect(() => {
-  //   const unsubscribe = onIdTokenChanged(auth, async (user) => {
-  //     if (user) {
-  //       const idToken = await user.getIdToken();
-  //       if (idToken) {
-  //         setUser({
-  //           uid: user.uid,
-  //           email: user.email,
-  //           displayName: user.displayName,
-  //           photoURL: user.photoURL,
-  //           jwt: idToken,
-  //         });
-  //         localStorage.setItem("token", JSON.stringify(idToken));
-  //         setToken(idToken)
-  //       } else {
-  //         setUser(null);
-  //       }
-  //     } else {
-  //       setUser(null);
-  //       localStorage.removeItem("token");
-  //     }
-  //     setLoading(false);
-  //   });
-
-  //   return () => unsubscribe();
-  // }, []);
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setUser(user);
-        // const idToken = await user.getIdTokenResult();
-        // if (idToken) {
-        //   setUser({
-        //     uid: user.uid,
-        //     email: user.email,
-        //     displayName: user.displayName,
-        //     photoURL: user.photoURL,
-        //     jwt: idToken.token,
-        //   });
-        //   localStorage.setItem("token", JSON.stringify(idToken.token));
-        //   // localStorage.setItem("token", idToken.token);
-        //   // setToken(idToken)
-        // } else {
-        //   setUser(null);
-        //   // await signOut(auth);
-        // }
       } else {
         setUser(null);
         localStorage.removeItem("token");
@@ -87,12 +44,18 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       }).then(res => {
         if(res.ok) return res.json();
       }).then(data => {
-        setToken(data?.accessToken);
+        checkAdmin(user.user.email, data?.accessToken).then(res => {
+          if(res?.admin) {
+            sessionStorage.setItem("is-admin", "admin");
+            router.push("/").then();
+          } else {
+            alert("You are not admin");
+          }
+        });
         localStorage.setItem("token", data?.accessToken);
       })
       .catch(error => console.log(error))
     });
-
     return user;
   };
 
@@ -100,12 +63,28 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
     setUser(null);
     await signOut(auth);
     localStorage.removeItem("token");
+    sessionStorage.removeItem("is-admin");
     router.push("/login").then();
   };
 
   return (
-    <AuthContext.Provider value={{ user, logout, googleLogin, token }}>
+    <AuthContext.Provider value={{ user, logout, googleLogin }}>
       {loading ? null : children}
     </AuthContext.Provider>
   );
 };
+
+
+const checkAdmin = async (email:string|null, token: string|null) => {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${email}`, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "authorization": `Bearer ${token}`
+      },
+  })
+
+  if(response.ok) {
+    return await response.json();
+  } 
+}
