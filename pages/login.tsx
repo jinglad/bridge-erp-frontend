@@ -1,13 +1,17 @@
 import { Box, Button, Container } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import LoginButton from "../components/Login/LoginButton";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const { user, logout, admin } = useAuth();
-  const accessToken:any = useRef(null);
+  const { user, logout} = useAuth();
   const router = useRouter();
+  const [admin, setAdmin] = useState<null | string>(null);
+
+  useEffect(() => {
+    setAdmin(sessionStorage.getItem("is-admin"));
+  },[user])
   
   
 
@@ -15,7 +19,7 @@ const Login = () => {
     <Container>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
         <h1 className="text-center my-3 ">Sign in</h1>
-        {(!user && !admin) ? <LoginButton /> : <Button onClick={async () => await logout()}>Logout</Button>}
+        {(admin !== "admin") ? <LoginButton /> : <Button onClick={async () => await logout()}>Logout</Button>}
       </Box>
     </Container>
   );

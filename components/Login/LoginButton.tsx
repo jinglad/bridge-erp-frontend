@@ -11,7 +11,6 @@ const LoginButton = (props: Props) => {
   const handleLogin = async () => {
     try {
       await googleLogin();
-      router.push("/");
     } catch (err) {
       console.log(err);
     }
