@@ -19,9 +19,9 @@ const Login = () => {
   return (
     <Container>
       <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        {/* <h1 className="text-center my-3 ">Sign in</h1>
-        {(admin !== "admin") ? <LoginButton /> : <Button onClick={async () => await logout()}>Logout</Button>} */}
-        <EmailLogin />
+        <h1 className="text-center my-3 ">Sign in</h1>
+        {(admin !== "admin") ? <LoginButton /> : <Button onClick={async () => await logout()}>Logout</Button>}
+        {/* <EmailLogin /> */}
       </Box>
     </Container>
   );
