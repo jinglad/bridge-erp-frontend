@@ -43,8 +43,9 @@ const PurchaseCreate = () => {
   const onSubmit = async (data: any) => {
     await mutateAsync({
       ...data,
-      to_be_paid: Number(data.to_be_paid),
-      paid: Number(data.paid),
+      to_be_paid: 0,
+      paid: 0,
+      payment_method: "cash",
     });
   };
 
@@ -183,65 +184,23 @@ const PurchaseCreate = () => {
                   </Grid>
                 );
               })}
-              <Grid item xs={12} sm={12} justifySelf="start">
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    setProductName("");
-                    append({
-                      name: undefined,
-                      qty: 0,
-                      sell_price: 0,
-                      buy_price: 0,
-                    });
-                  }}
-                >
-                  ADD PRODUCT
-                </Button>
-              </Grid>
 
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  fullWidth
-                  {...register("to_be_paid")}
-                  type="number"
-                  required
-                  id="to_be_paid"
-                  inputProps={{
-                    step: "any",
-                    min: 0,
-                  }}
-                  label="Amount to be paid"
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={4}>
-                <TextField
-                  {...register("paid")}
-                  required
-                  type="number"
-                  id="paid"
-                  label="Paid Amount"
-                  fullWidth
-                  inputProps={{
-                    step: "any",
-                    min: 0,
-                  }}
-                />
-              </Grid>
-              <Grid item xs={12} sm={4}>
-                <Autocomplete
-                  disablePortal
-                  onInputChange={(e, value) => {
-                    setValue("payment_method", value);
-                  }}
-                  options={["Bkash", "Rocket", "Nagad", "IIBL"]}
-                  renderInput={(params) => <TextField {...params} label="Payment Method" required />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={12}>
                 <ButtonGroup>
+                  <Button
+                    variant="contained"
+                    onClick={() => {
+                      setProductName("");
+                      append({
+                        name: undefined,
+                        qty: 0,
+                        sell_price: 0,
+                        buy_price: 0,
+                      });
+                    }}
+                  >
+                    ADD PRODUCT
+                  </Button>
                   <LoadingButton loading={isLoading} type="submit" variant="contained" color="success">
                     Submit
                   </LoadingButton>

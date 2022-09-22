@@ -41,18 +41,6 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
               <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Supplier:</TableCell>
               <TableCell>{purchase.supplier}</TableCell>
             </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Payment method:</TableCell>
-              <TableCell>{purchase.payment_method}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Paid:</TableCell>
-              <TableCell>{purchase.paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>To be paid:</TableCell>
-              <TableCell>{purchase.to_be_paid}</TableCell>
-            </TableRow>
           </Table>
         </TableContainer>
 

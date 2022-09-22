@@ -114,8 +114,6 @@ const Purchase = (props: Props) => {
             <TableHead>
               <TableRow>
                 <TableCell>Supplier</TableCell>
-                <TableCell>Paid</TableCell>
-                <TableCell>To be paid</TableCell>
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
@@ -130,8 +128,6 @@ const Purchase = (props: Props) => {
                     {group?.purchase.map((row) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.supplier}</TableCell>
-                        <TableCell>{row.paid}</TableCell>
-                        <TableCell>{row.to_be_paid}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
