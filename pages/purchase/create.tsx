@@ -122,6 +122,8 @@ const PurchaseCreate = () => {
                         onChange={(e, value) => {
                           if (value) {
                             setValue(`products.${index}._id`, value._id);
+                            setValue(`products.${index}.buy_price`, value.buy_price);
+                            setValue(`products.${index}.sell_price`, value.sell_price);
                           }
                         }}
                         renderInput={(params) => (
