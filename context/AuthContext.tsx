@@ -46,13 +46,13 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
       }).then(data => {
         checkAdmin(user.user.email, data?.accessToken).then(res => {
           if(res?.admin) {
-            sessionStorage.setItem("is-admin", "admin");
             router.push("/").then();
+            localStorage.setItem("is-admin", "admin");
+            localStorage.setItem("token", data?.accessToken);
           } else {
             alert("You are not admin");
           }
         });
-        localStorage.setItem("token", data?.accessToken);
       })
       .catch(error => console.log(error))
     });
@@ -62,9 +62,9 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   const logout = async () => {
     setUser(null);
     await signOut(auth);
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("is-admin");
     router.push("/login").then();
+    localStorage.removeItem("token");
+    localStorage.removeItem("is-admin");
   };
 
   return (

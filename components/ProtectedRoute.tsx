@@ -39,7 +39,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   // }, [user, accessToken]);
 
   useEffect(() => {
-    const admin = sessionStorage.getItem("is-admin");
+    const admin = localStorage.getItem("is-admin");
     const accessToken = localStorage.getItem("token");
     setIsAdmin(admin);
     if (admin !== "admin" || !accessToken) {
