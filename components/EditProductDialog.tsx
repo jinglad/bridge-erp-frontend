@@ -107,22 +107,28 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                  required
                   type="number"
                   label="Buy price"
-                  fullWidth
+                  required
                   {...register("buy_price")}
+                  fullWidth
+                  inputProps={{
+                    step: "any",
+                    min: 0,
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <TextField
-                  inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-                  required
                   type="number"
                   label="Sell price"
-                  fullWidth
+                  required
                   {...register("sell_price")}
+                  fullWidth
+                  inputProps={{
+                    step: "any",
+                    min: 0,
+                  }}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
