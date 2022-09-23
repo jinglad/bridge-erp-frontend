@@ -19,6 +19,17 @@ import { createCustomer } from "../apis/customer-service";
 
 function AddAdminDialog({setEmail}:any) {
   const queryClient = useQueryClient();
+  const { register, handleSubmit, reset } = useForm();
+  const [openAddCustomer, setOpenAddCustomer] = useState(false);
+
+  const notify = (msg: string) => {
+    toast.success(msg);
+  };
+
+  const addAdminDialogToggle = () => {
+    setOpenAddCustomer(!openAddCustomer);
+  };
+
   const { mutateAsync, isLoading } = useMutation("add-admin", createAdmin, {
     onSuccess: (data) => {
       notify(data.msg);
@@ -28,20 +39,8 @@ function AddAdminDialog({setEmail}:any) {
     },
   });
 
-  const notify = (msg: string) => {
-    toast.success(msg);
-  };
-
-  const { register, handleSubmit, reset } = useForm();
-
   const onSubmit = async (data: any) => {
     await mutateAsync(data.email);
-  };
-
-  const [openAddCustomer, setOpenAddCustomer] = useState(false);
-
-  const addAdminDialogToggle = () => {
-    setOpenAddCustomer(!openAddCustomer);
   };
 
   return (
