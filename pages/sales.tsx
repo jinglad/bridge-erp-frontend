@@ -19,43 +19,48 @@ import TableCell from "@mui/material/TableCell";
 import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-
 import { Box } from "@mui/system";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
 import { Customers, getCustomers } from "../apis/customer-service";
 import { getAndSearchProduct, Product, Products } from "../apis/product-service";
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
+import useSalesStore from "../store/salesStore";
 
 type Props = {};
 
 function Sales({}: Props) {
-  const [cartItems, setCartItems] = useState<Product[]>([]);
-
-  const [productName, setProductName] = useState("");
-  const [brandName, setBrandName] = useState("");
-  const [categoryName, setCategoryName] = useState("");
-
-  const addToCart = (product: Product) => {
-    const item = cartItems.findIndex((item) => item._id === product._id);
-
-    if (item !== -1) {
-      const newCartItems = [...cartItems];
-      newCartItems[item].qty += 1;
-      setCartItems(newCartItems);
-
-      return;
-    }
-
-    setCartItems([...cartItems, { ...product }]);
-  };
-
-  const deleteItemFromCart = (id: string) => {
-    const newCart = cartItems.filter((c) => c._id !== id);
-    setCartItems(newCart);
-  };
+  const {
+    cartItems,
+    setCartItems,
+    deleteItemFromCart,
+    customerName,
+    addToCart,
+    reset,
+    setCustomerName,
+    productName,
+    setProductName,
+    brandName,
+    setBrandName,
+    categoryName,
+    setCategoryName,
+  } = useSalesStore((state) => ({
+    cartItems: state.cartItems,
+    deleteItemFromCart: state.deleteItemFromCart,
+    customerName: state.customerName,
+    addToCart: state.addToCart,
+    reset: state.reset,
+    setCartItems: state.setCartItems,
+    setCustomerName: state.setCustomerName,
+    productName: state.productName,
+    setProductName: state.setProductName,
+    brandName: state.brandName,
+    setBrandName: state.setBrandName,
+    categoryName: state.categoryName,
+    setCategoryName: state.setCategoryName,
+  }));
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
     ["searchedProducts", productName, brandName, categoryName],
@@ -92,8 +97,6 @@ function Sales({}: Props) {
     return [...new Set(categoryName)];
   };
 
-  const [customerName, setCustomerName] = useState("");
-
   const { data: customerData, status: customerStatus } = useInfiniteQuery(["customers", customerName], getCustomers, {
     getNextPageParam: (lastPage, pages) => {
       if (pages.length === lastPage.totalPages) {
@@ -110,8 +113,7 @@ function Sales({}: Props) {
   };
 
   const onPaymentSuccess = () => {
-    setCartItems([]);
-    setCustomerName("");
+    reset();
     queryClient.refetchQueries("searchedProducts", { active: true });
     queryClient.refetchQueries("customers", { active: true });
   };
@@ -132,22 +134,15 @@ function Sales({}: Props) {
         <Grid item xs={12} sm={5}>
           <Stack spacing={2}>
             <Autocomplete
-              sx={{ flex: 1 }}
               loading={customerStatus === "loading"}
               options={getCustomerFormattedData(customerData)}
-              onInputChange={(e, value) => {
-                setCustomerName(value);
+              defaultValue={customerName}
+              value={customerName}
+              onChange={(e, value) => {
+                value ? setCustomerName(value) : setCustomerName("");
               }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  value={customerName.toLowerCase()}
-                  placeholder="search customer"
-                  variant="outlined"
-                />
-              )}
+              renderInput={(params) => <TextField {...params} placeholder="search customer" variant="outlined" />}
             />
-
             <AddCustomerDialog />
           </Stack>
           <Box mt={5} sx={{ width: "100%" }}>
@@ -230,18 +225,22 @@ function Sales({}: Props) {
             <Autocomplete
               loading={status === "loading"}
               options={getProductFormattedData(data)}
-              onInputChange={(e, value) => {
-                setProductName(value);
+              defaultValue={productName}
+              value={productName}
+              onChange={(e, value) => {
+                value ? setProductName(value) : setProductName("");
               }}
-              renderInput={(params) => <TextField {...params} placeholder="search products" variant="outlined" />}
+              renderInput={(params) => <TextField {...params} placeholder="search product" variant="outlined" />}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
               loading={status === "loading"}
               options={getCategoryFormattedData(data)}
-              onInputChange={(e, value) => {
-                setCategoryName(value);
+              defaultValue={categoryName}
+              value={categoryName}
+              onChange={(e, value) => {
+                value ? setCategoryName(value) : setCategoryName("");
               }}
               renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
             />
@@ -250,8 +249,10 @@ function Sales({}: Props) {
             <Autocomplete
               loading={status === "loading"}
               options={getBrandFormattedData(data)}
-              onInputChange={(e, value) => {
-                setBrandName(value);
+              defaultValue={brandName}
+              value={brandName}
+              onChange={(e, value) => {
+                value ? setBrandName(value) : setBrandName("");
               }}
               renderInput={(params) => <TextField {...params} placeholder="search brand" variant="outlined" />}
             />
