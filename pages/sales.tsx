@@ -128,6 +128,8 @@ function Sales({}: Props) {
     return true;
   };
 
+  console.log(productName);
+
   return (
     <Layout>
       <Grid container spacing={3}>
@@ -225,36 +227,57 @@ function Sales({}: Props) {
             <Autocomplete
               loading={status === "loading"}
               options={getProductFormattedData(data)}
-              defaultValue={productName}
-              value={productName}
+              disablePortal
               onChange={(e, value) => {
                 value ? setProductName(value) : setProductName("");
               }}
-              renderInput={(params) => <TextField {...params} placeholder="search product" variant="outlined" />}
+              value={productName}
+              renderInput={(params) => (
+                <TextField
+                  onChange={(e) => setProductName(e.target.value)}
+                  placeholder="search product"
+                  variant="outlined"
+                  {...params}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
               loading={status === "loading"}
               options={getCategoryFormattedData(data)}
-              defaultValue={categoryName}
-              value={categoryName}
+              disablePortal
               onChange={(e, value) => {
                 value ? setCategoryName(value) : setCategoryName("");
               }}
-              renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
+              value={categoryName}
+              renderInput={(params) => (
+                <TextField
+                  onChange={(e) => setCategoryName(e.target.value)}
+                  placeholder="search category"
+                  variant="outlined"
+                  {...params}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
               loading={status === "loading"}
               options={getBrandFormattedData(data)}
-              defaultValue={brandName}
-              value={brandName}
+              disablePortal
               onChange={(e, value) => {
                 value ? setBrandName(value) : setBrandName("");
               }}
-              renderInput={(params) => <TextField {...params} placeholder="search brand" variant="outlined" />}
+              value={brandName}
+              renderInput={(params) => (
+                <TextField
+                  onChange={(e) => setBrandName(e.target.value)}
+                  placeholder="search brand"
+                  variant="outlined"
+                  {...params}
+                />
+              )}
             />
           </Grid>
           <Grid item xs={12}>
