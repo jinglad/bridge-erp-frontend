@@ -53,27 +53,42 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
       >
         <Box
           sx={{
-            fontSize: "9px !important",
+            fontSize: "10px !important",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
+            "@media print": {
+              fontSize: "10px !important",
+              fontWeight: 700,
+              fontFamily: "'Poppins', sans-serif",
+            },
           }}
         >
           নিউ আমজাদিয়া ভান্ডার
         </Box>
         <Box
           sx={{
-            fontSize: "9px !important",
+            fontSize: "10px !important",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
+            "@media print": {
+              fontSize: "10px !important",
+              fontWeight: 700,
+              fontFamily: "'Poppins', sans-serif",
+            },
           }}
         >
           ০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১
         </Box>
         <Box
           sx={{
-            fontSize: "9px !important",
+            fontSize: "10px !important",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
+            "@media print": {
+              fontSize: "10px !important",
+              fontWeight: 700,
+              fontFamily: "'Poppins', sans-serif",
+            },
           }}
         >
           {customer}
@@ -92,18 +107,28 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             <Box>
               <Box
                 sx={{
-                  fontSize: "9px !important",
+                  fontSize: "10px !important",
                   fontWeight: 700,
                   fontFamily: "'Poppins', sans-serif",
+                  "@media print": {
+                    fontSize: "10px !important",
+                    fontWeight: 700,
+                    fontFamily: "'Poppins', sans-serif",
+                  },
                 }}
               >
                 {product.name}
               </Box>
               <Box
                 sx={{
-                  fontSize: "9px !important",
+                  fontSize: "10px !important",
                   fontWeight: 700,
                   fontFamily: "'Poppins', sans-serif",
+                  "@media print": {
+                    fontSize: "10px !important",
+                    fontWeight: 700,
+                    fontFamily: "'Poppins', sans-serif",
+                  },
                 }}
               >
                 {product.qty} X ৳{product.sell_price}
@@ -111,9 +136,14 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             </Box>
             <Box
               sx={{
-                fontSize: "9px !important",
+                fontSize: "10px !important",
                 fontWeight: 700,
                 fontFamily: "'Poppins', sans-serif",
+                "@media print": {
+                  fontSize: "10px !important",
+                  fontWeight: 700,
+                  fontFamily: "'Poppins', sans-serif",
+                },
               }}
             >
               ৳
@@ -135,10 +165,30 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             p: "3px 12px",
           }}
         >
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             Discount
           </Box>
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             ৳{parseFloat(discount.toString()).toFixed(2)}
           </Box>
         </Box>
@@ -153,8 +203,30 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>Total</Box>
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
+            Total
+          </Box>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             ৳
             {parseFloat(
               products
@@ -174,10 +246,30 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             {payment_method}
           </Box>
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             ৳{parseFloat(paid.toString()).toFixed(2)}
           </Box>
         </Box>
@@ -192,13 +284,45 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>Due</Box>
-          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
+            Due
+          </Box>
+          <Box
+            sx={{
+              fontSize: "9px!important",
+              fontWeight: 700,
+              "@media print": {
+                fontSize: "10px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              },
+            }}
+          >
             ৳{parseFloat(to_be_paid.toString()).toFixed(2)}
           </Box>
         </Box>
         <DoubleDivider />
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>
+        <Box
+          sx={{
+            fontSize: "10px !important",
+            fontWeight: 700,
+            "@media print": {
+              fontSize: "10px !important",
+              fontWeight: 700,
+              fontFamily: "'Poppins', sans-serif",
+            },
+          }}
+        >
           {createdDate}
         </Box>
       </Box>
