@@ -1,16 +1,15 @@
 import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
+import useFormPersist from "react-hook-form-persist";
 import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { getAndSearchProduct, Products } from "../../apis/product-service";
 import { createPurchase } from "../../apis/purchase-service";
 import { getSupplier, Suppliers } from "../../apis/supplier-service";
 import Layout from "../../components/Layout/Layout";
-
-import useFormPersist from "react-hook-form-persist";
 import usePurchaseStore from "../../store/purchaseStore";
 
 const PurchaseCreate = () => {
@@ -19,9 +18,8 @@ const PurchaseCreate = () => {
     setPurchaseForm: state.setPurchaseForm,
   }));
 
-  const { register, control, watch, handleSubmit, setValue, reset, getValues } = useForm({
+  const { register, control, handleSubmit, setValue, reset, watch, getValues } = useForm({
     defaultValues: purchaseForm,
-    mode: "onBlur",
   });
 
   useFormPersist("purchase-create", {
@@ -30,12 +28,11 @@ const PurchaseCreate = () => {
     storage: window.localStorage,
   });
 
-  watch();
-
-  useEffect(() => {
-    ///@ts-ignore-next-line
-    watch((value, { name, type }) => setPurchaseForm(value));
-  }, [watch, setPurchaseForm]);
+  watch((data, { name, type }) => {
+    // @ts-ignore-next-line
+    setPurchaseForm(data);
+    console.log(data, name, type);
+  });
 
   const {
     mutateAsync,
@@ -62,8 +59,6 @@ const PurchaseCreate = () => {
       paid: 0,
       payment_method: "cash",
     });
-    setValue("products", [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }]);
-    setValue("supplier", "");
   };
 
   const [productName, setProductName] = useState("");
@@ -77,6 +72,8 @@ const PurchaseCreate = () => {
       }
     },
   });
+
+  const [supplierName, setSupplierName] = useState("");
 
   const { data: spData, status: spStatus } = useInfiniteQuery(["suppliers", purchaseForm.supplier], getSupplier, {
     getNextPageParam: (lastPage, pages) => {
@@ -114,18 +111,29 @@ const PurchaseCreate = () => {
                 <Autocomplete
                   loading={spStatus === "loading"}
                   options={getSupplierFormattedData(spData)}
-                  defaultValue={purchaseForm.supplier ? purchaseForm.supplier : ""}
-                  value={purchaseForm.supplier ? purchaseForm.supplier : ""}
                   onChange={(e, value) => {
-                    value
-                      ? setPurchaseForm({
-                          ...purchaseForm,
-                          supplier: value,
-                        })
-                      : setPurchaseForm({ ...purchaseForm, supplier: "" });
+                    if (value) {
+                      setValue("supplier", value);
+                    }
                   }}
+                  onInputChange={(event, newInputValue, reason) => {
+                    if (reason === "clear") {
+                      setValue("supplier", "");
+                    }
+                    return;
+                  }}
+                  value={purchaseForm.supplier}
                   renderInput={(params) => (
-                    <TextField {...params} placeholder="suppliers" {...register(`supplier`)} required />
+                    <TextField
+                      {...params}
+                      placeholder="suppliers"
+                      {...register(`supplier`, {
+                        onChange: (e) => {
+                          setValue("supplier", e.target.value);
+                        },
+                      })}
+                      required
+                    />
                   )}
                 />
               </Grid>
@@ -137,22 +145,27 @@ const PurchaseCreate = () => {
                         loading={status === "loading"}
                         options={getProductFormattedData(data)}
                         getOptionLabel={(option) => option.name}
+                        onInputChange={(e, value) => {
+                          setProductName(value);
+                        }}
                         onChange={(e, value) => {
                           if (value) {
-                            setValue(`products.${index}.name`, value.name);
                             setValue(`products.${index}._id`, value._id);
                             setValue(`products.${index}.buy_price`, value.buy_price);
                             setValue(`products.${index}.sell_price`, value.sell_price);
                           }
                         }}
-                        defaultValue={getValues(`products.${index}`)}
-                        value={getValues(`products.${index}`)}
+                        value={purchaseForm.products[index]}
                         renderInput={(params) => (
                           <TextField
                             {...params}
-                            required
                             placeholder="search products"
-                            {...register(`products.${index}.name`)}
+                            {...register(`products.${index}.name`, {
+                              onChange: (e) => {
+                                setProductName(e.target.value);
+                              },
+                            })}
+                            required
                           />
                         )}
                       />
@@ -215,7 +228,7 @@ const PurchaseCreate = () => {
                     onClick={() => {
                       setProductName("");
                       append({
-                        name: "",
+                        name: undefined,
                         qty: 0,
                         sell_price: 0,
                         buy_price: 0,

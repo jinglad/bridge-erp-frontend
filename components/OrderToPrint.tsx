@@ -16,7 +16,18 @@ interface OrderToPrintProps {
 
 // eslint-disable-next-line react/display-name
 export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
-  ({ customer, paid, discount, payment_method, products, to_be_paid, createdDate }, ref) => {
+  (
+    {
+      customer,
+      paid,
+      discount,
+      payment_method,
+      products,
+      to_be_paid,
+      createdDate,
+    },
+    ref
+  ) => {
     return (
       <Box
         ref={ref}
@@ -34,15 +45,39 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             visibility: "hidden",
           },
           "*": {
-            // fontSize: "8px",
+            // fontSize: "9px",
             fontWeight: "medium !important",
             fontFamily: "Poppins",
           },
         }}
       >
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>নিউ আমজাদিয়া ভান্ডার</Box>
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১</Box>
-        <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>{customer}</Box>
+        <Box
+          sx={{
+            fontSize: "9px !important",
+            fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          নিউ আমজাদিয়া ভান্ডার
+        </Box>
+        <Box
+          sx={{
+            fontSize: "9px !important",
+            fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          ০১৮৭২৫০০৬৪৫ , ০১৭০৯২০২৫৮১
+        </Box>
+        <Box
+          sx={{
+            fontSize: "9px !important",
+            fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          {customer}
+        </Box>
         <DoubleDivider />
         {products.map((product, i) => (
           <Box
@@ -55,13 +90,36 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             key={product._id}
           >
             <Box>
-              <Box sx={{ fontSize: "8px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>{product.name}</Box>
-              <Box sx={{ fontSize: "8px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>
+              <Box
+                sx={{
+                  fontSize: "9px !important",
+                  fontWeight: 700,
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
+                {product.name}
+              </Box>
+              <Box
+                sx={{
+                  fontSize: "9px !important",
+                  fontWeight: 700,
+                  fontFamily: "'Poppins', sans-serif",
+                }}
+              >
                 {product.qty} X ৳{product.sell_price}
               </Box>
             </Box>
-            <Box sx={{ fontSize: "9px !important", fontWeight: 700, fontFamily: "'Poppins', sans-serif" }}>
-              ৳{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}
+            <Box
+              sx={{
+                fontSize: "9px !important",
+                fontWeight: 700,
+                fontFamily: "'Poppins', sans-serif",
+              }}
+            >
+              ৳
+              {parseFloat(
+                (product.sell_price * product.qty).toString()
+              ).toFixed(2)}
             </Box>
           </Box>
         ))}
@@ -71,29 +129,17 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "8px!important",
+            fontSize: "9px!important",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
             p: "3px 12px",
           }}
         >
-          <Box>Discount</Box>
-          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(discount.toString()).toFixed(2)}</Box>
-        </Box>
-        <Box
-          sx={{
-            width: "100%",
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: "8px!important",
-            p: "3px 12px",
-            fontWeight: 700,
-            fontFamily: "'Poppins', sans-serif",
-          }}
-        >
-          <Box>Total</Box>
-          <Box sx={{fontSize: "9px!important"}}>
-            ৳{parseFloat(products.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()).toFixed(2)}
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            Discount
+          </Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            ৳{parseFloat(discount.toString()).toFixed(2)}
           </Box>
         </Box>
         <Box
@@ -101,31 +147,60 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "8px!important",
+            fontSize: "9px!important",
             p: "3px 12px",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <Box>{payment_method}</Box>
-          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(paid.toString()).toFixed(2)}</Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>Total</Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            ৳
+            {parseFloat(
+              products
+                .reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)
+                .toString()
+            ).toFixed(2)}
+          </Box>
         </Box>
         <Box
           sx={{
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "8px!important",
+            fontSize: "9px!important",
             p: "3px 12px",
             fontWeight: 700,
             fontFamily: "'Poppins', sans-serif",
           }}
         >
-          <Box>Due</Box>
-          <Box sx={{fontSize: "9px!important"}}>৳{parseFloat(to_be_paid.toString()).toFixed(2)}</Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            {payment_method}
+          </Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            ৳{parseFloat(paid.toString()).toFixed(2)}
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            justifyContent: "space-between",
+            fontSize: "9px!important",
+            p: "3px 12px",
+            fontWeight: 700,
+            fontFamily: "'Poppins', sans-serif",
+          }}
+        >
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>Due</Box>
+          <Box sx={{ fontSize: "9px!important", fontWeight: 700 }}>
+            ৳{parseFloat(to_be_paid.toString()).toFixed(2)}
+          </Box>
         </Box>
         <DoubleDivider />
-        <Box sx={{ fontSize: "7px !important", fontWeight: 700 }}>{createdDate}</Box>
+        <Box sx={{ fontSize: "9px !important", fontWeight: 700 }}>
+          {createdDate}
+        </Box>
       </Box>
     );
   }
