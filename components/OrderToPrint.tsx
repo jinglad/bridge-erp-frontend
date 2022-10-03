@@ -46,8 +46,8 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           },
           "*": {
             // fontSize: "9px",
-            fontWeight: "medium !important",
-            fontFamily: "Poppins",
+            fontWeight: 800,
+            // fontFamily: "Poppins",
           },
         }}
       >
@@ -55,11 +55,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           sx={{
             fontSize: "10px !important",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
             "@media print": {
               fontSize: "10px !important",
               fontWeight: 800,
-              fontFamily: "'Poppins', sans-serif",
+              // fontFamily: "'Poppins', sans-serif",
             },
           }}
         >
@@ -69,11 +69,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           sx={{
             fontSize: "10px !important",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
             "@media print": {
               fontSize: "10px !important",
               fontWeight: 800,
-              fontFamily: "'Poppins', sans-serif",
+              // fontFamily: "'Poppins', sans-serif",
             },
           }}
         >
@@ -83,11 +83,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           sx={{
             fontSize: "10px !important",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
             "@media print": {
               fontSize: "10px !important",
               fontWeight: 800,
-              fontFamily: "'Poppins', sans-serif",
+              // fontFamily: "'Poppins', sans-serif",
             },
           }}
         >
@@ -107,13 +107,13 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             <Box>
               <Box
                 sx={{
-                  fontSize: "11px !important",
+                  fontSize: "13px !important",
                   fontWeight: 800,
-                  fontFamily: "'Poppins', sans-serif",
+                  // fontFamily: "'Poppins', sans-serif",
                   "@media print": {
-                    fontSize: "11px !important",
+                    fontSize: "13px !important",
                     fontWeight: 800,
-                    fontFamily: "'Poppins', sans-serif",
+                    // fontFamily: "'Poppins', sans-serif",
                   },
                 }}
               >
@@ -121,13 +121,13 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
               </Box>
               <Box
                 sx={{
-                  fontSize: "11px !important",
+                  fontSize: "13px !important",
                   fontWeight: 800,
-                  fontFamily: "'Poppins', sans-serif",
+                  // fontFamily: "'Poppins', sans-serif",
                   "@media print": {
-                    fontSize: "11px !important",
+                    fontSize: "13px !important",
                     fontWeight: 800,
-                    fontFamily: "'Poppins', sans-serif",
+                    // fontFamily: "'Poppins', sans-serif",
                   },
                 }}
               >
@@ -136,13 +136,13 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             </Box>
             <Box
               sx={{
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
                 "@media print": {
-                  fontSize: "11px !important",
+                  fontSize: "13px !important",
                   fontWeight: 800,
-                  fontFamily: "'Poppins', sans-serif",
+                  // fontFamily: "'Poppins', sans-serif",
                 },
               }}
             >
@@ -159,20 +159,20 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "11px!important",
+            fontSize: "13px!important",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
             p: "3px 12px",
           }}
         >
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -180,12 +180,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -197,20 +197,20 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "11px!important",
+            fontSize: "13px!important",
             p: "3px 12px",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -218,12 +218,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -240,20 +240,20 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "11px!important",
+            fontSize: "13px!important",
             p: "3px 12px",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -261,12 +261,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -278,20 +278,20 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "11px!important",
+            fontSize: "13px!important",
             p: "3px 12px",
             fontWeight: 800,
-            fontFamily: "'Poppins', sans-serif",
+            // fontFamily: "'Poppins', sans-serif",
           }}
         >
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -299,12 +299,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "11px!important",
+              fontSize: "13px!important",
               fontWeight: 800,
               "@media print": {
-                fontSize: "11px !important",
+                fontSize: "13px !important",
                 fontWeight: 800,
-                fontFamily: "'Poppins', sans-serif",
+                // fontFamily: "'Poppins', sans-serif",
               },
             }}
           >
@@ -314,12 +314,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         <DoubleDivider />
         <Box
           sx={{
-            fontSize: "11px !important",
+            fontSize: "13px !important",
             fontWeight: 800,
             "@media print": {
-              fontSize: "11px !important",
+              fontSize: "13px !important",
               fontWeight: 800,
-              fontFamily: "'Poppins', sans-serif",
+              // fontFamily: "'Poppins', sans-serif",
             },
           }}
         >
