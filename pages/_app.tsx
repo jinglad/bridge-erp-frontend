@@ -14,6 +14,7 @@ import "../styles/globals.css";
 
 import { ToastContainer } from "react-toastify";
 import { theme } from "../theme/theme";
+import { PrintContextProvider } from "../context/PrintContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -34,6 +35,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       </Head>
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>
+          <PrintContextProvider>
           <ThemeProvider theme={theme}>
             {router.pathname === "/login" ? (
               <Component {...pageProps} />
@@ -52,6 +54,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               pauseOnHover
             />
           </ThemeProvider>
+          </PrintContextProvider>
         </AuthContextProvider>
       </QueryClientProvider>
     </>

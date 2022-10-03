@@ -16,9 +16,11 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import { useCallback, useRef } from "react";
+import { Router, useRouter } from "next/router";
+import { useCallback, useContext, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Order } from "../apis/order-service";
+import { PrintContext } from "../context/PrintContext";
 import { OrderToPrint } from "./OrderToPrint";
 
 interface ViewOrderProps {
@@ -29,6 +31,9 @@ interface ViewOrderProps {
 
 function ViewOrder({ onClose, open, order }: ViewOrderProps) {
   const componentRef = useRef(null);
+  const [printOpen, setPrintOpen] = useState(false);
+  const router = useRouter();
+  const {setValue} = useContext(PrintContext);
 
   const pageStyle = `
   @page {
@@ -42,12 +47,25 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
     return componentRef.current;
   }, [componentRef]);
 
-  const handlePrint = useReactToPrint({
-    content: reactToPrintContent,
-    documentTitle: "AwesomeFileName",
-    removeAfterPrint: true,
-    pageStyle: pageStyle,
-  });
+  // const handlePrint = useReactToPrint({
+  //   content: reactToPrintContent,
+  //   documentTitle: "AwesomeFileName",
+  //   removeAfterPrint: true,
+  //   pageStyle: pageStyle,
+  // });
+
+  const handlePrint = () => {
+    setValue({
+      payment_method:order.payment_method,
+        discount:Number(order.discount),
+        paid:Number(order.paid),
+        to_be_paid:order.to_be_paid,
+        products:order.products,
+        customer:order.customer,
+        createdDate:moment(order.createdDate).format("ddd MMM D YYYY")
+    })
+    router.push("/print-memo").then();
+  }
 
   return (
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
@@ -113,13 +131,13 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
         </TableContainer>
 
         <DialogActions>
-          <Button onClick={() => handlePrint()}>Print</Button>
+          <Button onClick={handlePrint}>Print</Button>
           <Button color="error" onClick={onClose}>
             close
           </Button>
         </DialogActions>
       </DialogContent>
-      <OrderToPrint
+      {/* <OrderToPrint
         ref={componentRef}
         payment_method={order.payment_method}
         discount={Number(order.discount)}
@@ -128,7 +146,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
         products={order.products}
         customer={order.customer}
         createdDate={moment(order.createdDate).format("ddd MMM D YYYY")}
-      />
+      /> */}
     </Dialog>
   );
 }

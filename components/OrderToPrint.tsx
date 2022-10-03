@@ -69,13 +69,13 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         </Box>
         <Box
           sx={{
-            fontSize: "15px !important",
+            fontSize: "14px !important",
             fontWeight: 900,
-            fontFamily: "'Noto Sans Bengali', sans-serif!important",
+            // fontFamily: "'Noto Sans Bengali', sans-serif!important",
             "@media print": {
-              fontSize: "15px !important",
+              fontSize: "14px !important",
               fontWeight: 900,
-              fontFamily: "'Noto Sans Bengali', sans-serif!important",
+              // fontFamily: "'Noto Sans Bengali', sans-serif!important",
             },
           }}
         >
@@ -83,11 +83,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         </Box>
         <Box
           sx={{
-            fontSize: "15px !important",
+            fontSize: "14px !important",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
             "@media print": {
-              fontSize: "15px !important",
+              fontSize: "14px !important",
               fontWeight: 900,
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
             },
@@ -109,13 +109,13 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             <Box>
               <Box
                 sx={{
-                  fontSize: "15px !important",
+                  fontSize: "14px !important",
                   fontWeight: 900,
-                  fontFamily: "'Noto Sans Bengali', sans-serif!important",
+                  // fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   "@media print": {
-                    fontSize: "15px !important",
+                    fontSize: "14px !important",
                     fontWeight: 900,
-                    fontFamily: "'Noto Sans Bengali', sans-serif!important",
+                    // fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   },
                 }}
               >
@@ -332,7 +332,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
   }
 );
 
-const DoubleDivider = () => {
+export const DoubleDivider = () => {
   return (
     <Fragment>
       <Box
