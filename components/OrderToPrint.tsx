@@ -53,12 +53,12 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
       >
         <Box
           sx={{
-            fontSize: "12px !important",
+            fontSize: "16px !important",
             fontWeight: 900,
             // fontFamily: "'Poppins', sans-serif",
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
             "@media print": {
-              fontSize: "12px !important",
+              fontSize: "16px !important",
               fontWeight: 900,
               // fontFamily: "'Poppins', sans-serif",
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
@@ -69,11 +69,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         </Box>
         <Box
           sx={{
-            fontSize: "12px !important",
+            fontSize: "16px !important",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
             "@media print": {
-              fontSize: "12px !important",
+              fontSize: "16px !important",
               fontWeight: 900,
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
             },
@@ -83,11 +83,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         </Box>
         <Box
           sx={{
-            fontSize: "12px !important",
+            fontSize: "16px !important",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
             "@media print": {
-              fontSize: "12px !important",
+              fontSize: "16px !important",
               fontWeight: 900,
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
             },
@@ -109,11 +109,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             <Box>
               <Box
                 sx={{
-                  fontSize: "14px !important",
+                  fontSize: "16px !important",
                   fontWeight: 900,
                   fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   "@media print": {
-                    fontSize: "14px !important",
+                    fontSize: "16px !important",
                     fontWeight: 900,
                     fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   },
@@ -123,11 +123,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
               </Box>
               <Box
                 sx={{
-                  fontSize: "14px !important",
+                  fontSize: "16px !important",
                   fontWeight: 900,
                   fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   "@media print": {
-                    fontSize: "14px !important",
+                    fontSize: "16px !important",
                     fontWeight: 900,
                     fontFamily: "'Noto Sans Bengali', sans-serif!important",
                   },
@@ -138,11 +138,11 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             </Box>
             <Box
               sx={{
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
                 "@media print": {
-                  fontSize: "14px !important",
+                  fontSize: "16px !important",
                   fontWeight: 900,
                   fontFamily: "'Noto Sans Bengali', sans-serif!important",
                 },
@@ -161,7 +161,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "14px!important",
+            fontSize: "16px!important",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
             p: "3px 12px",
@@ -169,10 +169,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         >
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -182,10 +182,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -199,7 +199,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "14px!important",
+            fontSize: "16px!important",
             p: "3px 12px",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
@@ -207,10 +207,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         >
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -220,10 +220,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -242,7 +242,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "14px!important",
+            fontSize: "16px!important",
             p: "3px 12px",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
@@ -250,10 +250,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         >
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -263,10 +263,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -280,7 +280,7 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
             width: "100%",
             display: "flex",
             justifyContent: "space-between",
-            fontSize: "14px!important",
+            fontSize: "16px!important",
             p: "3px 12px",
             fontWeight: 900,
             fontFamily: "'Noto Sans Bengali', sans-serif!important",
@@ -288,10 +288,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         >
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -301,10 +301,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
           </Box>
           <Box
             sx={{
-              fontSize: "14px!important",
+              fontSize: "16px!important",
               fontWeight: 900,
               "@media print": {
-                fontSize: "14px !important",
+                fontSize: "16px !important",
                 fontWeight: 900,
                 fontFamily: "'Noto Sans Bengali', sans-serif!important",
               },
@@ -316,10 +316,10 @@ export const OrderToPrint = forwardRef<HTMLInputElement, OrderToPrintProps>(
         <DoubleDivider />
         <Box
           sx={{
-            fontSize: "14px !important",
+            fontSize: "16px !important",
             fontWeight: 900,
             "@media print": {
-              fontSize: "14px !important",
+              fontSize: "16px !important",
               fontWeight: 900,
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
             },
