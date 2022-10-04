@@ -33,13 +33,14 @@ const PrintMemoPage = () => {
           size: "80mm",
           margin: "0px",
         },
-        // padding: "2mm .6mm",
+        padding: "2mm .6mm",
         display: "flex",
         flexDirection: "column",
-        width: "80mm",
+        width: "75mm",
         // maxWidth: "78mm",
         alignItems: "center",
         justifyContent: "center",
+        fontFamily: "'Noto Sans Bengali', sans-serif!important",
       }}
     >
       <Box
