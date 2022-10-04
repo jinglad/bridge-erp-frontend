@@ -127,34 +127,6 @@ const PrintMemoPage = () => {
           display: "flex",
           justifyContent: "space-between",
           fontSize: "14px!important",
-          fontWeight: 900,
-          fontFamily: "'Noto Sans Bengali', sans-serif!important",
-          p: "3px 12px",
-        }}
-      >
-        <Box
-          sx={{
-            fontSize: "14px!important",
-            fontWeight: 900,
-          }}
-        >
-          Discount
-        </Box>
-        <Box
-          sx={{
-            fontSize: "14px!important",
-            fontWeight: 900,
-          }}
-        >
-          ৳{parseFloat(discount?.toString()).toFixed(2)}
-        </Box>
-      </Box>
-      <Box
-        sx={{
-          width: "100%",
-          display: "flex",
-          justifyContent: "space-between",
-          fontSize: "14px!important",
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
@@ -183,6 +155,34 @@ const PrintMemoPage = () => {
               )
               .toString()
           ).toFixed(2)}
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "14px!important",
+          fontWeight: 900,
+          fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          p: "3px 12px",
+        }}
+      >
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          Discount
+        </Box>
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          ৳{parseFloat(discount?.toString()).toFixed(2)}
         </Box>
       </Box>
       <Box
