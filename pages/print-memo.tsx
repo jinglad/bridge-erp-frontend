@@ -32,6 +32,7 @@ const PrintMemoPage = () => {
         "@page": {
           size: "80mm",
           margin: "0px",
+          padding: "10px 15px",
         },
         padding: "2mm .6mm",
         display: "flex",
@@ -78,6 +79,7 @@ const PrintMemoPage = () => {
             display: "flex",
             justifyContent: "space-between",
             p: "0px 12px",
+            pr: 1,
           }}
           key={product?._id}
         >
@@ -106,11 +108,6 @@ const PrintMemoPage = () => {
               fontSize: "14px !important",
               fontWeight: 900,
               fontFamily: "'Noto Sans Bengali', sans-serif!important",
-              // "@media print": {
-              //   fontSize: "14px !important",
-              //   fontWeight: 900,
-              //   fontFamily: "'Noto Sans Bengali', sans-serif!important",
-              // },
             }}
           >
             ৳
@@ -130,6 +127,7 @@ const PrintMemoPage = () => {
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr: 1,
         }}
       >
         <Box
@@ -166,6 +164,7 @@ const PrintMemoPage = () => {
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
           p: "3px 12px",
+          pr: 1,
         }}
       >
         <Box
@@ -194,6 +193,7 @@ const PrintMemoPage = () => {
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr:1,
         }}
       >
         <Box
@@ -222,6 +222,7 @@ const PrintMemoPage = () => {
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr:1,
         }}
       >
         <Box

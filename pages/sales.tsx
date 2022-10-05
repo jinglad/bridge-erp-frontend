@@ -128,7 +128,7 @@ function Sales({}: Props) {
     return true;
   };
 
-  console.log(productName);
+  // console.log(productName);
 
   return (
     <Layout>
@@ -160,7 +160,7 @@ function Sales({}: Props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {cartItems.map((product:any) => (
+                  {cartItems?.map((product:any) => (
                     <TableRow key={product._id} hover>
                       <TableCell align="left">
                         <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>

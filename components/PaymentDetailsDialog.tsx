@@ -23,13 +23,15 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { useReactToPrint } from "react-to-print";
 import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
 import { Product } from "../apis/product-service";
+import { PrintContext } from "../context/PrintContext";
 import { OrderToPrint } from "./OrderToPrint";
 
 type PaymentDetailsDialogProps = {
@@ -45,7 +47,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
   const { mutateAsync, isLoading } = useMutation("createOrder", createOrder, {
     onSuccess: (data) => {
-      toast.success(data.msg);
+      // toast.success(data.msg);
       handlePrint();
       reset();
       onSuccess();
@@ -90,6 +92,9 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
   const componentRef = useRef(null);
 
+  const router = useRouter();
+  const {setValue:setPrint} = useContext(PrintContext);
+
   const pageStyle = `
   @page {
     size: 80mm auto;
@@ -102,12 +107,25 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     return componentRef.current;
   }, [componentRef]);
 
-  const handlePrint = useReactToPrint({
-    content: reactToPrintContent,
-    documentTitle: "AwesomeFileName",
-    removeAfterPrint: true,
-    pageStyle: pageStyle,
-  });
+  // const handlePrint = useReactToPrint({
+  //   // content: reactToPrintContent,
+  //   // documentTitle: "AwesomeFileName",
+  //   // removeAfterPrint: true,
+  //   // pageStyle: pageStyle,
+  // });
+
+  const handlePrint = () => {
+    setPrint({
+        payment_method:getValues("payment_method"),
+        discount:Number(getValues("discount")),
+        paid:Number(getValues("paid")),
+        to_be_paid:cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid")),
+        products:cartItems,
+        customer:customerName,
+        createdDate:moment(new Date()).format("ddd MMM D YYYY")
+    })
+    router.push("/print-memo").then();
+  }
 
   return (
     <>
@@ -243,7 +261,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                 </TableBody>
               </Table>
             </TableContainer>
-            <OrderToPrint
+            {/* <OrderToPrint
               ref={componentRef}
               payment_method={getValues("payment_method")}
               discount={Number(getValues("discount"))}
@@ -254,7 +272,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
               products={cartItems}
               customer={customerName}
               createdDate={moment(new Date()).format("ddd MMM D YYYY")}
-            />
+            /> */}
           </DialogContent>
           <DialogActions>
             <LoadingButton loading={isLoading} autoFocus type="submit" variant="contained">
