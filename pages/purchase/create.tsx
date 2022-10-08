@@ -1,67 +1,63 @@
 import { LoadingButton } from "@mui/lab";
 import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import useFormPersist from "react-hook-form-persist";
 import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { getAndSearchProduct, Products } from "../../apis/product-service";
 import { createPurchase } from "../../apis/purchase-service";
 import { getSupplier, Suppliers } from "../../apis/supplier-service";
 import Layout from "../../components/Layout/Layout";
-import usePurchaseStore from "../../store/purchaseStore";
+import { useTrackedPurchaseStore } from "../../store/purchaseStore";
 
 const PurchaseCreate = () => {
-  const { purchaseForm, setPurchaseForm } = usePurchaseStore((state) => ({
-    purchaseForm: state.purchaseFrom,
-    setPurchaseForm: state.setPurchaseForm,
-  }));
+  const { purchaseForm, setPurchaseForm, resetPurchaseForm } = useTrackedPurchaseStore();
 
-  const { register, control, handleSubmit, setValue, reset, watch, getValues } = useForm({
+  const { register, control, handleSubmit, setValue, reset, watch, setFocus } = useForm({
     defaultValues: purchaseForm,
   });
-
-  useFormPersist("purchase-create", {
-    watch,
-    setValue,
-    storage: window.localStorage,
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "products",
   });
 
   watch((data, { name, type }) => {
-    // @ts-ignore-next-line
+    //@ts-ignore-next-line
     setPurchaseForm(data);
-    console.log(data, name, type);
   });
 
-  const {
-    mutateAsync,
-    isLoading,
-    reset: resetQ,
-  } = useMutation("createPurchase", createPurchase, {
+  const [productName, setProductName] = useState("");
+
+  const { mutate, mutateAsync, isLoading } = useMutation("createPurchase", createPurchase, {
+    onMutate: (data) => {
+      reset({
+        products: [
+          {
+            name: "",
+            qty: 0,
+            sell_price: 0,
+            buy_price: 0,
+          },
+        ],
+        supplier: "",
+      });
+    },
     onSuccess: (data) => {
       toast.success(data.msg);
-      reset();
     },
     onError: (error: any) => {
       toast.error(error.response.data.msg);
     },
   });
 
-  const { fields, append, remove } = useFieldArray({
-    name: "products",
-    control,
-  });
-  const onSubmit = async (data: any) => {
-    await mutateAsync({
+  const onSubmit = (data: any) => {
+    mutate({
       ...data,
       to_be_paid: 0,
       paid: 0,
       payment_method: "cash",
     });
   };
-
-  const [productName, setProductName] = useState("");
 
   const { data, status } = useInfiniteQuery(["searchedProducts", productName], getAndSearchProduct, {
     getNextPageParam: (lastPage, pages) => {
@@ -72,8 +68,6 @@ const PurchaseCreate = () => {
       }
     },
   });
-
-  const [supplierName, setSupplierName] = useState("");
 
   const { data: spData, status: spStatus } = useInfiniteQuery(["suppliers", purchaseForm.supplier], getSupplier, {
     getNextPageParam: (lastPage, pages) => {
@@ -95,8 +89,6 @@ const PurchaseCreate = () => {
     return productName || [];
   };
 
-  const router = useRouter();
-
   return (
     <Layout>
       <Grid container spacing={3} columns={12}>
@@ -113,12 +105,12 @@ const PurchaseCreate = () => {
                   options={getSupplierFormattedData(spData)}
                   onChange={(e, value) => {
                     if (value) {
-                      setValue("supplier", value);
+                      setPurchaseForm({ ...purchaseForm, supplier: value });
                     }
                   }}
                   onInputChange={(event, newInputValue, reason) => {
                     if (reason === "clear") {
-                      setValue("supplier", "");
+                      setPurchaseForm({ ...purchaseForm, supplier: "" });
                     }
                     return;
                   }}
@@ -129,7 +121,7 @@ const PurchaseCreate = () => {
                       placeholder="suppliers"
                       {...register(`supplier`, {
                         onChange: (e) => {
-                          setValue("supplier", e.target.value);
+                          setPurchaseForm({ ...purchaseForm, supplier: e.target.value });
                         },
                       })}
                       required
@@ -150,21 +142,29 @@ const PurchaseCreate = () => {
                         }}
                         onChange={(e, value) => {
                           if (value) {
+                            setValue(`products.${index}.name`, value.name);
                             setValue(`products.${index}._id`, value._id);
-                            setValue(`products.${index}.buy_price`, value.buy_price);
-                            setValue(`products.${index}.sell_price`, value.sell_price);
+                            setValue(`products.${index}.buy_price`, Number(value.buy_price));
+                            setValue(`products.${index}.sell_price`, Number(value.sell_price));
+                            setProductName("");
                           }
                         }}
-                        value={purchaseForm.products[index]}
+                        value={
+                          purchaseForm.products[index]
+                            ? purchaseForm.products[index]
+                            : {
+                                name: "",
+                                qty: 0,
+                                sell_price: 0,
+                                buy_price: 0,
+                                _id: index.toString(),
+                              }
+                        }
                         renderInput={(params) => (
                           <TextField
                             {...params}
                             placeholder="search products"
-                            {...register(`products.${index}.name`, {
-                              onChange: (e) => {
-                                setProductName(e.target.value);
-                              },
-                            })}
+                            {...register(`products.${index}.name`)}
                             required
                           />
                         )}
@@ -176,7 +176,9 @@ const PurchaseCreate = () => {
                         label="Purchase Quantity"
                         type="number"
                         required
-                        {...register(`products.${index}.qty`)}
+                        {...register(`products.${index}.qty`, {
+                          valueAsNumber: true,
+                        })}
                         fullWidth
                         inputProps={{
                           step: "any",
@@ -186,7 +188,6 @@ const PurchaseCreate = () => {
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
                       <TextField
-                        placeholder="value"
                         type="number"
                         label="Purchase Per Unit"
                         required
@@ -201,7 +202,6 @@ const PurchaseCreate = () => {
                     <Grid item xs={12} sm={2} md={3}>
                       <TextField
                         label="Sells Per Unit"
-                        placeholder="value"
                         type="number"
                         required
                         {...register(`products.${index}.sell_price`)}
@@ -222,13 +222,13 @@ const PurchaseCreate = () => {
               })}
 
               <Grid item xs={12} sm={12}>
-                <ButtonGroup>
+                <ButtonGroup fullWidth>
                   <Button
                     variant="contained"
                     onClick={() => {
                       setProductName("");
                       append({
-                        name: undefined,
+                        name: "",
                         qty: 0,
                         sell_price: 0,
                         buy_price: 0,
@@ -240,15 +240,6 @@ const PurchaseCreate = () => {
                   <LoadingButton loading={isLoading} type="submit" variant="contained" color="success">
                     Submit
                   </LoadingButton>
-                  <Button
-                    color="error"
-                    onClick={() => {
-                      resetQ();
-                      router.push("/purchase");
-                    }}
-                  >
-                    Cancel
-                  </Button>
                 </ButtonGroup>
               </Grid>
             </Grid>

@@ -1,5 +1,5 @@
 import create from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { persist } from "zustand/middleware";
 
 interface IProductForm {
   name: string;
@@ -9,39 +9,48 @@ interface IProductForm {
   _id: string;
 }
 
-interface PurchaseForm {
+export interface PurchaseForm {
   products: IProductForm[];
   supplier: string;
-  to_be_paid: number;
-  paid: number;
-  payment_method: string;
 }
 
 interface PurchaseStore {
-  purchaseFrom: PurchaseForm;
+  purchaseForm: PurchaseForm;
   setPurchaseForm: (purchaseForm: PurchaseForm) => void;
+  resetPurchaseForm: () => void;
 }
 
 const usePurchaseStore = create<PurchaseStore>()(
-  devtools(
-    persist((set) => ({
-      purchaseFrom: {
+  persist(
+    (set) => ({
+      purchaseForm: {
         products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
         supplier: "",
-        to_be_paid: 0,
-        paid: 0,
-        payment_method: "",
       },
       setPurchaseForm: (purchaseForm: PurchaseForm) => {
         set({
-          purchaseFrom: purchaseForm,
+          purchaseForm: purchaseForm,
         });
       },
-    })),
+
+      resetPurchaseForm: () => {
+        set({
+          purchaseForm: {
+            products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
+            supplier: "",
+          },
+        });
+      },
+    }),
+
     {
-      name: "purchase-store",
+      name: "purchase-form",
     }
   )
 );
 
 export default usePurchaseStore;
+
+import { createTrackedSelector } from "react-tracked";
+
+export const useTrackedPurchaseStore = createTrackedSelector(usePurchaseStore);

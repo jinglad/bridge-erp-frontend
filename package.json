@@ -21,14 +21,16 @@
     "firebase": "^9.8.3",
     "moment": "^2.29.3",
     "next": "12.1.6",
-    "react": "18.1.0",
-    "react-dom": "18.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-google-login": "^5.2.2",
     "react-hook-form": "^7.32.1",
     "react-hook-form-persist": "^3.0.0",
     "react-query": "^3.39.1",
     "react-to-print": "^2.14.7",
     "react-toastify": "^9.0.5",
+    "react-tracked": "^1.7.10",
+    "scheduler": "^0.23.0",
     "zustand": "^4.1.1"
   },
   "devDependencies": {
