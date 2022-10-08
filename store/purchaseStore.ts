@@ -15,7 +15,7 @@ export interface PurchaseForm {
 }
 
 interface PurchaseStore {
-  purchaseFrom: PurchaseForm;
+  purchaseForm: PurchaseForm;
   setPurchaseForm: (purchaseForm: PurchaseForm) => void;
   resetPurchaseForm: () => void;
 }
@@ -23,19 +23,19 @@ interface PurchaseStore {
 const usePurchaseStore = create<PurchaseStore>()(
   persist(
     (set) => ({
-      purchaseFrom: {
+      purchaseForm: {
         products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
         supplier: "",
       },
       setPurchaseForm: (purchaseForm: PurchaseForm) => {
         set({
-          purchaseFrom: purchaseForm,
+          purchaseForm: purchaseForm,
         });
       },
 
       resetPurchaseForm: () => {
         set({
-          purchaseFrom: {
+          purchaseForm: {
             products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
             supplier: "",
           },
@@ -50,3 +50,7 @@ const usePurchaseStore = create<PurchaseStore>()(
 );
 
 export default usePurchaseStore;
+
+import { createTrackedSelector } from "react-tracked";
+
+export const useTrackedPurchaseStore = createTrackedSelector(usePurchaseStore);
