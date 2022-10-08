@@ -144,8 +144,8 @@ const PurchaseCreate = () => {
                           if (value) {
                             setValue(`products.${index}.name`, value.name);
                             setValue(`products.${index}._id`, value._id);
-                            setValue(`products.${index}.buy_price`, value.buy_price);
-                            setValue(`products.${index}.sell_price`, value.sell_price);
+                            setValue(`products.${index}.buy_price`, Number(value.buy_price));
+                            setValue(`products.${index}.sell_price`, Number(value.sell_price));
                             setProductName("");
                           }
                         }}
@@ -191,10 +191,7 @@ const PurchaseCreate = () => {
                         type="number"
                         label="Purchase Per Unit"
                         required
-                        {...(register(`products.${index}.buy_price`),
-                        {
-                          valueAsNumber: true,
-                        })}
+                        {...register(`products.${index}.buy_price`)}
                         fullWidth
                         inputProps={{
                           step: "any",
@@ -207,10 +204,7 @@ const PurchaseCreate = () => {
                         label="Sells Per Unit"
                         type="number"
                         required
-                        {...(register(`products.${index}.sell_price`),
-                        {
-                          valueAsNumber: true,
-                        })}
+                        {...register(`products.${index}.sell_price`)}
                         fullWidth
                         inputProps={{
                           step: "any",
