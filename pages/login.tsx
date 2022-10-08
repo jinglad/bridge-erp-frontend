@@ -6,22 +6,34 @@ import LoginButton from "../components/Login/LoginButton";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const { user, logout} = useAuth();
+  const { user, logout } = useAuth();
   const router = useRouter();
   const [admin, setAdmin] = useState<null | string>(null);
 
   useEffect(() => {
     setAdmin(localStorage.getItem("is-admin"));
-  },[user])
-  
-  
+  }, [user]);
 
   return (
     <Container>
-      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
-        <h1 className="text-center my-3 ">Sign in</h1>
-        {(admin !== "admin") ? <LoginButton /> : <Button onClick={() => logout()}>Logout</Button>}
-        {/* <EmailLogin /> */}
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+        }}
+      >
+        <Box
+          
+        >
+          {admin !== "admin" ? (
+            <EmailLogin />
+          ) : (
+            <Button onClick={() => logout()}>Logout</Button>
+          )}
+          {/* <EmailLogin /> */}
+        </Box>
       </Box>
     </Container>
   );

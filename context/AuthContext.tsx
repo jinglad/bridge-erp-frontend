@@ -68,14 +68,14 @@ export const AuthContextProvider = ({ children }: { children: React.ReactNode })
   };
 
   return (
-    <AuthContext.Provider value={{ user, logout, googleLogin }}>
+    <AuthContext.Provider value={{ user, logout, googleLogin, setUser }}>
       {loading ? null : children}
     </AuthContext.Provider>
   );
 };
 
 
-const checkAdmin = async (email:string|null, token: string|null) => {
+export const checkAdmin = async (email:string|null, token: string|null) => {
   const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/is-admin?email=${email}`, {
       method: "POST",
       headers: {
