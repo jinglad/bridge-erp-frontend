@@ -13,7 +13,7 @@ import { useTrackedPurchaseStore } from "../../store/purchaseStore";
 const PurchaseCreate = () => {
   const { purchaseForm, setPurchaseForm, resetPurchaseForm } = useTrackedPurchaseStore();
 
-  const { register, control, handleSubmit, setValue, reset, watch, setFocus } = useForm({
+  const { register, control, handleSubmit, setValue, watch, resetField } = useForm({
     defaultValues: purchaseForm,
   });
   const { fields, append, remove } = useFieldArray({
@@ -29,29 +29,23 @@ const PurchaseCreate = () => {
   const [productName, setProductName] = useState("");
 
   const { mutate, mutateAsync, isLoading } = useMutation("createPurchase", createPurchase, {
-    onMutate: (data) => {
-      reset({
-        products: [
-          {
-            name: "",
-            qty: 0,
-            sell_price: 0,
-            buy_price: 0,
-          },
-        ],
-        supplier: "",
-      });
-    },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(data.msg);
+      resetField("products", {
+        defaultValue: [{ name: "", qty: 0, sell_price: 0, buy_price: 0, _id: "" }],
+      });
+      resetField("supplier", {
+        defaultValue: "",
+      });
+      resetPurchaseForm();
     },
     onError: (error: any) => {
       toast.error(error.response.data.msg);
     },
   });
 
-  const onSubmit = (data: any) => {
-    mutate({
+  const onSubmit = async (data: any) => {
+    await mutateAsync({
       ...data,
       to_be_paid: 0,
       paid: 0,
@@ -150,7 +144,7 @@ const PurchaseCreate = () => {
                           }
                         }}
                         value={
-                          purchaseForm.products[index]
+                          purchaseForm.products !== undefined && purchaseForm.products[index]
                             ? purchaseForm.products[index]
                             : {
                                 name: "",
@@ -227,12 +221,18 @@ const PurchaseCreate = () => {
                     variant="contained"
                     onClick={() => {
                       setProductName("");
-                      append({
-                        name: "",
-                        qty: 0,
-                        sell_price: 0,
-                        buy_price: 0,
-                      });
+                      append(
+                        {
+                          name: "",
+                          qty: 0,
+                          sell_price: 0,
+                          buy_price: 0,
+                          _id: fields.length.toString(),
+                        },
+                        {
+                          focusName: `products.${fields.length}.name`,
+                        }
+                      );
                     }}
                   >
                     ADD PRODUCT

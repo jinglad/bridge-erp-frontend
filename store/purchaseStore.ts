@@ -1,5 +1,6 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
+import { createTrackedSelector } from "react-tracked";
 
 interface IProductForm {
   name: string;
@@ -34,9 +35,11 @@ const usePurchaseStore = create<PurchaseStore>()(
       },
 
       resetPurchaseForm: () => {
+        const newProducts = [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }];
+
         set({
           purchaseForm: {
-            products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
+            products: newProducts,
             supplier: "",
           },
         });
@@ -50,7 +53,5 @@ const usePurchaseStore = create<PurchaseStore>()(
 );
 
 export default usePurchaseStore;
-
-import { createTrackedSelector } from "react-tracked";
 
 export const useTrackedPurchaseStore = createTrackedSelector(usePurchaseStore);
