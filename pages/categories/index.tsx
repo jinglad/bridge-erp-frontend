@@ -25,6 +25,7 @@ import Layout from "../../components/Layout/Layout";
 
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import useDebounce from "../../hooks/useDebounce";
 
 type Props = {};
 
@@ -33,9 +34,10 @@ function Categories({}: Props) {
   const [open, setOpen] = React.useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [selected, setSelected] = useState<null | Category>(null);
+  const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["categories", categoryName],
+    ["categories", debouncedCategoryNameSearchQuery],
     getCategories,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -77,6 +79,7 @@ function Categories({}: Props) {
           }}
         >
           <Autocomplete
+            freeSolo={true}
             sx={{ flex: 1 }}
             loading={status === "loading"}
             options={getCategoryFormattedData(data)}

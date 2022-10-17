@@ -26,6 +26,7 @@ import { toast } from "react-toastify";
 import { deleteSupplier, getSupplier, Supplier, Suppliers } from "../../apis/supplier-service";
 import EditSupplierDialog from "../../components/EditSupplierDialog";
 import Layout from "../../components/Layout/Layout";
+import useDebounce from "../../hooks/useDebounce";
 type Props = {};
 
 function Suppliers({}: Props) {
@@ -33,9 +34,10 @@ function Suppliers({}: Props) {
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = useState<null | Supplier>(null);
   const [supplierName, setSupplierName] = useState("");
+  const debouncedSupplierNameSearchQuery = useDebounce(supplierName, 500);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["suppliers", supplierName],
+    ["suppliers", debouncedSupplierNameSearchQuery],
     getSupplier,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -78,6 +80,7 @@ function Suppliers({}: Props) {
           }}
         >
           <Autocomplete
+            freeSolo={true}
             sx={{ flex: 1 }}
             loading={status === "loading"}
             options={getSupplierFormattedData(data)}

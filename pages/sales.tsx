@@ -27,7 +27,8 @@ import { getAndSearchProduct, Product, Products } from "../apis/product-service"
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
-import useSalesStore from "../store/salesStore";
+import useDebounce from "../hooks/useDebounce";
+import { useTrackedSalesStore } from "../store/salesStore";
 
 type Props = {};
 
@@ -46,24 +47,20 @@ function Sales({}: Props) {
     setBrandName,
     categoryName,
     setCategoryName,
-  } = useSalesStore((state: any) => ({
-    cartItems: state.cartItems,
-    deleteItemFromCart: state.deleteItemFromCart,
-    customerName: state.customerName,
-    addToCart: state.addToCart,
-    reset: state.reset,
-    setCartItems: state.setCartItems,
-    setCustomerName: state.setCustomerName,
-    productName: state.productName,
-    setProductName: state.setProductName,
-    brandName: state.brandName,
-    setBrandName: state.setBrandName,
-    categoryName: state.categoryName,
-    setCategoryName: state.setCategoryName,
-  }));
+  } = useTrackedSalesStore();
+
+  const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
+  const debouncedProductNameSearchQuery = useDebounce(productName, 500);
+  const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
+  const debouncedCustomerNameSearchQuery = useDebounce(customerName, 500);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
-    ["searchedProducts", productName, brandName, categoryName],
+    [
+      "searchedProducts",
+      debouncedProductNameSearchQuery,
+      debouncedBrandNameSearchQuery,
+      debouncedCategoryNameSearchQuery,
+    ],
     getAndSearchProduct,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -97,15 +94,19 @@ function Sales({}: Props) {
     return [...new Set(categoryName)];
   };
 
-  const { data: customerData, status: customerStatus } = useInfiniteQuery(["customers", customerName], getCustomers, {
-    getNextPageParam: (lastPage, pages) => {
-      if (pages.length === lastPage.totalPages) {
-        return undefined;
-      } else {
-        return pages.length;
-      }
-    },
-  });
+  const { data: customerData, status: customerStatus } = useInfiniteQuery(
+    ["customers", debouncedCustomerNameSearchQuery],
+    getCustomers,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
 
   const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
     const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
@@ -136,6 +137,7 @@ function Sales({}: Props) {
         <Grid item xs={12} sm={5}>
           <Stack spacing={2}>
             <Autocomplete
+              freeSolo={true}
               loading={customerStatus === "loading"}
               options={getCustomerFormattedData(customerData)}
               defaultValue={customerName}
@@ -232,6 +234,7 @@ function Sales({}: Props) {
         <Grid item container spacing={1} xs={12} sm={7}>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
+              freeSolo={true}
               loading={status === "loading"}
               options={getProductFormattedData(data)}
               disablePortal
@@ -251,6 +254,7 @@ function Sales({}: Props) {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
+              freeSolo={true}
               loading={status === "loading"}
               options={getCategoryFormattedData(data)}
               disablePortal
