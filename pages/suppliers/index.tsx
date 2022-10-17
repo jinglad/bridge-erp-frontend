@@ -84,7 +84,7 @@ function Suppliers({}: Props) {
             onInputChange={(e, value) => {
               setSupplierName(value);
             }}
-            renderInput={(params) => <TextField {...params} placeholder="search products" variant="outlined" />}
+            renderInput={(params) => <TextField {...params} placeholder="search supplier" variant="outlined" />}
           />
 
           <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/suppliers/create")}>
