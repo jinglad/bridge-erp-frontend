@@ -46,7 +46,7 @@ function Sales({}: Props) {
     setBrandName,
     categoryName,
     setCategoryName,
-  } = useSalesStore((state:any) => ({
+  } = useSalesStore((state: any) => ({
     cartItems: state.cartItems,
     deleteItemFromCart: state.deleteItemFromCart,
     customerName: state.customerName,
@@ -119,7 +119,7 @@ function Sales({}: Props) {
   };
 
   const isAvailable = (product: Product) => {
-    const c = cartItems.find((item:any) => item._id === product._id);
+    const c = cartItems.find((item: any) => item._id === product._id);
 
     if (c) {
       return c.qty < product.qty;
@@ -143,7 +143,14 @@ function Sales({}: Props) {
               onChange={(e, value) => {
                 value ? setCustomerName(value) : setCustomerName("");
               }}
-              renderInput={(params) => <TextField {...params} placeholder="search customer" variant="outlined" />}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  placeholder="search customer"
+                  variant="outlined"
+                  onChange={(e) => setCustomerName(e.target.value)}
+                />
+              )}
             />
             <AddCustomerDialog />
           </Stack>
@@ -160,7 +167,7 @@ function Sales({}: Props) {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {cartItems?.map((product:any) => (
+                  {cartItems?.map((product: any) => (
                     <TableRow key={product._id} hover>
                       <TableCell align="left">
                         <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
@@ -172,7 +179,7 @@ function Sales({}: Props) {
                         <TextField
                           onChange={(e) => {
                             setCartItems(
-                              cartItems.map((item:any) => {
+                              cartItems.map((item: any) => {
                                 if (item._id === product._id) {
                                   item.qty = Number(e.target.value);
                                 }
@@ -195,7 +202,7 @@ function Sales({}: Props) {
                         <TextField
                           onChange={(e) => {
                             setCartItems(
-                              cartItems.map((item:any) => {
+                              cartItems.map((item: any) => {
                                 if (item._id === product._id) {
                                   item.sell_price = Number(e.target.value);
                                 }
