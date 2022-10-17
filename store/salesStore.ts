@@ -1,3 +1,4 @@
+import { createTrackedSelector } from "react-tracked";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { Product } from "../apis/product-service";
@@ -72,3 +73,5 @@ const useSalesStore = create<SalesStore>()(
 );
 
 export default useSalesStore;
+
+export const useTrackedSalesStore = createTrackedSelector(useSalesStore);

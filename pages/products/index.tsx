@@ -27,15 +27,17 @@ import { toast } from "react-toastify";
 import { deleteProduct, getAndSearchProduct, Product, Products } from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
+import useDebounce from "../../hooks/useDebounce";
 
 const Products: NextPage = () => {
   const router = useRouter();
   const [productName, setProductName] = useState("");
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = useState<null | Product>(null);
+  const debouncedSearchQuery = useDebounce(productName, 500);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["searchedProducts", productName],
+    ["searchedProducts", debouncedSearchQuery],
     getAndSearchProduct,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -88,13 +90,29 @@ const Products: NextPage = () => {
           }}
         >
           <Autocomplete
+            freeSolo={true}
             sx={{ flex: 1 }}
             loading={status === "loading"}
             options={getProductFormattedData(data)}
             onInputChange={(e, value) => {
               setProductName(value);
             }}
-            renderInput={(params) => <TextField {...params} placeholder="search products" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="search products"
+                variant="outlined"
+                InputProps={{
+                  ...params.InputProps,
+                  endAdornment: (
+                    <React.Fragment>
+                      {status === "loading" ? <CircularProgress color="inherit" size={20} /> : null}
+                      {params.InputProps.endAdornment}
+                    </React.Fragment>
+                  ),
+                }}
+              />
+            )}
           />
           <Button onClick={() => router.push("/products/create")} startIcon={<AddOutlinedIcon />}>
             Add Product

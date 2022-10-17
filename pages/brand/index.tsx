@@ -24,7 +24,7 @@ import Layout from "../../components/Layout/Layout";
 
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import SearchIcon from "@mui/icons-material/Search";
+import useDebounce from "../../hooks/useDebounce";
 
 type Props = {};
 
@@ -32,10 +32,12 @@ function Brand({}: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [brandName, setBrandName] = useState("");
+  const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
+
   const [selected, setSelected] = useState<null | Brand>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["brands", brandName],
+    ["brands", debouncedBrandNameSearchQuery],
     getBrands,
     {
       getNextPageParam: (lastPage, pages) => {
@@ -77,6 +79,7 @@ function Brand({}: Props) {
           }}
         >
           <Autocomplete
+            freeSolo={true}
             sx={{ flex: 1 }}
             loading={status === "loading"}
             options={getBrandFormattedData(data)}
