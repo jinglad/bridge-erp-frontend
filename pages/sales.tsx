@@ -23,7 +23,11 @@ import { Box } from "@mui/system";
 import { Fragment, useEffect } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
 import { Customers, getCustomers } from "../apis/customer-service";
-import { getAndSearchProduct, Product, Products } from "../apis/product-service";
+import {
+  getAndSearchProduct,
+  Product,
+  Products,
+} from "../apis/product-service";
 import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
@@ -68,7 +72,14 @@ function Sales({}: Props) {
   const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
   const debouncedCustomerNameSearchQuery = useDebounce(customerName, 500);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    refetch,
+  } = useInfiniteQuery(
     [
       "searchedProducts",
       debouncedProductNameSearchQuery,
@@ -94,17 +105,27 @@ function Sales({}: Props) {
   }, [queryClient, productName, brandName, categoryName]);
 
   const getBrandFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const brands = data?.pages.flatMap((page) => page.products.map((product) => product.brand));
+    const brands = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.brand)
+    );
     return [...new Set(brands)];
   };
 
-  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+  const getProductFormattedData = (
+    data: InfiniteData<Products> | undefined
+  ) => {
+    const productName = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.name)
+    );
     return [...new Set(productName)];
   };
 
-  const getCategoryFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const categoryName = data?.pages.flatMap((page) => page.products.map((product) => product.category));
+  const getCategoryFormattedData = (
+    data: InfiniteData<Products> | undefined
+  ) => {
+    const categoryName = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.category)
+    );
     return [...new Set(categoryName)];
   };
 
@@ -122,8 +143,12 @@ function Sales({}: Props) {
     }
   );
 
-  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
-    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+  const getCustomerFormattedData = (
+    data: InfiniteData<Customers> | undefined
+  ) => {
+    const customers = data?.pages.flatMap((page) =>
+      page.customer.map((c) => c.customerName)
+    );
     return [...new Set(customers)];
   };
 
@@ -149,100 +174,113 @@ function Sales({}: Props) {
     <Layout>
       <Grid container spacing={3}>
         <Grid item xs={12} sm={5}>
-          <Stack spacing={2}>
-            <Autocomplete
-              freeSolo={true}
-              loading={customerStatus === "loading"}
-              options={getCustomerFormattedData(customerData)}
-              defaultValue={customerName}
-              value={customerName}
-              onChange={(e, value) => {
-                value ? setCustomerName(value) : setCustomerName("");
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  placeholder="search customer"
-                  variant="outlined"
-                  onChange={(e) => setCustomerName(e.target.value)}
-                />
-              )}
-            />
-            <AddCustomerDialog />
-          </Stack>
-          <Box mt={5} sx={{ width: "100%" }}>
-            <TableContainer sx={{ maxHeight: 440 }} component={Paper}>
-              <Table size="small" stickyHeader aria-label="caption table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell align="center">#</TableCell>
-                    <TableCell>SKU</TableCell>
-                    <TableCell>Qty</TableCell>
-                    <TableCell>Price</TableCell>
-                    <TableCell>Sub</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {cartItems?.map((product: any) => (
-                    <TableRow key={product._id} hover>
-                      <TableCell align="left">
-                        <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
-                          <DeleteIcon fontSize="inherit" />
-                        </IconButton>
-                      </TableCell>
-                      <TableCell>{product.name}</TableCell>
-                      <TableCell>
-                        <TextField
-                          onChange={(e) => {
-                            setCartItems(
-                              cartItems.map((item: any) => {
-                                if (item._id === product._id) {
-                                  item.qty = Number(e.target.value);
-                                }
-                                return item;
-                              })
-                            );
-                          }}
-                          sx={{ maxWidth: "100px", minWidth: "70px" }}
-                          inputProps={{
-                            min: 1,
-                            max: product.available,
-                          }}
-                          variant="outlined"
-                          type="number"
-                          defaultValue={product.qty}
-                          value={product.qty}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <TextField
-                          onChange={(e) => {
-                            setCartItems(
-                              cartItems.map((item: any) => {
-                                if (item._id === product._id) {
-                                  item.sell_price = Number(e.target.value);
-                                }
-                                return item;
-                              })
-                            );
-                          }}
-                          sx={{ maxWidth: "100px", minWidth: "70px" }}
-                          inputProps={{
-                            min: 1,
-                          }}
-                          variant="outlined"
-                          type="number"
-                          defaultValue={product.sell_price}
-                          value={product.sell_price}
-                        />
-                      </TableCell>
-                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
+          <Box sx={{ position: "sticky", top: 70 }}>
+            <Stack spacing={2}>
+              <Autocomplete
+                freeSolo={true}
+                loading={customerStatus === "loading"}
+                options={getCustomerFormattedData(customerData)}
+                defaultValue={customerName}
+                value={customerName}
+                onChange={(e, value) => {
+                  value ? setCustomerName(value) : setCustomerName("");
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    placeholder="search customer"
+                    variant="outlined"
+                    onChange={(e) => setCustomerName(e.target.value)}
+                  />
+                )}
+              />
+              <AddCustomerDialog />
+            </Stack>
+            <Box mt={5} sx={{ width: "100%" }}>
+              <TableContainer sx={{ maxHeight: 440 }} component={Paper}>
+                <Table size="small" stickyHeader aria-label="caption table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell align="center">#</TableCell>
+                      <TableCell>SKU</TableCell>
+                      <TableCell>Qty</TableCell>
+                      <TableCell>Price</TableCell>
+                      <TableCell>Sub</TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
+                  </TableHead>
+                  <TableBody>
+                    {cartItems?.map((product: any) => (
+                      <TableRow key={product._id} hover>
+                        <TableCell align="left">
+                          <IconButton
+                            size="small"
+                            onClick={() => deleteItemFromCart(product._id)}
+                          >
+                            <DeleteIcon fontSize="inherit" />
+                          </IconButton>
+                        </TableCell>
+                        <TableCell>{product.name}</TableCell>
+                        <TableCell>
+                          <TextField
+                            onChange={(e) => {
+                              setCartItems(
+                                cartItems.map((item: any) => {
+                                  if (item._id === product._id) {
+                                    item.qty = Number(e.target.value);
+                                  }
+                                  return item;
+                                })
+                              );
+                            }}
+                            sx={{ maxWidth: "100px", minWidth: "70px" }}
+                            inputProps={{
+                              min: 1,
+                              max: product.available,
+                            }}
+                            variant="outlined"
+                            type="number"
+                            defaultValue={product.qty}
+                            value={product.qty}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <TextField
+                            onChange={(e) => {
+                              setCartItems(
+                                cartItems.map((item: any) => {
+                                  if (item._id === product._id) {
+                                    item.sell_price = Number(e.target.value);
+                                  }
+                                  return item;
+                                })
+                              );
+                            }}
+                            sx={{ maxWidth: "100px", minWidth: "70px" }}
+                            inputProps={{
+                              min: 1,
+                            }}
+                            variant="outlined"
+                            type="number"
+                            defaultValue={product.sell_price}
+                            value={product.sell_price}
+                          />
+                        </TableCell>
+                        <TableCell>
+                          {parseFloat(
+                            (product.sell_price * product.qty).toString()
+                          ).toFixed(2)}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+              <PaymentDetailsDialog
+                onSuccess={onPaymentSuccess}
+                customerName={customerName}
+                cartItems={cartItems}
+              />
+            </Box>
           </Box>
         </Grid>
         <Grid item container spacing={1} xs={12} sm={7}>
@@ -328,18 +366,35 @@ function Sales({}: Props) {
                 {data?.pages.map((group, i) => (
                   <Fragment key={i}>
                     {group?.products.map((row) => (
-                      <Grid key={row._id} item xs={12} sm={12} md={12} lg={6} xl={4}>
+                      <Grid
+                        key={row._id}
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={4}
+                      >
                         <Card
                           sx={{
                             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-                            cursor: row.qty <= 0 ? "not-allowed" : !isAvailable(row) ? "not-allowed" : "pointer",
+                            cursor:
+                              row.qty <= 0
+                                ? "not-allowed"
+                                : !isAvailable(row)
+                                ? "not-allowed"
+                                : "pointer",
                           }}
                           onClick={() =>
                             row.qty <= 0
                               ? null
                               : !isAvailable(row)
                               ? null
-                              : addToCart({ ...row, qty: 1, available: row.qty })
+                              : addToCart({
+                                  ...row,
+                                  qty: 1,
+                                  available: row.qty,
+                                })
                           }
                         >
                           {row.image ? (
@@ -349,13 +404,20 @@ function Sales({}: Props) {
                               image={`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/${row.image}`}
                             />
                           ) : (
-                            <CardMedia component="img" height="200" image="/placeholder-image.png" />
+                            <CardMedia
+                              component="img"
+                              height="200"
+                              image="/placeholder-image.png"
+                            />
                           )}
                           <CardContent sx={{ padding: "8px" }}>
                             <Typography variant="h6" component="div">
                               {row.name}
                             </Typography>
-                            <Stack direction="row" justifyContent="space-between">
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                            >
                               <Typography sx={{ lineHeight: 1 }} variant="h6">
                                 ৳{row.sell_price}
                               </Typography>
