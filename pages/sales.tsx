@@ -28,7 +28,7 @@ import AddCustomerDialog from "../components/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 import useDebounce from "../hooks/useDebounce";
-import { useTrackedSalesStore } from "../store/salesStore";
+import useSalesStore from "../store/salesStore";
 
 type Props = {};
 
@@ -47,7 +47,21 @@ function Sales({}: Props) {
     setBrandName,
     categoryName,
     setCategoryName,
-  } = useTrackedSalesStore();
+  } = useSalesStore((state: any) => ({
+    cartItems: state.cartItems,
+    deleteItemFromCart: state.deleteItemFromCart,
+    customerName: state.customerName,
+    addToCart: state.addToCart,
+    reset: state.reset,
+    setCartItems: state.setCartItems,
+    setCustomerName: state.setCustomerName,
+    productName: state.productName,
+    setProductName: state.setProductName,
+    brandName: state.brandName,
+    setBrandName: state.setBrandName,
+    categoryName: state.categoryName,
+    setCategoryName: state.setCategoryName,
+  }));
 
   const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
   const debouncedProductNameSearchQuery = useDebounce(productName, 500);
