@@ -22,7 +22,7 @@ export interface CreateOrderProps {
 }
 
 export interface Orders {
-  orders: Order[];
+  orders: any;
   page: string;
   size: number;
   totalPages: number;
@@ -47,8 +47,9 @@ export const getOrders = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; 
     params.page = pageParam;
   }
 
-  const { data } = await http.get<Orders>("/order", {
+  const { data } = await http.get<any>("/order", {
     params: params,
   });
+
   return data;
 };

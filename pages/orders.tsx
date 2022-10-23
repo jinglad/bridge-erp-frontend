@@ -26,7 +26,7 @@ type Props = {};
 
 const Order = (props: Props) => {
   const [date, setDate] = useState<Date | null>(null);
-  const [createdDate, setCreatedDate] = useState<string | null>(null);
+  const [createdDate, setCreatedDate] = useState<string | Date | null>(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | Order>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
@@ -53,9 +53,10 @@ const Order = (props: Props) => {
   };
 
   const handleChange = (newValue: Date | null) => {
+    // console.log(newValue?.toISOString());
     setDate(newValue);
     if (newValue) {
-      setCreatedDate(newValue.toDateString());
+      setCreatedDate(newValue.toLocaleDateString());
     }
   };
 
@@ -120,7 +121,7 @@ const Order = (props: Props) => {
               <>
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
-                    {group?.orders.map((row) => (
+                    {group?.orders.map((row:any) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.customer}</TableCell>
                         <TableCell>{parseFloat(row.paid.toString()).toFixed(2)}</TableCell>

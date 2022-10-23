@@ -8,7 +8,7 @@ import { getTotalSales, getTotalStocks } from "../apis/dashboard-service";
 import Layout from "../components/Layout/Layout";
 
 const Home: NextPage = () => {
-  const { data, isLoading } = useQuery("total-sales", getTotalSales);
+  // const { data, isLoading } = useQuery("total-sales", getTotalSales);
   const { data: totalStock, isLoading: totalStockLoading } = useQuery("total-stocks", getTotalStocks);
 
   return (
@@ -23,26 +23,26 @@ const Home: NextPage = () => {
           gap: "20px",
         }}
       >
-        {!isLoading ? (
+        {/* {!isLoading ? (
           <Card>
             <CardContent>
-              <Typography sx={{ fontSize: 18 }} gutterBottom>
+              <Typography sx={{ fontSize: 16 }} gutterBottom>
                 Total Sales
               </Typography>
-              <Typography variant="h5" component="div" fontWeight="bold" fontSize="40px">
-                {data?.total_sell}
+              <Typography variant="h5" component="div" fontWeight="bold" fontSize="18px">
+              ৳{data?.total_sell}
               </Typography>
             </CardContent>
           </Card>
-        ) : null}
+        ) : null} */}
         {!totalStockLoading ? (
           <Card>
             <CardContent>
-              <Typography sx={{ fontSize: 18 }} gutterBottom>
+              <Typography sx={{ fontSize: 16 }} gutterBottom>
                 Total Stocks
               </Typography>
-              <Typography variant="h5" component="div" fontWeight="bold" fontSize="40px">
-                {totalStock?.total_stock}
+              <Typography variant="h5" component="div" fontWeight="bold" fontSize="18px">
+              ৳{totalStock?.total_stock}
               </Typography>
             </CardContent>
           </Card>

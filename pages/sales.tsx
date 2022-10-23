@@ -397,7 +397,7 @@ function Sales({}: Props) {
                                 })
                           }
                         >
-                          {row.image ? (
+                          {/* {row.image ? (
                             <CardMedia
                               component="img"
                               height="200"
@@ -409,7 +409,7 @@ function Sales({}: Props) {
                               height="200"
                               image="/placeholder-image.png"
                             />
-                          )}
+                          )} */}
                           <CardContent sx={{ padding: "8px" }}>
                             <Typography variant="h6" component="div">
                               {row.name}
