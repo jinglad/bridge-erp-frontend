@@ -41,7 +41,7 @@ const EmailLogin = () => {
               if (res?.admin) {
                 localStorage.setItem("token", data.accessToken);
                 localStorage.setItem("is-admin", "admin");
-                router.push("/").then();
+                router.push("/");
               } else {
                 alert("You are not admin");
               }
