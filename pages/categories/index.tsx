@@ -98,7 +98,7 @@ function Categories({}: Props) {
             <TableHead>
               <TableRow>
                 <TableCell>Category Name </TableCell>
-                <TableCell align="right">Actions</TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
               </TableRow>
             </TableHead>
             {status === "loading" ? (
@@ -112,7 +112,7 @@ function Categories({}: Props) {
                     {group?.categories.map((row) => (
                       <TableRow key={row._id}>
                         <TableCell>{row.categorytitle}</TableCell>
-                        <TableCell align="right">
+                        {/* <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
                               color="info"
@@ -125,7 +125,7 @@ function Categories({}: Props) {
                               <ModeEditOutlineOutlinedIcon />
                             </Button>
                           </ButtonGroup>
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
                     ))}
                   </TableBody>
