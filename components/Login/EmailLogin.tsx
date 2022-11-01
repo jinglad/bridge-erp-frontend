@@ -19,7 +19,7 @@ const EmailLogin = () => {
     reset,
   } = useForm<Inputs>();
 
-  const { user, logout, setUser } = useAuth();
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
@@ -37,11 +37,11 @@ const EmailLogin = () => {
             if (res.ok) return res.json();
           })
           .then((data) => {
-            checkAdmin(user.user.email, data?.accessToken).then((res) => {
+            checkAdmin(user.user.email, data.accessToken).then((res) => {
               if (res?.admin) {
-                router.push("/").then();
+                localStorage.setItem("token", data.accessToken);
                 localStorage.setItem("is-admin", "admin");
-                localStorage.setItem("token", data?.accessToken);
+                router.push("/");
               } else {
                 alert("You are not admin");
               }
@@ -54,7 +54,7 @@ const EmailLogin = () => {
           });
       })
       .catch((error) => {
-        if(error.code === "auth/wrong-password") alert("Wrong password. Please try again with correct password.");
+        if (error.code === "auth/wrong-password") alert("Wrong password. Please try again with correct password.");
         reset();
       });
   };
