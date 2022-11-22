@@ -48,7 +48,7 @@ const PurchaseCreate = () => {
     await mutateAsync({
       ...data,
       to_be_paid: 0,
-      paid: 0,
+      paid: data.products.reduce((acc: number, cur: any) => acc + cur.buy_price * cur.qty, 0),
       payment_method: "cash",
     });
   };
@@ -215,6 +215,28 @@ const PurchaseCreate = () => {
                 );
               })}
 
+              <Grid item xs={12} sm={12}>
+                <TextField
+                  label="Total Paid"
+                  type="number"
+                  required
+                  sx={{
+                    "*": {
+                      color: "black !important",
+                      WebkitTextFillColor: "black !important",
+                    },
+                  }}
+                  disabled
+                  value={watch("products").reduce((acc: number, cur: any) => {
+                    return acc + cur.qty * cur.buy_price;
+                  }, 0)}
+                  fullWidth
+                  inputProps={{
+                    step: "any",
+                    min: 0,
+                  }}
+                />
+              </Grid>
               <Grid item xs={12} sm={12}>
                 <ButtonGroup fullWidth>
                   <Button
