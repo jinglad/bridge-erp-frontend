@@ -97,7 +97,7 @@ function Brand({}: Props) {
             <TableHead>
               <TableRow>
                 <TableCell>Brand Name </TableCell>
-                <TableCell align="right">Actions</TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
               </TableRow>
             </TableHead>
             {status === "loading" ? (
@@ -111,7 +111,7 @@ function Brand({}: Props) {
                     {group?.brands.map((row) => (
                       <TableRow key={row._id}>
                         <TableCell>{row.brandtitle}</TableCell>
-                        <TableCell align="right">
+                        {/* <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
                               color="info"
@@ -124,7 +124,7 @@ function Brand({}: Props) {
                               <ModeEditOutlineOutlinedIcon />
                             </Button>
                           </ButtonGroup>
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
                     ))}
                   </TableBody>

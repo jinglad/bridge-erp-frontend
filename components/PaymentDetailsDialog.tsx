@@ -27,12 +27,10 @@ import { useRouter } from "next/router";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
-import { useReactToPrint } from "react-to-print";
 import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
 import { Product } from "../apis/product-service";
 import { PrintContext } from "../context/PrintContext";
-import { OrderToPrint } from "./OrderToPrint";
 
 type PaymentDetailsDialogProps = {
   cartItems: Product[];
@@ -75,6 +73,22 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   }, [watchDiscount, cartItems, setValue]);
 
   const onSubmit = async (data: any) => {
+    //check if qty is available
+
+    let isValid = true;
+
+    for (let i = 0; i < cartItems.length; i++) {
+      if (cartItems[i].qty > cartItems[i].available) {
+        toast.error("Quantity not available for " + cartItems[i].name);
+        isValid = false;
+      }
+    }
+
+    if (!isValid) {
+      handleClose();
+      return;
+    }
+
     await mutateAsync({
       payment_method: data.payment_method,
       discount: Number(data.discount),
@@ -93,7 +107,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
   const componentRef = useRef(null);
 
   const router = useRouter();
-  const {setValue:setPrint} = useContext(PrintContext);
+  const { setValue: setPrint } = useContext(PrintContext);
 
   const pageStyle = `
   @page {
@@ -116,16 +130,16 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
   const handlePrint = () => {
     setPrint({
-        payment_method:getValues("payment_method"),
-        discount:Number(getValues("discount")),
-        paid:Number(getValues("paid")),
-        to_be_paid:cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid")),
-        products:cartItems,
-        customer:customerName,
-        createdDate:moment(new Date()).format("ddd MMM D YYYY")
-    })
+      payment_method: getValues("payment_method"),
+      discount: Number(getValues("discount")),
+      paid: Number(getValues("paid")),
+      to_be_paid: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid")),
+      products: cartItems,
+      customer: customerName,
+      createdDate: moment(new Date()).format("ddd MMM D YYYY"),
+    });
     router.push("/print-memo").then();
-  }
+  };
 
   return (
     <>

@@ -1,7 +1,5 @@
 import axios from "axios";
 
-const jwtToken = typeof window !== "undefined" && localStorage.getItem("token")!;
-
 const authFetch = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}`,
   headers: {
@@ -11,9 +9,7 @@ const authFetch = axios.create({
 });
 
 authFetch.interceptors.request.use((config) => {
-  if (jwtToken) {
-    config.headers!.Authorization = `Bearer ${jwtToken}`;
-  }
+  config.headers!.Authorization = `Bearer ${localStorage.getItem("token")}`;
   return config;
 });
 

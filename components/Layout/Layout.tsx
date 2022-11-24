@@ -67,7 +67,9 @@ export default function Layout({ children }: LayoutProps) {
       >
         <Toolbar>
           <Link href="/">
-            <Typography variant="h6" fontWeight="bold" noWrap component="div">
+            <Typography variant="h6" fontWeight="bold" noWrap component="div" sx={{
+              cursor: "pointer",
+            }}>
               Bridge ERP
             </Typography>
           </Link>

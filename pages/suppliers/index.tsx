@@ -102,7 +102,7 @@ function Suppliers({}: Props) {
                 <TableCell>Email </TableCell>
                 <TableCell sx={{ minWidth: "200px" }}>Contact No.</TableCell>
                 <TableCell>Full Address</TableCell>
-                <TableCell align="right">Actions</TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
               </TableRow>
             </TableHead>
             {status === "loading" ? (
@@ -119,7 +119,7 @@ function Suppliers({}: Props) {
                         <TableCell>{row.email}</TableCell>
                         <TableCell>{row.phone}</TableCell>
                         <TableCell>{row.address}</TableCell>
-                        <TableCell align="right">
+                        {/* <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
                               color="info"
@@ -132,7 +132,7 @@ function Suppliers({}: Props) {
                               <ModeEditOutlineOutlinedIcon />
                             </Button>
                           </ButtonGroup>
-                        </TableCell>
+                        </TableCell> */}
                       </TableRow>
                     ))}
                   </TableBody>
