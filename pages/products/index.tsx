@@ -159,7 +159,7 @@ const Products: NextPage = () => {
                         </TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
-                            {/* <Button
+                            <Button
                               color="info"
                               variant="contained"
                               onClick={() => {
@@ -168,7 +168,7 @@ const Products: NextPage = () => {
                               }}
                             >
                               <ModeEditOutlineOutlinedIcon />
-                            </Button> */}
+                            </Button>
                             <Button
                               color="error"
                               variant="contained"
