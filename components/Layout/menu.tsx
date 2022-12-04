@@ -61,6 +61,11 @@ export const menu = [
     to: "/orders",
   },
   {
+    icon: <SellIcon />,
+    title: "Sales Retrun",
+    to: "/sales-return",
+  },
+  {
     icon: <Admin />,
     title: "Admins",
     to: "/admins",

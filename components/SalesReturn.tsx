@@ -1,4 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
+import { LoadingButton } from "@mui/lab";
 import {
   Button,
   Dialog,
@@ -15,56 +16,31 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import moment from "moment";
-import { Router, useRouter } from "next/router";
-import { useCallback, useContext, useRef, useState } from "react";
-import { useReactToPrint } from "react-to-print";
-import { Order } from "../apis/order-service";
-import { PrintContext } from "../context/PrintContext";
-import { OrderToPrint } from "./OrderToPrint";
+import { useMutation } from "react-query";
+import { toast } from "react-toastify";
+import { Order, salesReturn } from "../apis/order-service";
 
-interface ViewOrderProps {
+interface SalesReturnProps {
   order: Order;
   open: boolean;
   onClose: () => void;
 }
 
-function ViewOrder({ onClose, open, order }: ViewOrderProps) {
-  const componentRef = useRef(null);
-  const [printOpen, setPrintOpen] = useState(false);
-  const router = useRouter();
-  const { setValue } = useContext(PrintContext);
+function SalesReturn({ onClose, open, order }: SalesReturnProps) {
+  const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
+    onSuccess: (data) => {
+      toast.success("Return Successful");
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.msg);
+    },
+  });
 
-  const pageStyle = `
-  @page {
-    size: 80mm auto;
-    margin: 0;
-    padding: 0;
-  }
-`;
-
-  const reactToPrintContent = useCallback(() => {
-    return componentRef.current;
-  }, [componentRef]);
-
-  // const handlePrint = useReactToPrint({
-  //   content: reactToPrintContent,
-  //   documentTitle: "AwesomeFileName",
-  //   removeAfterPrint: true,
-  //   pageStyle: pageStyle,
-  // });
-
-  const handlePrint = () => {
-    setValue({
-      payment_method: order.payment_method,
-      discount: Number(order.discount),
-      paid: Number(order.paid),
-      to_be_paid: order.to_be_paid,
-      products: order.products,
-      customer: order.customer,
-      createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
+  const saleReturn = async () => {
+    await mutateAsync({
+      ...order,
     });
-    router.push("/print-memo").then();
+    onClose();
   };
 
   return (
@@ -131,24 +107,16 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
         </TableContainer>
 
         <DialogActions>
-          <Button onClick={handlePrint}>Print</Button>
+          <LoadingButton variant="contained" loading={isLoading} onClick={saleReturn}>
+            Return
+          </LoadingButton>
           <Button color="error" onClick={onClose}>
             close
           </Button>
         </DialogActions>
       </DialogContent>
-      {/* <OrderToPrint
-        ref={componentRef}
-        payment_method={order.payment_method}
-        discount={Number(order.discount)}
-        paid={Number(order.paid)}
-        to_be_paid={order.to_be_paid}
-        products={order.products}
-        customer={order.customer}
-        createdDate={moment(order.createdDate).format("ddd MMM D YYYY")}
-      /> */}
     </Dialog>
   );
 }
 
-export default ViewOrder;
+export default SalesReturn;
