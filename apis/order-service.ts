@@ -36,6 +36,13 @@ export const createOrder = async (order: CreateOrderProps) => {
   return data;
 };
 
+export const salesReturn = async (order: CreateOrderProps) => {
+  const { data } = await http.post<{ msg: string }>("/sales-return", {
+    ...order,
+  });
+  return data;
+};
+
 export const getOrders = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
@@ -48,6 +55,24 @@ export const getOrders = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; 
   }
 
   const { data } = await http.get<any>("/order", {
+    params: params,
+  });
+
+  return data;
+};
+
+export const getSalesReturn = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
+  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
+
+  if (createdDate) {
+    params.createdDate = createdDate;
+  }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<any>("/sales-return", {
     params: params,
   });
 
