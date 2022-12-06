@@ -46,6 +46,11 @@ export const menu = [
     to: "/purchase",
   },
   {
+    icon: <ShoppingCartOutlinedIcon />,
+    title: "Return Purchase",
+    to: "/return-purchase",
+  },
+  {
     icon: <EuroIcon />,
     title: "Expense",
     to: "/expense",

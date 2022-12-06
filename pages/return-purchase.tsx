@@ -1,5 +1,4 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import { DesktopDatePicker, LoadingButton, LocalizationProvider } from "@mui/lab";
+import { LoadingButton } from "@mui/lab";
 import {
   Box,
   Button,
@@ -13,29 +12,22 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
   Typography,
 } from "@mui/material";
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
-import router from "next/router";
 import { useState } from "react";
 import { useInfiniteQuery } from "react-query";
-import { getPurchases, Purchase } from "../../apis/purchase-service";
-import Layout from "../../components/Layout/Layout";
-import ViewPurchase from "../../components/ViewPurchaseDialog";
-import ViewReturnPurchase from "../../components/ViewReturnPurchase";
+import { getReturnPurchases, Purchase } from "../apis/purchase-service";
+import Layout from "../components/Layout/Layout";
+import ViewPurchase from "../components/ViewPurchaseDialog";
 
 type Props = {};
 
 const Purchase = (props: Props) => {
-  const [saleOpen, setSaleOpen] = useState(false);
-  const [date, setDate] = useState<Date | null>(null);
-  const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | Purchase>(null);
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["purchases", createdDate],
-    getPurchases,
+    ["return-purchases"],
+    getReturnPurchases,
     {
       getNextPageParam: (lastPage, pages) => {
         if (pages.length === lastPage.totalPages) {
@@ -57,69 +49,13 @@ const Purchase = (props: Props) => {
     setSelected(null);
   };
 
-  const handleChange = (newValue: Date | null) => {
-    setDate(newValue);
-    if (newValue) {
-      setCreatedDate(newValue.toDateString());
-    }
-  };
-
-  const handleClickSalesOpen = () => {
-    setSaleOpen(true);
-  };
-
-  const handleSalesClose = () => {
-    setSaleOpen(false);
-    setSelected(null);
-  };
-
   return (
     <Layout>
       <Stack spacing={2}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
-          All Purchase
+          All Return Purchase
         </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            gap: 2,
-            flexDirection: ["column", "row", "row"],
-          }}
-        >
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/purchase/create")}>
-            New purchase
-          </Button>
-          <Box
-            sx={{
-              display: "flex",
-              gap: 2,
-            }}
-          >
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DesktopDatePicker
-                label="Filter by date"
-                inputFormat="MM/dd/yyyy"
-                value={date}
-                onChange={handleChange}
-                // disableCloseOnSelect={true}
-                renderInput={(params) => <TextField variant="outlined" fullWidth {...params} />}
-              />
-            </LocalizationProvider>
-            {createdDate && (
-              <Button
-                color="error"
-                onClick={() => {
-                  setDate(null);
-                  setCreatedDate(null);
-                }}
-              >
-                clear
-                {/* <CloseIcon /> */}
-              </Button>
-            )}
-          </Box>
-        </Box>
         <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
@@ -137,10 +73,10 @@ const Purchase = (props: Props) => {
               <>
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
-                    {group?.purchase.map((row) => (
+                    {group?.purchaseReturns.map((row) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.supplier}</TableCell>
-                        <TableCell>{row.paid ? row.paid.toFixed(2) : null}</TableCell>
+                        <TableCell>{row.paid ? row.paid : null}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
@@ -153,16 +89,6 @@ const Purchase = (props: Props) => {
                             >
                               View
                             </Button>
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickSalesOpen();
-                              }}
-                            >
-                              Return
-                            </Button>
                           </ButtonGroup>
                         </TableCell>
                       </TableRow>
@@ -174,7 +100,7 @@ const Purchase = (props: Props) => {
           </Table>
         </TableContainer>
         <Box textAlign="center">
-          {data?.pages[0].totalPurchase !== 0 && hasNextPage && (
+          {data?.pages[0].totalPurchaseReturn !== 0 && hasNextPage && (
             <LoadingButton
               variant="contained"
               loading={isFetchingNextPage}
@@ -188,9 +114,6 @@ const Purchase = (props: Props) => {
       </Stack>
 
       {selected && <ViewPurchase onClose={handleClose} open={open} purchase={selected} key={selected._id} />}
-      {selected && (
-        <ViewReturnPurchase onClose={handleSalesClose} open={saleOpen} purchase={selected} key={selected._id + 1} />
-      )}
     </Layout>
   );
 };

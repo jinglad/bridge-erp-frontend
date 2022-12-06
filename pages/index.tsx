@@ -75,7 +75,7 @@ const Home: NextPage = () => {
                 fontWeight="bold"
                 fontSize="18px"
               >
-                ৳{totalStock?.total_stock}
+                ৳{totalStock?.total_stock.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -92,7 +92,7 @@ const Home: NextPage = () => {
                 fontWeight="bold"
                 fontSize="18px"
               >
-                ৳{monthlySale?.monthly_sales}
+                ৳{monthlySale?.monthly_sales.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
@@ -112,7 +112,7 @@ const Home: NextPage = () => {
                   fontWeight="bold"
                   fontSize="18px"
                 >
-                  ৳{monthlyPurchases?.monthly_purchases}
+                  ৳{monthlyPurchases?.monthly_purchases.toFixed(2)}
                 </Typography>
               </CardContent>
             </Card>
