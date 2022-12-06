@@ -31,12 +31,12 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
   const { mutateAsync: deleteAsync } = useMutation("deleteProduct", deletePurchase, {
     onSuccess: (data) => {
       queryClient.invalidateQueries("purchases");
+      toast.success("Return Successful");
     },
   });
 
   const { mutateAsync, isLoading } = useMutation("createReturnPurchase", createReturnPurchase, {
     onSuccess: async (data) => {
-      toast.success("Return Successful");
       await deleteAsync(purchase._id);
     },
     onError: (error: any) => {
