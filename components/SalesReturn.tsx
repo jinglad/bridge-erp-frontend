@@ -32,12 +32,12 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
   const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
     onSuccess: (data) => {
       queryClient.invalidateQueries("orders");
+      toast.success("Return Successful");
     },
   });
 
   const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
     onSuccess: async (data) => {
-      toast.success("Return Successful");
       await deleteAsync(order._id);
     },
     onError: (error: any) => {
