@@ -18,36 +18,35 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { deleteOrder, Order, salesReturn } from "../apis/order-service";
+import { createReturnPurchase, deletePurchase, Purchase } from "../apis/purchase-service";
 
-interface SalesReturnProps {
-  order: Order;
+interface ViewPurchaseProps {
+  purchase: Purchase;
   open: boolean;
   onClose: () => void;
 }
 
-function SalesReturn({ onClose, open, order }: SalesReturnProps) {
+function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
   const queryClient = useQueryClient();
-
-  const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
+  const { mutateAsync: deleteAsync } = useMutation("deleteProduct", deletePurchase, {
     onSuccess: (data) => {
-      queryClient.invalidateQueries("orders");
+      queryClient.invalidateQueries("purchases");
     },
   });
 
-  const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
+  const { mutateAsync, isLoading } = useMutation("createReturnPurchase", createReturnPurchase, {
     onSuccess: async (data) => {
       toast.success("Return Successful");
-      await deleteAsync(order._id);
+      await deleteAsync(purchase._id);
     },
     onError: (error: any) => {
       toast.error(error.response.data.msg);
     },
   });
 
-  const saleReturn = async () => {
+  const purchaseReturn = async () => {
     await mutateAsync({
-      ...order,
+      ...purchase,
     });
     onClose();
   };
@@ -66,24 +65,8 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
         <TableContainer>
           <Table size="small" aria-label="simple table">
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Customer:</TableCell>
-              <TableCell>{order.customer}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Payment method:</TableCell>
-              <TableCell>{order.payment_method}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Paid:</TableCell>
-              <TableCell>{order.paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>To be paid:</TableCell>
-              <TableCell>{order.to_be_paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Discount:</TableCell>
-              <TableCell>{order.discount}</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Supplier:</TableCell>
+              <TableCell>{purchase.supplier}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
@@ -103,7 +86,7 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
               </TableRow>
             </TableHead>
             <TableBody>
-              {order.products.map((product) => (
+              {purchase.products.map((product) => (
                 <TableRow key={product._id}>
                   <TableCell>{product.name}</TableCell>
                   <TableCell>{product.qty}</TableCell>
@@ -116,7 +99,7 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
         </TableContainer>
 
         <DialogActions>
-          <LoadingButton variant="contained" loading={isLoading} onClick={saleReturn}>
+          <LoadingButton variant="contained" loading={isLoading} onClick={purchaseReturn}>
             Return
           </LoadingButton>
           <Button color="error" onClick={onClose}>
@@ -128,4 +111,4 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
   );
 }
 
-export default SalesReturn;
+export default ViewReturnPurchase;
