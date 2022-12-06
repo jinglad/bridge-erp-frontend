@@ -140,7 +140,7 @@ const Purchase = (props: Props) => {
                     {group?.purchase.map((row) => (
                       <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
                         <TableCell>{row.supplier}</TableCell>
-                        <TableCell>{row.paid ? row.paid : null}</TableCell>
+                        <TableCell>{row.paid ? row.paid.toFixed(2) : null}</TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
