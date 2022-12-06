@@ -50,4 +50,9 @@ export const getMonthlySales = async () => {
   }
 }
 
+export const getMonthlyPurchases = async () => {
+  const response = await http.get("/monthly-purchase");
+  return response.data;
+}
+
 

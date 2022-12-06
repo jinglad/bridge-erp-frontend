@@ -28,6 +28,15 @@ export interface Purchases {
   totalPurchase: number;
 }
 
+export interface ReturnPurchases {
+  purchaseReturns: Purchase[];
+  count: number;
+  page: string;
+  size: number;
+  totalPages: number;
+  totalPurchaseReturn: number;
+}
+
 export const createPurchase = async (formData: Purchase) => {
   const { data } = await http.post<{ msg: string }>("/purchase", {
     ...formData,
@@ -35,6 +44,29 @@ export const createPurchase = async (formData: Purchase) => {
   return data;
 };
 
+export const createReturnPurchase = async (formData: Purchase) => {
+  const { data } = await http.post<{ msg: string }>("/purchase-return", {
+    ...formData,
+  });
+  return data;
+};
+
+export const getReturnPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
+  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
+
+  if (createdDate) {
+    params.createdDate = createdDate;
+  }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<ReturnPurchases>("/purchase-return", {
+    params: params,
+  });
+  return data;
+};
 export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
@@ -50,4 +82,13 @@ export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[
     params: params,
   });
   return data;
+};
+
+export const deletePurchase = async (id: string) => {
+  try {
+    const { data } = await http.delete<{ msg: string }>("/purchase/" + id);
+    return data;
+  } catch (error: any) {
+    throw Error(error);
+  }
 };

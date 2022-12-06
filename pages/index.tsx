@@ -1,19 +1,18 @@
-import { Typography } from "@mui/material";
+import { Grid, Typography } from "@mui/material";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import { useQuery } from "react-query";
 import {
+  getMonthlyPurchases,
   getMonthlySales,
   getTodaySales,
-  getTotalSales,
   getTotalStocks,
 } from "../apis/dashboard-service";
 import Layout from "../components/Layout/Layout";
 
 const Home: NextPage = () => {
-  // const { data, isLoading } = useQuery("total-sales", getTotalSales);
   const { data: totalStock, isLoading: totalStockLoading } = useQuery(
     "total-stocks",
     getTotalStocks
@@ -26,6 +25,9 @@ const Home: NextPage = () => {
     "monthly-sales",
     getMonthlySales
   );
+
+  const { data: monthlyPurchases, isLoading: monthlyPurchasesLoading } =
+    useQuery("monthly-purchases", getMonthlyPurchases);
 
   return (
     <Layout>
@@ -96,6 +98,27 @@ const Home: NextPage = () => {
           </Card>
         ) : null}
       </Box>
+      <Grid container spacing={2} mt={4}>
+        {!monthlyPurchasesLoading ? (
+          <Grid item xs={12} md={4} lg={3}>
+            <Card>
+              <CardContent>
+                <Typography sx={{ fontSize: 16 }} gutterBottom>
+                  Monthly Purchases
+                </Typography>
+                <Typography
+                  variant="h5"
+                  component="div"
+                  fontWeight="bold"
+                  fontSize="18px"
+                >
+                  ৳{monthlyPurchases?.monthly_purchases}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ) : null}
+      </Grid>
     </Layout>
   );
 };

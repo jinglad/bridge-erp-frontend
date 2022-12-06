@@ -83,17 +83,17 @@ function ExpensePage() {
                       <TableRow key={row._id}>
                         <TableCell>{row.date}</TableCell>
                         <TableCell>
-                          {row.expenses.map((expense) => (
+                          {row.expenses.map((expense: any) => (
                             <div key={expense.name}>
                               {expense.name} - ৳{expense.spent}
                             </div>
                           ))}
                         </TableCell>
 
-                        <TableCell>{row.expenseTotal}</TableCell>
-                        <TableCell>{row.monthlyProfit}</TableCell>
-                        <TableCell>{row.monthlyPurchase}</TableCell>
-                        <TableCell>{row.monthlySales}</TableCell>
+                        <TableCell>{Number(row.expenseTotal).toFixed(2)}</TableCell>
+                        <TableCell>{row.monthlyProfit.toFixed(2)}</TableCell>
+                        <TableCell>{row.monthlyPurchase.toFixed(2)}</TableCell>
+                        <TableCell>{row.monthlySales.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

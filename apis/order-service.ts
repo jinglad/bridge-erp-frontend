@@ -78,3 +78,12 @@ export const getSalesReturn = async ({ queryKey, pageParam = 0 }: { queryKey: an
 
   return data;
 };
+
+export const deleteOrder = async (id: string) => {
+  try {
+    const { data } = await http.delete<{ msg: string }>("/order/" + id);
+    return data;
+  } catch (error: any) {
+    throw Error(error);
+  }
+};
