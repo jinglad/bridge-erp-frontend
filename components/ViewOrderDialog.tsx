@@ -17,7 +17,7 @@ import {
 } from "@mui/material";
 import moment from "moment";
 import { Router, useRouter } from "next/router";
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import { Order } from "../apis/order-service";
 import { PrintContext } from "../context/PrintContext";
@@ -71,7 +71,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
       <DialogTitle>
         <Stack direction="row" justifyContent="space-between">
-          <Typography variant="h6">Purchase Details</Typography>
+          <Typography variant="h6">Order Details</Typography>
           <IconButton color="error" onClick={onClose}>
             <CloseIcon fontSize="inherit" />
           </IconButton>
@@ -80,30 +80,51 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       <DialogContent>
         <TableContainer>
           <Table size="small" aria-label="simple table">
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Customer:</TableCell>
-              <TableCell>{order.customer}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Payment method:</TableCell>
-              <TableCell>{order.payment_method}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Paid:</TableCell>
-              <TableCell>{order.paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>To be paid:</TableCell>
-              <TableCell>{order.to_be_paid}</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Discount:</TableCell>
-              <TableCell>{order.discount}</TableCell>
-            </TableRow>
+            <TableBody>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Customer:
+                </TableCell>
+                <TableCell>{order.customer}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Payment method:
+                </TableCell>
+                <TableCell>{order.payment_method}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Paid:
+                </TableCell>
+                <TableCell>{order.paid}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Buy_Price_Total:
+                </TableCell>
+                <TableCell>{order?.buy_total}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  To be paid:
+                </TableCell>
+                <TableCell>{order.to_be_paid}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Discount:
+                </TableCell>
+                <TableCell>{order.discount}</TableCell>
+              </TableRow>
+            </TableBody>
           </Table>
         </TableContainer>
 
-        <Typography sx={{ marginLeft: "16px", paddingTop: "10px" }} variant="h6">
+        <Typography
+          sx={{ marginLeft: "16px", paddingTop: "10px" }}
+          variant="h6"
+        >
           Products
         </Typography>
 

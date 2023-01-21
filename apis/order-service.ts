@@ -7,6 +7,7 @@ export interface Order {
   customer: string;
   products: Product[];
   to_be_paid: number;
+  buy_total: number;
   paid: number;
   payment_method: string;
   createdDate?: Date;
@@ -43,7 +44,13 @@ export const salesReturn = async (order: CreateOrderProps) => {
   return data;
 };
 
-export const getOrders = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
+export const getOrders = async ({
+  queryKey,
+  pageParam = 0,
+}: {
+  queryKey: any[];
+  pageParam?: number;
+}) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 
@@ -61,7 +68,13 @@ export const getOrders = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; 
   return data;
 };
 
-export const getSalesReturn = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
+export const getSalesReturn = async ({
+  queryKey,
+  pageParam = 0,
+}: {
+  queryKey: any[];
+  pageParam?: number;
+}) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 

@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { auth } from "../../config/firebase";
 import { checkAdmin, useAuth } from "../../context/AuthContext";
@@ -19,10 +19,13 @@ const EmailLogin = () => {
     reset,
   } = useForm<Inputs>();
 
+  const [loading, setLoading] = useState<boolean>(false);
+
   const { setUser } = useAuth();
   const router = useRouter();
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
+    setLoading(true);
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then((user) => {
         setUser(user.user);
@@ -42,19 +45,24 @@ const EmailLogin = () => {
                 localStorage.setItem("token", data.accessToken);
                 localStorage.setItem("is-admin", "admin");
                 router.push("/");
+                setLoading(false);
               } else {
                 alert("You are not admin");
+                setLoading(false);
               }
             });
             reset();
           })
           .catch((error) => {
             console.log(error);
+            setLoading(false);
             reset();
           });
       })
       .catch((error) => {
-        if (error.code === "auth/wrong-password") alert("Wrong password. Please try again with correct password.");
+        if (error.code === "auth/wrong-password")
+          alert("Wrong password. Please try again with correct password.");
+        setLoading(false);
         reset();
       });
   };
@@ -117,12 +125,12 @@ const EmailLogin = () => {
         <Box sx={{ width: "100%" }}>
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={loading}
             sx={{
               width: "100%",
             }}
           >
-            {isSubmitting ? "Loading..." : "Login"}
+            {loading ? "Loading..." : "Login"}
           </Button>
         </Box>
       </Box>
