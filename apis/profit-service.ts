@@ -16,7 +16,7 @@ export interface Profit {
   expenseTotal: number;
   expenses: Expense[];
   monthlyProfit: number;
-  monthlyPurchase: number;
+  monthlyBuys: number;
   monthlySales: number;
 }
 
@@ -25,7 +25,13 @@ export interface Expense {
   spent: number;
 }
 
-export const createExpense = async ({ date, expenses }: { date: string; expenses: Expense[] }) => {
+export const createExpense = async ({
+  date,
+  expenses,
+}: {
+  date: string;
+  expenses: Expense[];
+}) => {
   try {
     const { data } = await http.post<{ msg: string }>("/monthly-profit", {
       date,
@@ -38,7 +44,13 @@ export const createExpense = async ({ date, expenses }: { date: string; expenses
   }
 };
 
-export const getProfitList = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+export const getProfitList = async ({
+  queryKey,
+  pageParam = 0,
+}: {
+  queryKey: string[];
+  pageParam?: number;
+}) => {
   const customerName = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 

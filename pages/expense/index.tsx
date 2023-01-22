@@ -23,21 +23,24 @@ import { getProfitList } from "../../apis/profit-service";
 function ExpensePage() {
   const router = useRouter();
 
-  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
-    ["customers"],
-    getProfitList,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    status,
+  } = useInfiniteQuery(["customers"], getProfitList, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
 
-  console.log(data);
+  // console.log(data);
 
   return (
     <Layout>
@@ -53,7 +56,10 @@ function ExpensePage() {
             flexDirection: ["column", "row", "row"],
           }}
         >
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/expense/create")}>
+          <Button
+            startIcon={<AddOutlinedIcon />}
+            onClick={() => router.push("/expense/create")}
+          >
             Add Expense
           </Button>
         </Box>
@@ -66,7 +72,7 @@ function ExpensePage() {
                 <TableCell>Expenses</TableCell>
                 <TableCell>Expense Total</TableCell>
                 <TableCell>Monthly Profit</TableCell>
-                <TableCell>Monthly Purchase</TableCell>
+                <TableCell>Monthly Buys</TableCell>
                 <TableCell>Monthly Sales</TableCell>
               </TableRow>
             </TableHead>
@@ -90,9 +96,11 @@ function ExpensePage() {
                           ))}
                         </TableCell>
 
-                        <TableCell>{Number(row.expenseTotal).toFixed(2)}</TableCell>
+                        <TableCell>
+                          {Number(row.expenseTotal).toFixed(2)}
+                        </TableCell>
                         <TableCell>{row.monthlyProfit.toFixed(2)}</TableCell>
-                        <TableCell>{row.monthlyPurchase.toFixed(2)}</TableCell>
+                        <TableCell>{row.monthlyBuys.toFixed(2)}</TableCell>
                         <TableCell>{row.monthlySales.toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
