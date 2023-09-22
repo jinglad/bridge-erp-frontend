@@ -1,4 +1,8 @@
-import { DesktopDatePicker, LoadingButton, LocalizationProvider } from "@mui/lab";
+import {
+  DesktopDatePicker,
+  LoadingButton,
+  LocalizationProvider,
+} from "@mui/lab";
 import {
   Box,
   Button,
@@ -31,10 +35,8 @@ const Order = (props: Props) => {
   const [open, setOpen] = useState(false);
   const [saleOpen, setSaleOpen] = useState(false);
   const [selected, setSelected] = useState<null | Order>(null);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["orders", createdDate],
-    getOrders,
-    {
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useInfiniteQuery(["orders", createdDate], getOrders, {
       getNextPageParam: (lastPage, pages) => {
         if (pages.length === lastPage.totalPages) {
           return undefined;
@@ -42,8 +44,7 @@ const Order = (props: Props) => {
           return pages.length;
         }
       },
-    }
-  );
+    });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -66,7 +67,7 @@ const Order = (props: Props) => {
     // console.log(newValue?.toISOString());
     setDate(newValue);
     if (newValue) {
-      setCreatedDate(newValue.toLocaleDateString());
+      setCreatedDate(newValue.toDateString());
     }
   };
 
@@ -97,7 +98,9 @@ const Order = (props: Props) => {
                 value={date}
                 onChange={handleChange}
                 // disableCloseOnSelect={true}
-                renderInput={(params) => <TextField variant="outlined" fullWidth {...params} />}
+                renderInput={(params) => (
+                  <TextField variant="outlined" fullWidth {...params} />
+                )}
               />
             </LocalizationProvider>
             {createdDate && (
@@ -132,10 +135,19 @@ const Order = (props: Props) => {
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.orders.map((row: any) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow
+                        key={row._id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
                         <TableCell>{row.customer}</TableCell>
-                        <TableCell>{parseFloat(row.paid.toString()).toFixed(2)}</TableCell>
-                        <TableCell>{parseFloat(row.to_be_paid.toString()).toFixed(2)}</TableCell>
+                        <TableCell>
+                          {parseFloat(row.paid.toString()).toFixed(2)}
+                        </TableCell>
+                        <TableCell>
+                          {parseFloat(row.to_be_paid.toString()).toFixed(2)}
+                        </TableCell>
                         <TableCell align="right">
                           <ButtonGroup size="small">
                             <Button
@@ -182,8 +194,22 @@ const Order = (props: Props) => {
         </Box>
       </Stack>
 
-      {selected && <ViewOrder onClose={handleClose} open={open} order={selected} key={selected._id} />}
-      {selected && <SalesReturn onClose={handleSalesClose} open={saleOpen} order={selected} key={selected._id + 1} />}
+      {selected && (
+        <ViewOrder
+          onClose={handleClose}
+          open={open}
+          order={selected}
+          key={selected._id}
+        />
+      )}
+      {selected && (
+        <SalesReturn
+          onClose={handleSalesClose}
+          open={saleOpen}
+          order={selected}
+          key={selected._id + 1}
+        />
+      )}
     </Layout>
   );
 };
