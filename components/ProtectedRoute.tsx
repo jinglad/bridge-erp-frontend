@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import useUserStore from "../store/userStore";
+import { getCookie } from "cookies-next";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user, accessToken } = useUserStore((state) => state);
+  const { user } = useUserStore((state) => state);
+  const accessToken = getCookie("token");
   const router = useRouter();
 
   useEffect(() => {

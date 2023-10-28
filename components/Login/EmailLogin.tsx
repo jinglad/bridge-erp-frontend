@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import useUserStore from "../../store/userStore";
+import { setCookie } from "cookies-next";
 
 type Inputs = {
   email: string;
@@ -41,6 +42,9 @@ const EmailLogin = () => {
             email,
             id: data?.data?.user?._id,
             role: data?.data?.user?.role,
+          });
+          setCookie("token", data?.data?.accessToken, {
+            maxAge: 30 * 24 * 60 * 60, // 30 days
           });
           router.push("/");
           setLoading(false);

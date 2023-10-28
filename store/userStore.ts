@@ -1,6 +1,7 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import { createTrackedSelector } from "react-tracked";
+import { deleteCookie } from "cookies-next";
 
 interface IUser {
   email: string | null;
@@ -11,8 +12,6 @@ interface IUser {
 interface IUserStore {
   user: IUser | null;
   setUser: (user: IUser) => void;
-  // accessToken: string | null;
-  // setAccessToken: (accessToken: string) => void;
   logout: () => void;
 }
 
@@ -22,9 +21,10 @@ const useUserStore = create<IUserStore>()(
       ({
         user: null,
         setUser: (user: IUser) => set({ user }),
-        // accessToken: null,
-        // setAccessToken: (accessToken: string) => set({ accessToken }),
-        logout: () => set({ user: null }),
+        logout: () => {
+          set({ user: null });
+          deleteCookie("token");
+        },
       } as IUserStore),
     {
       name: "user",
