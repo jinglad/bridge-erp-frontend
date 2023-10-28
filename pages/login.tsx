@@ -1,15 +1,9 @@
 import { Box, Button, Container } from "@mui/material";
-import { useEffect, useState } from "react";
 import EmailLogin from "../components/Login/EmailLogin";
-import { useAuth } from "../context/AuthContext";
+import useUserStore from "../store/userStore";
 
 const Login = () => {
-  const { user, logout } = useAuth();
-  const [admin, setAdmin] = useState<null | string>(null);
-
-  useEffect(() => {
-    setAdmin(localStorage.getItem("is-admin"));
-  }, [user]);
+  const { user, logout } = useUserStore((state) => state);
 
   return (
     <Container>
@@ -22,8 +16,11 @@ const Login = () => {
         }}
       >
         <Box>
-          {admin !== "admin" ? <EmailLogin /> : <Button onClick={() => logout()}>Logout</Button>}
-          {/* <EmailLogin /> */}
+          {user?.role !== "admin" ? (
+            <EmailLogin />
+          ) : (
+            <Button onClick={() => logout()}>Logout</Button>
+          )}
         </Box>
       </Box>
     </Container>
