@@ -1,3 +1,5 @@
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import {
   Autocomplete,
   Button,
@@ -17,38 +19,24 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { InfiniteData, useInfiniteQuery } from "react-query";
-import { Brand, Brands, getBrands } from "../../apis/brand-service";
+import { IBrand } from "../../apis/brand-service";
 import EditBrandDialog from "../../components/EditBrandDialog";
 import Layout from "../../components/Layout/Layout";
-
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import useDebounce from "../../hooks/useDebounce";
+import { useBrands } from "../../hooks/useBrands";
 
 type Props = {};
 
 function Brand({}: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
-  const [brandName, setBrandName] = useState("");
-  const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
+  const [brandName, setBrandName] = useState<string>("");
+  const [selected, setSelected] = useState<null | IBrand>(null);
 
-  const [selected, setSelected] = useState<null | Brand>(null);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["brands", debouncedBrandNameSearchQuery],
-    getBrands,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
+  const { data, isLoading } = useBrands({
+    page: 1,
+    limit: 20,
+    searchTerm: brandName,
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -57,11 +45,6 @@ function Brand({}: Props) {
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
-  };
-
-  const getBrandFormattedData = (data: InfiniteData<Brands> | undefined) => {
-    const brandName = data?.pages.flatMap((page) => page.brands.map((brand) => brand.brandtitle));
-    return [...new Set(brandName)];
   };
 
   return (
@@ -81,14 +64,23 @@ function Brand({}: Props) {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={status === "loading"}
-            options={getBrandFormattedData(data)}
-            onInputChange={(e, value) => {
-              setBrandName(value);
+            loading={isLoading}
+            options={data?.data?.map((brand) => brand.brandtitle) || []}
+            onChange={(e, value) => {
+              setBrandName(value || "");
             }}
-            renderInput={(params) => <TextField {...params} placeholder="search brands" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="search brands"
+                variant="outlined"
+              />
+            )}
           />
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/brand/create")}>
+          <Button
+            startIcon={<AddOutlinedIcon />}
+            onClick={() => router.push("/brand/create")}
+          >
             Add Brands
           </Button>
         </Box>
@@ -97,36 +89,34 @@ function Brand({}: Props) {
             <TableHead>
               <TableRow>
                 <TableCell>Brand Name </TableCell>
-                {/* <TableCell align="right">Actions</TableCell> */}
+                <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            {status === "loading" ? (
+            {isLoading ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
                 <CircularProgress />
               </TableBody>
             ) : (
               <>
-                {data?.pages.map((group, i) => (
+                {data?.data?.map((brand, i) => (
                   <TableBody key={i}>
-                    {group?.brands.map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell>{row.brandtitle}</TableCell>
-                        {/* <TableCell align="right">
-                          <ButtonGroup size="small">
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickOpen();
-                              }}
-                            >
-                              <ModeEditOutlineOutlinedIcon />
-                            </Button>
-                          </ButtonGroup>
-                        </TableCell> */}
-                      </TableRow>
-                    ))}
+                    <TableRow key={brand._id}>
+                      <TableCell>{brand.brandtitle}</TableCell>
+                      <TableCell align="right">
+                        <ButtonGroup size="small">
+                          <Button
+                            color="info"
+                            variant="contained"
+                            onClick={() => {
+                              setSelected(brand);
+                              handleClickOpen();
+                            }}
+                          >
+                            <ModeEditOutlineOutlinedIcon />
+                          </Button>
+                        </ButtonGroup>
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 ))}
               </>
@@ -135,7 +125,14 @@ function Brand({}: Props) {
         </TableContainer>
       </Stack>
 
-      {selected && <EditBrandDialog onClose={handleClose} open={open} brand={selected} key={selected._id} />}
+      {selected && (
+        <EditBrandDialog
+          onClose={handleClose}
+          open={open}
+          brand={selected}
+          key={selected._id}
+        />
+      )}
     </Layout>
   );
 }
