@@ -1,18 +1,13 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import {
+  ModeEditOutlineOutlined,
+  AddOutlined,
+  DeleteOutline,
+} from "@mui/icons-material";
 import {
   Autocomplete,
   Button,
   ButtonGroup,
-  CircularProgress,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,7 +17,9 @@ import React, { useState } from "react";
 import { IBrand } from "../../apis/brand-service";
 import EditBrandDialog from "../../components/EditBrandDialog";
 import Layout from "../../components/Layout/Layout";
+import DataTable from "../../components/Table/DataTable";
 import { useBrands } from "../../hooks/useBrands";
+import { IColumn } from "../../interfaces/common";
 
 type Props = {};
 
@@ -31,10 +28,12 @@ function Brand({}: Props) {
   const [open, setOpen] = React.useState(false);
   const [brandName, setBrandName] = useState<string>("");
   const [selected, setSelected] = useState<null | IBrand>(null);
+  const [page, setPage] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(10);
 
   const { data, isLoading } = useBrands({
-    page: 1,
-    limit: 20,
+    page: page + 1,
+    limit,
     searchTerm: brandName,
   });
 
@@ -46,6 +45,43 @@ function Brand({}: Props) {
     setOpen(false);
     setSelected(null);
   };
+
+  const columns: IColumn[] = [
+    {
+      field: "brandtitle",
+      label: "Brand Name",
+      align: "left",
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: IBrand) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            onClick={() => {
+              setSelected(row);
+              handleClickOpen();
+            }}
+          >
+            <ModeEditOutlineOutlined />
+          </Button>
+
+          <Button
+            color="warning"
+            onClick={() => {
+              console.log("delete");
+            }}
+          >
+            <DeleteOutline />
+          </Button>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
+  const rows = data?.data || [];
 
   return (
     <Layout>
@@ -78,51 +114,26 @@ function Brand({}: Props) {
             )}
           />
           <Button
-            startIcon={<AddOutlinedIcon />}
+            startIcon={<AddOutlined />}
             onClick={() => router.push("/brand/create")}
           >
             Add Brands
           </Button>
         </Box>
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Brand Name </TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            {isLoading ? (
-              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <CircularProgress />
-              </TableBody>
-            ) : (
-              <>
-                {data?.data?.map((brand, i) => (
-                  <TableBody key={i}>
-                    <TableRow key={brand._id}>
-                      <TableCell>{brand.brandtitle}</TableCell>
-                      <TableCell align="right">
-                        <ButtonGroup size="small">
-                          <Button
-                            color="info"
-                            variant="contained"
-                            onClick={() => {
-                              setSelected(brand);
-                              handleClickOpen();
-                            }}
-                          >
-                            <ModeEditOutlineOutlinedIcon />
-                          </Button>
-                        </ButtonGroup>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                ))}
-              </>
-            )}
-          </Table>
-        </TableContainer>
+
+        <DataTable
+          isLoading={isLoading}
+          columns={columns}
+          rows={rows}
+          pagination={true}
+          total={data?.meta?.total}
+          paginationOptions={{
+            page,
+            limit,
+            handleChangePage: (e, page) => setPage(page),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
       </Stack>
 
       {selected && (

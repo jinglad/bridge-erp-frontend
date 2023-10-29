@@ -16,3 +16,23 @@ export interface IGetResponse<T> {
   message: string;
   data: T;
 }
+
+// Data Table
+export interface IColumn {
+  field: string;
+  label: string;
+  align?: "left" | "right" | "center" | "justify" | "inherit";
+  render?: (row: any) => JSX.Element | string;
+}
+
+export interface IPaginationOptions {
+  page: number;
+  limit: number;
+  handleChangePage: (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent> | null,
+    page: number
+  ) => void;
+  handleChangePageSize: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => void;
+}
