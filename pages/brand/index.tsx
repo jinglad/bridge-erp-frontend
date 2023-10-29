@@ -29,7 +29,7 @@ function Brand({}: Props) {
   const [brandName, setBrandName] = useState<string>("");
   const [selected, setSelected] = useState<null | IBrand>(null);
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const [limit, setLimit] = useState<number>(30);
 
   const { data, isLoading } = useBrands({
     page: page + 1,
@@ -81,8 +81,6 @@ function Brand({}: Props) {
     },
   ];
 
-  const rows = data?.data || [];
-
   return (
     <Layout>
       <Stack spacing={2}>
@@ -124,7 +122,7 @@ function Brand({}: Props) {
         <DataTable
           isLoading={isLoading}
           columns={columns}
-          rows={rows}
+          rows={data?.data || []}
           pagination={true}
           total={data?.meta?.total}
           paginationOptions={{

@@ -1,31 +1,25 @@
-import { LoadingButton } from "@mui/lab";
+import {
+  ModeEditOutlineOutlined,
+  AddOutlined,
+  DeleteOutline,
+} from "@mui/icons-material";
 import {
   Autocomplete,
   Button,
   ButtonGroup,
-  CircularProgress,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { InfiniteData, useInfiniteQuery } from "react-query";
-import { Categories, Category, getCategories } from "../../apis/category-service";
+import { ICategory } from "../../apis/category-service";
 import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
-
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
-import useDebounce from "../../hooks/useDebounce";
+import DataTable from "../../components/Table/DataTable";
+import { useCategories } from "../../hooks/useCategories";
+import { IColumn } from "../../interfaces/common";
 
 type Props = {};
 
@@ -33,36 +27,49 @@ function Categories({}: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [categoryName, setCategoryName] = useState("");
-  const [selected, setSelected] = useState<null | Category>(null);
-  const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
+  const [selected, setSelected] = useState<null | ICategory>(null);
+  const [page, setPage] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(30);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["categories", debouncedCategoryNameSearchQuery],
-    getCategories,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
+  const { data, isLoading } = useCategories({
+    page: page + 1,
+    limit,
+    searchTerm: categoryName,
+  });
 
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
   };
 
-  const getCategoryFormattedData = (data: InfiniteData<Categories> | undefined) => {
-    const categoryName = data?.pages.flatMap((page) => page.categories.map((cat) => cat.categorytitle));
-    return [...new Set(categoryName)];
-  };
+  const columns: IColumn[] = [
+    {
+      field: "categorytitle",
+      label: "Category Name",
+      align: "left",
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: ICategory) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            onClick={() => {
+              setSelected(row);
+              setOpen(true);
+            }}
+          >
+            <ModeEditOutlineOutlined />
+          </Button>
+          <Button color="warning">
+            <DeleteOutline />
+          </Button>
+        </ButtonGroup>
+      ),
+    },
+  ];
 
   return (
     <Layout>
@@ -81,74 +88,53 @@ function Categories({}: Props) {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={status === "loading"}
-            options={getCategoryFormattedData(data)}
-            onInputChange={(e, value) => {
-              setCategoryName(value);
+            loading={isLoading}
+            options={
+              data?.data?.map((category) => category.categorytitle) || []
+            }
+            onChange={(e, value) => {
+              setCategoryName(value || "");
             }}
-            renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="search category"
+                variant="outlined"
+              />
+            )}
           />
 
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/categories/create")}>
+          <Button
+            startIcon={<AddOutlined />}
+            onClick={() => router.push("/categories/create")}
+          >
             Add Category
           </Button>
         </Box>
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Category Name </TableCell>
-                {/* <TableCell align="right">Actions</TableCell> */}
-              </TableRow>
-            </TableHead>
-            {status === "loading" ? (
-              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <CircularProgress />
-              </TableBody>
-            ) : (
-              <>
-                {data?.pages.map((group, i) => (
-                  <TableBody key={i}>
-                    {group?.categories.map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell>{row.categorytitle}</TableCell>
-                        {/* <TableCell align="right">
-                          <ButtonGroup size="small">
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickOpen();
-                              }}
-                            >
-                              <ModeEditOutlineOutlinedIcon />
-                            </Button>
-                          </ButtonGroup>
-                        </TableCell> */}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                ))}
-              </>
-            )}
-          </Table>
-        </TableContainer>
-        <Box textAlign="center">
-          {hasNextPage && (
-            <LoadingButton
-              variant="contained"
-              loading={isFetchingNextPage}
-              onClick={() => fetchNextPage()}
-              disabled={!hasNextPage || isFetchingNextPage}
-            >
-              Load More
-            </LoadingButton>
-          )}
-        </Box>
+
+        <DataTable
+          isLoading={isLoading}
+          columns={columns}
+          rows={data?.data || []}
+          pagination={true}
+          total={data?.meta?.total}
+          paginationOptions={{
+            page,
+            limit,
+            handleChangePage: (e, page) => setPage(page),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
       </Stack>
 
-      {selected && <EditcategoryDialog onClose={handleClose} open={open} category={selected} key={selected._id} />}
+      {selected && (
+        <EditcategoryDialog
+          onClose={handleClose}
+          open={open}
+          category={selected}
+          key={selected._id}
+        />
+      )}
     </Layout>
   );
 }
