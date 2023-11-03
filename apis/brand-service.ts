@@ -8,7 +8,7 @@ export interface IBrand {
 
 export const createBrand = async (brandtitle: string) => {
   try {
-    const { data } = await http.post<IGetResponse<IBrand>>("/brand", {
+    const { data } = await http.post<IGetResponse<IBrand>>("/api/v1/brand", {
       brandtitle,
     });
     return data;
@@ -19,7 +19,9 @@ export const createBrand = async (brandtitle: string) => {
 
 export const getBrand = async (id: string) => {
   try {
-    const { data } = await http.get<IGetResponse<IBrand>>("/brand/" + id);
+    const { data } = await http.get<IGetResponse<IBrand>>(
+      "/api/v1/brand/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -36,9 +38,16 @@ export const getBrands = async ({
   searchTerm?: string;
 }) => {
   try {
-    const { data } = await http.get<IAllGetResponse<IBrand[]>>("/brand", {
-      params: { page, limit, searchTerm: searchTerm ? searchTerm : undefined },
-    });
+    const { data } = await http.get<IAllGetResponse<IBrand[]>>(
+      "/api/v1/brand",
+      {
+        params: {
+          page,
+          limit,
+          searchTerm: searchTerm ? searchTerm : undefined,
+        },
+      }
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -48,7 +57,7 @@ export const getBrands = async ({
 export const updateBrand = async ({ id, brandtitle }: any) => {
   try {
     const { data } = await http.patch<IGetResponse<IBrand>>(
-      "/brand/" + id + 1,
+      "/api/v1/brand/" + id + 1,
       {
         brandtitle,
       }
@@ -61,7 +70,7 @@ export const updateBrand = async ({ id, brandtitle }: any) => {
 
 export const deleteBrand = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/brand/" + id);
+    const { data } = await http.delete<{ msg: string }>("/api/v1/brand/" + id);
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);

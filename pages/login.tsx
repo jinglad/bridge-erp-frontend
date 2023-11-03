@@ -1,10 +1,7 @@
-import { Box, Button, Container } from "@mui/material";
+import { Box, Container } from "@mui/material";
 import EmailLogin from "../components/Login/EmailLogin";
-import useUserStore from "../store/userStore";
 
 const Login = () => {
-  const { user, logout } = useUserStore((state) => state);
-
   return (
     <Container>
       <Box
@@ -16,11 +13,7 @@ const Login = () => {
         }}
       >
         <Box>
-          {user?.role !== "admin" ? (
-            <EmailLogin />
-          ) : (
-            <Button onClick={() => logout()}>Logout</Button>
-          )}
+          <EmailLogin />
         </Box>
       </Box>
     </Container>
@@ -28,3 +21,21 @@ const Login = () => {
 };
 
 export default Login;
+
+export const getServerSideProps = async (ctx: {
+  req: { cookies: { token: string } };
+}) => {
+  const { token } = ctx.req.cookies;
+  console.log(token);
+  if (token) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+  return {
+    props: {},
+  };
+};

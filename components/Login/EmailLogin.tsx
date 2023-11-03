@@ -5,6 +5,9 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import useUserStore from "../../store/userStore";
 import { setCookie } from "cookies-next";
+import { appConfig } from "../../config/appConfig";
+import { useLogin } from "../../hooks/user";
+import { ILoginResponse } from "../../interfaces/auth";
 
 type Inputs = {
   email: string;
@@ -19,48 +22,39 @@ const EmailLogin = () => {
     reset,
   } = useForm<Inputs>();
   const { setUser } = useUserStore((state) => state);
-
-  const [loading, setLoading] = useState<boolean>(false);
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<Inputs> = (input) => {
-    const { email } = input;
-    setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/user/login`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(input),
-    })
-      .then((res) => {
-        if (res.ok) return res.json();
-      })
-      .then((data) => {
-        if (data?.data?.user?.role === "admin") {
-          setUser({
-            email,
-            id: data?.data?.user?._id,
-            role: data?.data?.user?.role,
-          });
-          setCookie("token", data?.data?.accessToken, {
-            maxAge: 30 * 24 * 60 * 60, // 30 days
-          });
-          router.push("/");
-          setLoading(false);
-        } else {
-          toast.error("You are not admin");
-          setLoading(false);
-        }
-
-        reset();
-      })
-      .catch((error) => {
-        console.log(error);
-        setLoading(false);
-        reset();
+  const handleSuccess = (data: ILoginResponse) => {
+    const { accessToken, user } = data;
+    console.log(user);
+    if (user?.role === "admin") {
+      setUser({
+        email: user.email,
+        id: user._id,
+        role: user.role,
       });
+      setCookie("token", accessToken, {
+        maxAge: 30 * 24 * 60 * 60, // 30 days
+      });
+      reset();
+      router.push("/");
+    } else {
+      toast.error("You are not admin");
+    }
   };
+
+  const { mutate: login, isLoading } = useLogin({
+    handleSuccess,
+  });
+
+  const onSubmit: SubmitHandler<Inputs> = (input) => {
+    const { email, password } = input;
+    login({
+      email,
+      password,
+    });
+  };
+
   return (
     <Box sx={{ py: 3, px: 4, width: "400px" }}>
       <Box
@@ -119,12 +113,12 @@ const EmailLogin = () => {
         <Box sx={{ width: "100%" }}>
           <Button
             type="submit"
-            disabled={loading}
+            disabled={isLoading}
             sx={{
               width: "100%",
             }}
           >
-            {loading ? "Loading..." : "Login"}
+            {isLoading ? "Loading..." : "Login"}
           </Button>
         </Box>
       </Box>

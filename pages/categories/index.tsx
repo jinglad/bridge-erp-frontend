@@ -29,7 +29,7 @@ function Categories({}: Props) {
   const [categoryName, setCategoryName] = useState("");
   const [selected, setSelected] = useState<null | ICategory>(null);
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(30);
+  const [limit, setLimit] = useState<number>(10);
 
   const { data, isLoading } = useCategories({
     page: page + 1,

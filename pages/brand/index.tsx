@@ -29,7 +29,7 @@ function Brand({}: Props) {
   const [brandName, setBrandName] = useState<string>("");
   const [selected, setSelected] = useState<null | IBrand>(null);
   const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(30);
+  const [limit, setLimit] = useState<number>(10);
 
   const { data, isLoading } = useBrands({
     page: page + 1,

@@ -1,5 +1,7 @@
 import { useQuery } from "react-query";
 import { getCategories, getCategory } from "../apis/category-service";
+import { IError } from "../interfaces/common";
+import { toast } from "react-toastify";
 
 export const useCategories = ({
   page,
@@ -16,11 +18,21 @@ export const useCategories = ({
     {
       keepPreviousData: true,
       refetchOnMount: false,
+      refetchOnWindowFocus: false,
       retry: 0,
+      onError: (error: IError) => {
+        toast.error(error?.response?.data?.message);
+      },
     }
   );
 };
 
 export const useCategory = (id: string) => {
-  return useQuery(["categories", id], () => getCategory(id));
+  return useQuery(["categories", id], () => getCategory(id), {
+    refetchOnWindowFocus: false,
+    retry: 0,
+    onError: (error: IError) => {
+      toast.error(error?.response?.data?.message);
+    },
+  });
 };

@@ -8,9 +8,12 @@ export interface ICategory {
 
 export const createCategory = async (categorytitle: string) => {
   try {
-    const { data } = await http.post<IGetResponse<ICategory>>("/category", {
-      categorytitle,
-    });
+    const { data } = await http.post<IGetResponse<ICategory>>(
+      "/api/v1/category",
+      {
+        categorytitle,
+      }
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -20,7 +23,7 @@ export const createCategory = async (categorytitle: string) => {
 export const getCategory = async (id: string) => {
   try {
     const { data } = await http.get<IGetResponse<ICategory>>(
-      +"/category/" + id
+      +"/api/v1/category/" + id
     );
     return data;
   } catch (error: any) {
@@ -38,9 +41,16 @@ export const getCategories = async ({
   searchTerm?: string;
 }) => {
   try {
-    const { data } = await http.get<IAllGetResponse<ICategory[]>>("/category", {
-      params: { page, limit, searchTerm: searchTerm ? searchTerm : undefined },
-    });
+    const { data } = await http.get<IAllGetResponse<ICategory[]>>(
+      "/api/v1/category",
+      {
+        params: {
+          page,
+          limit,
+          searchTerm: searchTerm ? searchTerm : undefined,
+        },
+      }
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -50,7 +60,7 @@ export const getCategories = async ({
 export const updateCategory = async ({ id, categorytitle }: any) => {
   try {
     const { data } = await http.patch<IGetResponse<ICategory>>(
-      "/category/" + id,
+      "/api/v1/category/" + id,
       { categorytitle }
     );
     return data;
@@ -61,7 +71,9 @@ export const updateCategory = async ({ id, categorytitle }: any) => {
 
 export const deleteCategory = async (id: string) => {
   try {
-    const { data } = await http.delete<{ message: string }>("/category/" + id);
+    const { data } = await http.delete<{ message: string }>(
+      "/api/v1/category/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);

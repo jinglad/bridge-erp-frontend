@@ -1,5 +1,7 @@
 import { useQuery } from "react-query";
 import { getBrand, getBrands } from "../apis/brand-service";
+import { toast } from "react-toastify";
+import { IError } from "../interfaces/common";
 
 export const useBrands = ({
   page,
@@ -16,11 +18,21 @@ export const useBrands = ({
     {
       keepPreviousData: true,
       refetchOnMount: false,
+      refetchOnWindowFocus: false,
       retry: 0,
+      onError: (error: IError) => {
+        toast.error(error?.response?.data?.message);
+      },
     }
   );
 };
 
 export const useBrand = (id: string) => {
-  return useQuery(["brands", id], () => getBrand(id));
+  return useQuery(["brands", id], () => getBrand(id), {
+    refetchOnWindowFocus: false,
+    retry: 0,
+    onError: (error: IError) => {
+      toast.error(error?.response?.data?.message);
+    },
+  });
 };

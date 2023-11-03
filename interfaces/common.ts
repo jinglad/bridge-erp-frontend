@@ -36,3 +36,20 @@ export interface IPaginationOptions {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => void;
 }
+
+export interface IError {
+  response: {
+    data: {
+      success: boolean;
+      message: string;
+      errorMessages: IErrorMessage[];
+      status: number;
+      statusText: string;
+    };
+  };
+}
+
+export interface IErrorMessage {
+  path: string;
+  message: string;
+}
