@@ -22,7 +22,7 @@ function Create({}: Props) {
     onSuccess: (data) => {
       toast.success(data.message);
       reset();
-      queryClient.invalidateQueries("brands");
+      queryClient.invalidateQueries(["brands"]);
     },
     onError: (error: any) => {
       toast.error(error?.message || "Something went wrong!");

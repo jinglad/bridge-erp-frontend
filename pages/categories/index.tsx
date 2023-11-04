@@ -14,18 +14,23 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { ICategory } from "../../apis/category-service";
+import { ICategory, deleteCategory } from "../../apis/category-service";
 import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
 import DataTable from "../../components/Table/DataTable";
 import { useCategories } from "../../hooks/useCategories";
 import { IColumn } from "../../interfaces/common";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import DeleteDialog from "../../components/DeleteDialog";
 
 type Props = {};
 
 function Categories({}: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [categoryName, setCategoryName] = useState("");
   const [selected, setSelected] = useState<null | ICategory>(null);
   const [page, setPage] = useState<number>(0);
@@ -40,6 +45,24 @@ function Categories({}: Props) {
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
+  };
+
+  const { mutateAsync, isLoading: deleteLoading } = useMutation(
+    deleteCategory,
+    {
+      onSuccess: (data) => {
+        toast.success("Category deleted successfully");
+        queryClient.invalidateQueries(["categories"]);
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Something wen't wrong");
+      },
+    }
+  );
+
+  const handleDelete = async () => {
+    await mutateAsync(selected?._id as string);
+    setDeleteDialogOpen(false);
   };
 
   const columns: IColumn[] = [
@@ -63,7 +86,13 @@ function Categories({}: Props) {
           >
             <ModeEditOutlineOutlined />
           </Button>
-          <Button color="warning">
+          <Button
+            color="warning"
+            onClick={() => {
+              setSelected(row);
+              setDeleteDialogOpen(true);
+            }}
+          >
             <DeleteOutline />
           </Button>
         </ButtonGroup>
@@ -135,6 +164,15 @@ function Categories({}: Props) {
           key={selected._id}
         />
       )}
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Category"
+        text="Are you sure you want to delete this category?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
     </Layout>
   );
 }

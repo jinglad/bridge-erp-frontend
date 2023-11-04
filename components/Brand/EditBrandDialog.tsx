@@ -6,12 +6,12 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
-  TextField
+  TextField,
 } from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { IBrand, updateBrand } from "../apis/brand-service";
+import { IBrand, updateBrand } from "../../apis/brand-service";
 
 interface EditBrandDialogProps {
   brand: IBrand;

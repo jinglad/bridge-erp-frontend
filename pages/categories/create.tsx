@@ -9,7 +9,7 @@ import {
 import { Box } from "@mui/system";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createCategory } from "../../apis/category-service";
 import Layout from "../../components/Layout/Layout";
@@ -17,10 +17,12 @@ import Layout from "../../components/Layout/Layout";
 type Props = {};
 
 function Create({}: Props) {
+  const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation("categories", createCategory, {
     onSuccess: (data) => {
       toast.success(data.message);
       reset();
+      queryClient.invalidateQueries(["categories"]);
     },
     onError(error: any) {
       toast.error(error.message || "Something went wrong!");

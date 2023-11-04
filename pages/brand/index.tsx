@@ -14,18 +14,23 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { IBrand } from "../../apis/brand-service";
-import EditBrandDialog from "../../components/EditBrandDialog";
+import { IBrand, deleteBrand } from "../../apis/brand-service";
+import EditBrandDialog from "../../components/Brand/EditBrandDialog";
 import Layout from "../../components/Layout/Layout";
 import DataTable from "../../components/Table/DataTable";
 import { useBrands } from "../../hooks/useBrands";
 import { IColumn } from "../../interfaces/common";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import DeleteDialog from "../../components/DeleteDialog";
 
 type Props = {};
 
 function Brand({}: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [brandName, setBrandName] = useState<string>("");
   const [selected, setSelected] = useState<null | IBrand>(null);
   const [page, setPage] = useState<number>(0);
@@ -44,6 +49,21 @@ function Brand({}: Props) {
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
+  };
+
+  const { mutateAsync, isLoading: deleteLoading } = useMutation(deleteBrand, {
+    onSuccess: (data) => {
+      toast.success("Brand deleted successfully");
+      queryClient.invalidateQueries(["brands"]);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Something wen't wrong");
+    },
+  });
+
+  const handleDelete = async () => {
+    await mutateAsync(selected?._id as string);
+    setDeleteDialogOpen(false);
   };
 
   const columns: IColumn[] = [
@@ -71,7 +91,8 @@ function Brand({}: Props) {
           <Button
             color="warning"
             onClick={() => {
-              console.log("delete");
+              setSelected(row);
+              setDeleteDialogOpen(true);
             }}
           >
             <DeleteOutline />
@@ -142,6 +163,14 @@ function Brand({}: Props) {
           key={selected._id}
         />
       )}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Brand"
+        text="Are you sure you want to delete this brand?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
     </Layout>
   );
 }
