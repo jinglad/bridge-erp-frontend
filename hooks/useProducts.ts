@@ -1,20 +1,24 @@
 import { useQuery } from "react-query";
-import { getBrand, getBrands } from "../apis/brand-service";
 import { toast } from "react-toastify";
+import { getProduct, getProducts } from "../apis/product-service";
 import { IError } from "../interfaces/common";
 
-export const useBrands = ({
-  page = 1,
-  limit = 10,
+export const useProducts = ({
+  page,
+  limit,
   searchTerm,
+  brand,
+  category,
 }: {
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
   searchTerm?: string;
+  brand?: string;
+  category?: string;
 }) => {
   return useQuery(
-    ["brands", page, limit, searchTerm],
-    () => getBrands({ page, limit, searchTerm }),
+    ["products", page, limit, searchTerm, brand, category],
+    () => getProducts({ page, limit, searchTerm, brand, category }),
     {
       keepPreviousData: true,
       refetchOnMount: false,
@@ -27,8 +31,8 @@ export const useBrands = ({
   );
 };
 
-export const useBrand = (id: string) => {
-  return useQuery(["brands", id], () => getBrand(id), {
+export const useProduct = (id: string) => {
+  return useQuery(["products", id], () => getProduct(id), {
     refetchOnWindowFocus: false,
     retry: 0,
     onError: (error: IError) => {

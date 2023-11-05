@@ -23,6 +23,7 @@ import { IColumn } from "../../interfaces/common";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import DeleteDialog from "../../components/DeleteDialog";
+import useDebounce from "../../hooks/useDebounce";
 
 type Props = {};
 
@@ -33,13 +34,14 @@ function Brand({}: Props) {
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [brandName, setBrandName] = useState<string>("");
   const [selected, setSelected] = useState<null | IBrand>(null);
+  const debouncedBrandName = useDebounce(brandName, 500);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
 
   const { data, isLoading } = useBrands({
     page: page + 1,
     limit,
-    searchTerm: brandName,
+    searchTerm: debouncedBrandName,
   });
 
   const handleClickOpen = () => {
@@ -121,8 +123,11 @@ function Brand({}: Props) {
             sx={{ flex: 1 }}
             loading={isLoading}
             options={data?.data?.map((brand) => brand.brandtitle) || []}
-            onChange={(e, value) => {
-              setBrandName(value || "");
+            // onChange={(e, value) => {
+            //   setBrandName(value || "");
+            // }}
+            onInputChange={(e, value) => {
+              setBrandName(value);
             }}
             renderInput={(params) => (
               <TextField

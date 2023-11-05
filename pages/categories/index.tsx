@@ -1,7 +1,7 @@
 import {
-  ModeEditOutlineOutlined,
   AddOutlined,
   DeleteOutline,
+  ModeEditOutlineOutlined,
 } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -14,15 +14,16 @@ import {
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
 import { ICategory, deleteCategory } from "../../apis/category-service";
+import DeleteDialog from "../../components/DeleteDialog";
 import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
 import DataTable from "../../components/Table/DataTable";
 import { useCategories } from "../../hooks/useCategories";
+import useDebounce from "../../hooks/useDebounce";
 import { IColumn } from "../../interfaces/common";
-import { useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import DeleteDialog from "../../components/DeleteDialog";
 
 type Props = {};
 
@@ -32,6 +33,7 @@ function Categories({}: Props) {
   const [open, setOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [categoryName, setCategoryName] = useState("");
+  const debouncedCategoryName = useDebounce(categoryName, 500);
   const [selected, setSelected] = useState<null | ICategory>(null);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
@@ -39,7 +41,7 @@ function Categories({}: Props) {
   const { data, isLoading } = useCategories({
     page: page + 1,
     limit,
-    searchTerm: categoryName,
+    searchTerm: debouncedCategoryName,
   });
 
   const handleClose = () => {
@@ -121,8 +123,11 @@ function Categories({}: Props) {
             options={
               data?.data?.map((category) => category.categorytitle) || []
             }
-            onChange={(e, value) => {
-              setCategoryName(value || "");
+            // onChange={(e, value) => {
+            //   setCategoryName(value || "");
+            // }}
+            onInputChange={(e, value) => {
+              setCategoryName(value);
             }}
             renderInput={(params) => (
               <TextField

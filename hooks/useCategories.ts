@@ -4,12 +4,12 @@ import { IError } from "../interfaces/common";
 import { toast } from "react-toastify";
 
 export const useCategories = ({
-  page,
-  limit,
+  page = 1,
+  limit = 10,
   searchTerm,
 }: {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   searchTerm?: string;
 }) => {
   return useQuery(

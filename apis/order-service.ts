@@ -1,11 +1,11 @@
 import http from "./http-common";
-import { Product } from "./product-service";
+import { IProduct } from "./product-service";
 import { Supplier } from "./supplier-service";
 
 export interface Order {
   _id: string;
   customer: string;
-  products: Product[];
+  products: IProduct[];
   to_be_paid: number;
   buy_total: number;
   paid: number;
@@ -15,7 +15,7 @@ export interface Order {
 }
 export interface CreateOrderProps {
   customer: string;
-  products: Product[];
+  products: IProduct[];
   to_be_paid: number;
   paid: number;
   payment_method: string;
