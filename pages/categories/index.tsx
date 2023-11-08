@@ -18,7 +18,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { ICategory, deleteCategory } from "../../apis/category-service";
 import DeleteDialog from "../../components/DeleteDialog";
-import EditcategoryDialog from "../../components/EditCategoryDialog";
+import EditcategoryDialog from "../../components/Category/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
 import DataTable from "../../components/Table/DataTable";
 import { useCategories } from "../../hooks/useCategories";

@@ -28,7 +28,7 @@ import {
   IProduct,
   Products,
 } from "../apis/product-service";
-import AddCustomerDialog from "../components/AddCustomerDialog";
+import AddCustomerDialog from "../components/Customer/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 import useDebounce from "../hooks/useDebounce";

@@ -34,7 +34,7 @@ import {
   getAndSearchProduct,
   IProduct,
 } from "../../apis/product-service";
-import EditProductDialog from "../../components/EditProductDialog";
+import EditProductDialog from "../../components/Product/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
 import useDebounce from "../../hooks/useDebounce";
 import { useProducts } from "../../hooks/useProducts";

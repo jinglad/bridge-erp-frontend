@@ -13,11 +13,11 @@ import {
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { IProduct, updateProduct } from "../apis/product-service";
+import { IProduct, updateProduct } from "../../apis/product-service";
 import { useState } from "react";
-import useDebounce from "../hooks/useDebounce";
-import { useBrands } from "../hooks/useBrands";
-import { useCategories } from "../hooks/useCategories";
+import useDebounce from "../../hooks/useDebounce";
+import { useBrands } from "../../hooks/useBrands";
+import { useCategories } from "../../hooks/useCategories";
 
 interface EditProductDialogProps {
   product: IProduct;
