@@ -1,64 +1,75 @@
+import { IAllGetResponse, IGetResponse } from "../interfaces/common";
 import http from "./http-common";
 
-export interface Supplier {
+export interface ISupplier {
   _id: string;
   name: string;
-  email: number;
+  email: string;
   phone: string;
   address: string;
 }
 
-export interface Suppliers {
-  supplier: Supplier[];
-  count: number;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalProducts: number;
-}
-
-export interface CreateSupplierProps {
-  name: string;
-  email: number;
-  phone: string;
-  address: string;
-}
-
-export const createSupplier = async (sp: CreateSupplierProps) => {
+export const createSupplier = async (sp: Omit<ISupplier, "_id">) => {
   try {
-    const { data } = await http.post<{ msg: string }>("/supplier", { ...sp });
+    const { data } = await http.post<IGetResponse<ISupplier>>(
+      "/api/v1/supplier",
+      sp
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const getSupplier = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
-  const name = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
-
-  if (name) {
-    params.name = name;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
+export const getSupplier = async (id: string) => {
   try {
-    const { data } = await http.get<Suppliers>("/supplier", {
-      params: params,
-    });
+    const { data } = await http.get<IGetResponse<ISupplier>>(
+      "/api/v1/supplier/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const updateSupplier = async (sp: Supplier) => {
+export const getSuppliers = async ({
+  page,
+  limit,
+  searchTerm,
+}: {
+  page: number;
+  limit: number;
+  searchTerm?: string;
+}) => {
   try {
-    const { data } = await http.patch<{
-      msg: string;
-    }>("/Supplier/" + sp._id, { ...sp });
+    const { data } = await http.get<IAllGetResponse<ISupplier[]>>(
+      "/api/v1/supplier",
+      {
+        params: {
+          page,
+          limit,
+          searchTerm: searchTerm ? searchTerm : undefined,
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};
+
+export const updateSupplier = async ({
+  id,
+  input,
+}: {
+  id: string;
+  input: Omit<ISupplier, "_id">;
+}) => {
+  try {
+    const { data } = await http.patch<IGetResponse<ISupplier>>(
+      "/api/v1/supplier/" + id,
+      input
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -67,9 +78,11 @@ export const updateSupplier = async (sp: Supplier) => {
 
 export const deleteSupplier = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/supplier/" + id);
+    const { data } = await http.delete<{ msg: string }>(
+      "/api/v1/supplier/" + id
+    );
     return data;
   } catch (error: any) {
-    throw Error(error);
+    throw Error(error.response.data.message);
   }
 };

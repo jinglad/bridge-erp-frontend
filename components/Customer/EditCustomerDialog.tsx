@@ -36,6 +36,7 @@ const EditCustomerDialog = ({
     onSuccess: (data) => {
       toast.success(data?.message || "Customer Updated successfully");
       queryClient.invalidateQueries(["customers"]);
+      onClose();
     },
     onError: (error: any) => {
       toast.error(error.message || "Something wen't wrong");

@@ -66,7 +66,7 @@ export const updateCustomer = async ({
 }) => {
   try {
     const { data } = await http.patch<IGetResponse<ICustomer>>(
-      "/api/v1/customer/" + id + 1,
+      "/api/v1/customer/" + id,
       {
         customerName,
       }

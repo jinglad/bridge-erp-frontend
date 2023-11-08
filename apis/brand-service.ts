@@ -57,7 +57,7 @@ export const getBrands = async ({
 export const updateBrand = async ({ id, brandtitle }: any) => {
   try {
     const { data } = await http.patch<IGetResponse<IBrand>>(
-      "/api/v1/brand/" + id + 1,
+      "/api/v1/brand/" + id,
       {
         brandtitle,
       }

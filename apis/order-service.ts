@@ -1,6 +1,6 @@
 import http from "./http-common";
 import { IProduct } from "./product-service";
-import { Supplier } from "./supplier-service";
+import { ISupplier } from "./supplier-service";
 
 export interface Order {
   _id: string;

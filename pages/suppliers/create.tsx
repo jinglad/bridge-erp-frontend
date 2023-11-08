@@ -1,10 +1,16 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import Link from "next/link";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createSupplier } from "../../apis/supplier-service";
 import Layout from "../../components/Layout/Layout";
@@ -12,17 +18,27 @@ import Layout from "../../components/Layout/Layout";
 type Props = {};
 
 function Create({}: Props) {
-  const { mutateAsync, isLoading } = useMutation("createSupplier", createSupplier, {
-    onSuccess: (data) => {
-      toast.success(data.msg);
-      reset();
-    },
-  });
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isLoading } = useMutation(
+    "createSupplier",
+    createSupplier,
+    {
+      onSuccess: (data) => {
+        toast.success(data?.message || "Supplier created successfully");
+        queryClient.invalidateQueries(["suppliers"]);
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Something wen't wrong");
+      },
+    }
+  );
 
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = async (data: any) => {
     await mutateAsync(data);
+    reset();
   };
 
   return (
@@ -34,13 +50,31 @@ function Create({}: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField required id="Supplier" {...register("name")} label="Supplier Name" fullWidth />
+              <TextField
+                required
+                id="Supplier"
+                {...register("name")}
+                label="Supplier Name"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12}>
-              <TextField required id="emailAddress" {...register("email")} label="Email Address" fullWidth />
+              <TextField
+                required
+                id="emailAddress"
+                {...register("email")}
+                label="Email Address"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required {...register("phone")} id="contactNo" label="Contact No" fullWidth />
+              <TextField
+                required
+                {...register("phone")}
+                id="contactNo"
+                label="Contact No"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -53,7 +87,12 @@ function Create({}: Props) {
             </Grid>
             <Grid item xs={12} sm={3}>
               <ButtonGroup>
-                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                <LoadingButton
+                  color="success"
+                  variant="contained"
+                  type="submit"
+                  loading={isLoading}
+                >
                   Submit
                 </LoadingButton>
                 <Button color="error">
