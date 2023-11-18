@@ -1,14 +1,14 @@
 import { Typography } from "@mui/material";
 import { Box, styled } from "@mui/system";
 import React, { forwardRef, Fragment } from "react";
-import { IProduct } from "../apis/product-service";
+import { Product } from "../apis/product-service";
 
 interface OrderToPrintProps {
   payment_method: string;
   discount: number;
   paid: number;
   to_be_paid: number;
-  products: IProduct[];
+  products: Product[];
   customer: string;
   ref: React.RefObject<HTMLDivElement>;
   createdDate: string;

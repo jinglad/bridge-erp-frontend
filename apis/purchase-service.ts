@@ -1,5 +1,5 @@
 import http from "./http-common";
-import { ISupplier } from "./supplier-service";
+import { Supplier } from "./supplier-service";
 
 export interface Product {
   _id: string;
@@ -51,13 +51,7 @@ export const createReturnPurchase = async (formData: Purchase) => {
   return data;
 };
 
-export const getReturnPurchases = async ({
-  queryKey,
-  pageParam = 0,
-}: {
-  queryKey: any[];
-  pageParam?: number;
-}) => {
+export const getReturnPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 
@@ -73,13 +67,7 @@ export const getReturnPurchases = async ({
   });
   return data;
 };
-export const getPurchases = async ({
-  queryKey,
-  pageParam = 0,
-}: {
-  queryKey: any[];
-  pageParam?: number;
-}) => {
+export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
   const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const params: any = {};
 

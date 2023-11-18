@@ -1,70 +1,74 @@
 import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  Autocomplete,
-  Button,
-  ButtonGroup,
-  Grid,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "react-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
+import { Brands, getBrands } from "../../apis/brand-service";
+import { Categories, getCategories } from "../../apis/category-service";
 import { createProduct } from "../../apis/product-service";
 import Layout from "../../components/Layout/Layout";
-import { useBrands } from "../../hooks/useBrands";
-import { useCategories } from "../../hooks/useCategories";
-import useDebounce from "../../hooks/useDebounce";
 
 type Props = {};
 
 function Create({}: Props) {
-  const [categoryName, setCategoryName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
   const [brandName, setBrandName] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
-
-  const debouncedCategoryName = useDebounce(categoryName, 500);
-  const debouncedBrandName = useDebounce(brandName, 500);
+  const [categoryName, setCategoryName] = useState("");
   const queryClient = useQueryClient();
-
-  // Data
-  const { data: brands, isLoading: brandLoading } = useBrands({
-    searchTerm: debouncedBrandName,
+  const { mutateAsync, isLoading } = useMutation("createProduct", createProduct, {
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      reset();
+      queryClient.invalidateQueries("searchedProducts");
+    },
   });
-  const { data: categories, isLoading: categoryLoading } = useCategories({
-    searchTerm: debouncedCategoryName,
-  });
-
-  // Create Product
-  const { mutateAsync, isLoading } = useMutation(
-    "createProduct",
-    createProduct,
-    {
-      onSuccess: (data) => {
-        toast.success(data?.message || "Product created successfully");
-        reset();
-        queryClient.invalidateQueries(["products"]);
-      },
-      onError: (error: any) => {
-        toast.error(error?.message || "Something wen't wrong");
-      },
-    }
-  );
 
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = async (data: any) => {
-    data.category = selectedCategory;
-    data.brand = selectedBrand;
-    data.qty = 0;
-    data.buy_price = 0;
-    data.sell_price = 0;
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("brand", brandName);
+    formData.append("category", categoryName);
+    formData.append("reorder_limit", data.reorder_limit);
 
-    await mutateAsync(data);
+    if (data.file) {
+      formData.append("file", data.file[0]);
+    }
+
+    await mutateAsync(formData);
+  };
+
+  const { data, status } = useInfiniteQuery(["brands", brandName], getBrands, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
+
+  const { data: catData, status: catStatus } = useInfiniteQuery(["categories", categoryName], getCategories, {
+    getNextPageParam: (lastPage, pages) => {
+      if (pages.length === lastPage.totalPages) {
+        return undefined;
+      } else {
+        return pages.length;
+      }
+    },
+  });
+
+  const getBrandFormattedData = (data: InfiniteData<Brands> | undefined) => {
+    const brandName = data?.pages.flatMap((page) => page.brands.map((brand) => brand.brandtitle));
+    return [...new Set(brandName)];
+  };
+
+  const getCategoryFormattedData = (data: InfiniteData<Categories> | undefined) => {
+    const categoryName = data?.pages.flatMap((page) => page.categories.map((cat) => cat.categorytitle));
+    return [...new Set(categoryName)];
   };
 
   return (
@@ -76,54 +80,26 @@ function Create({}: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField
-                required
-                id="productName"
-                label="Product Name"
-                fullWidth
-                {...register("name")}
-              />
+              <TextField required id="productName" label="Product Name" fullWidth {...register("name")} />
             </Grid>
             <Grid item xs={12} sm={4}>
               <Autocomplete
-                loading={categoryLoading}
-                options={categories?.data || []}
-                getOptionLabel={(category) => category?.categorytitle}
-                isOptionEqualToValue={(option, value) =>
-                  option?._id === value?._id
-                }
+                loading={status === "loading"}
+                options={getCategoryFormattedData(catData)}
                 onInputChange={(e, value) => {
                   setCategoryName(value);
                 }}
-                onChange={(e, value) => {
-                  if (value) {
-                    setSelectedCategory(value._id);
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Search category" required />
-                )}
+                renderInput={(params) => <TextField {...params} label="search category" required />}
               />
             </Grid>
             <Grid item xs={12} sm={4}>
               <Autocomplete
-                loading={brandLoading}
-                options={brands?.data || []}
-                getOptionLabel={(brand) => brand?.brandtitle}
-                isOptionEqualToValue={(option, value) =>
-                  option?._id === value?._id
-                }
+                loading={status === "loading"}
+                options={getBrandFormattedData(data)}
                 onInputChange={(e, value) => {
                   setBrandName(value);
                 }}
-                onChange={(e, value) => {
-                  if (value) {
-                    setSelectedBrand(value._id);
-                  }
-                }}
-                renderInput={(params) => (
-                  <TextField {...params} label="Search brand" required />
-                )}
+                renderInput={(params) => <TextField {...params} label="search brand" required />}
               />
             </Grid>
 
@@ -138,7 +114,7 @@ function Create({}: Props) {
                 {...register("reorder_limit")}
               />
             </Grid>
-            {/* <Grid item xs={12} sm={6}>
+            <Grid item xs={12} sm={6}>
               <Button fullWidth variant="contained" component="label">
                 <label htmlFor="files" style={{ width: "100%" }}>
                   Please choose a image
@@ -153,15 +129,10 @@ function Create({}: Props) {
                   accept="image/*"
                 />
               </Button>
-            </Grid> */}
+            </Grid>
             <Grid item xs={12} sm={6}>
               <ButtonGroup>
-                <LoadingButton
-                  color="success"
-                  variant="contained"
-                  type="submit"
-                  loading={isLoading}
-                >
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
                   Submit
                 </LoadingButton>
                 <Button color="error">

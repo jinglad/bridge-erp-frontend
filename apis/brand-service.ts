@@ -1,67 +1,49 @@
-import { IAllGetResponse, IGetResponse } from "../interfaces/common";
 import http from "./http-common";
 
-export interface IBrand {
+export interface Brand {
   _id: string;
   brandtitle: string;
 }
 
+export interface Brands {
+  brands: Brand[];
+  page: string;
+  size: number;
+  totalPages: number;
+  totalBrands: number;
+}
+
 export const createBrand = async (brandtitle: string) => {
   try {
-    const { data } = await http.post<IGetResponse<IBrand>>("/api/v1/brand", {
-      brandtitle,
-    });
+    const { data } = await http.post<{ msg: string }>("/brand", { brandtitle });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const getBrand = async (id: string) => {
-  try {
-    const { data } = await http.get<IGetResponse<IBrand>>(
-      "/api/v1/brand/" + id
-    );
-    return data;
-  } catch (error: any) {
-    throw Error(error.response.data.message);
-  }
-};
+export const getBrands = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+  const brandtitle = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
 
-export const getBrands = async ({
-  page,
-  limit,
-  searchTerm,
-}: {
-  page: number;
-  limit: number;
-  searchTerm?: string;
-}) => {
-  try {
-    const { data } = await http.get<IAllGetResponse<IBrand[]>>(
-      "/api/v1/brand",
-      {
-        params: {
-          page,
-          limit,
-          searchTerm: searchTerm ? searchTerm : undefined,
-        },
-      }
-    );
-    return data;
-  } catch (error: any) {
-    throw Error(error.response.data.message);
+  if (brandtitle) {
+    params.brandtitle = brandtitle;
   }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<Brands>("/brand", {
+    params: params,
+  });
+  return data;
 };
 
 export const updateBrand = async ({ id, brandtitle }: any) => {
   try {
-    const { data } = await http.patch<IGetResponse<IBrand>>(
-      "/api/v1/brand/" + id,
-      {
-        brandtitle,
-      }
-    );
+    const { data } = await http.patch<{
+      msg: string;
+    }>("/brand/" + id, { brandtitle });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -70,9 +52,9 @@ export const updateBrand = async ({ id, brandtitle }: any) => {
 
 export const deleteBrand = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/api/v1/brand/" + id);
+    const { data } = await http.delete<{ msg: string }>("/brand/" + id);
     return data;
   } catch (error: any) {
-    throw Error(error.response.data.message);
+    throw Error(error);
   }
 };
