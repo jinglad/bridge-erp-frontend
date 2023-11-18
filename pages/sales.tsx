@@ -292,7 +292,7 @@ function Sales({}: Props) {
             </Typography>
           </Grid>
           <Grid item container spacing={1} xs={12}>
-            {status === "loading" ? (
+            {isLoading ? (
               <Grid item xs={12}>
                 <Box
                   sx={{
