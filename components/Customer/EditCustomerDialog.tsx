@@ -2,51 +2,58 @@ import { LoadingButton } from "@mui/lab";
 import {
   Button,
   ButtonGroup,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   TextField,
-  Typography,
 } from "@mui/material";
-import { Box } from "@mui/system";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { createCustomer } from "../../apis/customer-service";
-import Layout from "../../components/Layout/Layout";
-import { useCustomers } from "../../hooks/useCustomers";
+import { ICustomer, updateCustomer } from "../../apis/customer-service";
 
-type Props = {};
+interface EditCustomerDialogProps {
+  customer: ICustomer;
+  open: boolean;
+  onClose: () => void;
+}
 
-function Create({}: Props) {
+const EditCustomerDialog = ({
+  open,
+  onClose,
+  customer,
+}: EditCustomerDialogProps) => {
   const queryClient = useQueryClient();
-  const {} = useCustomers({});
+  const { register, handleSubmit, reset } = useForm({
+    defaultValues: {
+      customerName: customer?.customerName,
+    },
+  });
 
-  const { mutateAsync, isLoading } = useMutation(createCustomer, {
+  const { mutateAsync, isLoading } = useMutation(updateCustomer, {
     onSuccess: (data) => {
-      toast.success(data?.message || "Customer created successfully");
+      toast.success(data?.message || "Customer Updated successfully");
       queryClient.invalidateQueries(["customers"]);
-      reset();
+      onClose();
     },
     onError: (error: any) => {
       toast.error(error.message || "Something wen't wrong");
     },
   });
 
-  const { register, handleSubmit, reset } = useForm();
-
   const onSubmit = async (data: any) => {
-    await mutateAsync(data.customerName);
+    await mutateAsync({ id: customer?._id, customerName: data.customerName });
+    reset();
   };
-
   return (
-    <Layout>
-      <Box maxWidth="800px">
-        <Typography variant="h6" gutterBottom>
-          Create New customer
-        </Typography>
+    <Dialog open={open} onClose={onClose} scroll="body">
+      <DialogTitle>Update Customer</DialogTitle>
+      <DialogContent sx={{ p: 4 }}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={3}>
-            <Grid item xs={12} sm={6}>
+          <Grid container spacing={4}>
+            <Grid item xs={12}>
               <TextField
                 required
                 id="customerName"
@@ -56,7 +63,7 @@ function Create({}: Props) {
               />
             </Grid>
 
-            <Grid item xs={12} sm={3}>
+            <Grid item xs={12}>
               <ButtonGroup>
                 <LoadingButton
                   color="success"
@@ -66,16 +73,16 @@ function Create({}: Props) {
                 >
                   Submit
                 </LoadingButton>
-                <Button color="error">
+                <Button color="error" onClick={onClose}>
                   <Link href="/customers">Cancel</Link>
                 </Button>
               </ButtonGroup>
             </Grid>
           </Grid>
         </form>
-      </Box>
-    </Layout>
+      </DialogContent>
+    </Dialog>
   );
-}
+};
 
-export default Create;
+export default EditCustomerDialog;

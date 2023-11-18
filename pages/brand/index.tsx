@@ -1,54 +1,48 @@
 import {
+  ModeEditOutlineOutlined,
+  AddOutlined,
+  DeleteOutline,
+} from "@mui/icons-material";
+import {
   Autocomplete,
   Button,
   ButtonGroup,
-  CircularProgress,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { InfiniteData, useInfiniteQuery } from "react-query";
-import { Brand, Brands, getBrands } from "../../apis/brand-service";
-import EditBrandDialog from "../../components/EditBrandDialog";
+import { IBrand, deleteBrand } from "../../apis/brand-service";
+import EditBrandDialog from "../../components/Brand/EditBrandDialog";
 import Layout from "../../components/Layout/Layout";
-
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import DataTable from "../../components/Table/DataTable";
+import { useBrands } from "../../hooks/useBrands";
+import { IColumn } from "../../interfaces/common";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import DeleteDialog from "../../components/DeleteDialog";
 import useDebounce from "../../hooks/useDebounce";
 
 type Props = {};
 
 function Brand({}: Props) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
-  const [brandName, setBrandName] = useState("");
-  const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [brandName, setBrandName] = useState<string>("");
+  const [selected, setSelected] = useState<null | IBrand>(null);
+  const debouncedBrandName = useDebounce(brandName, 500);
+  const [page, setPage] = useState<number>(0);
+  const [limit, setLimit] = useState<number>(10);
 
-  const [selected, setSelected] = useState<null | Brand>(null);
-
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["brands", debouncedBrandNameSearchQuery],
-    getBrands,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
+  const { data, isLoading } = useBrands({
+    page: page + 1,
+    limit,
+    searchTerm: debouncedBrandName,
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -59,10 +53,56 @@ function Brand({}: Props) {
     setSelected(null);
   };
 
-  const getBrandFormattedData = (data: InfiniteData<Brands> | undefined) => {
-    const brandName = data?.pages.flatMap((page) => page.brands.map((brand) => brand.brandtitle));
-    return [...new Set(brandName)];
+  const { mutateAsync, isLoading: deleteLoading } = useMutation(deleteBrand, {
+    onSuccess: (data) => {
+      toast.success("Brand deleted successfully");
+      queryClient.invalidateQueries(["brands"]);
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Something wen't wrong");
+    },
+  });
+
+  const handleDelete = async () => {
+    await mutateAsync(selected?._id as string);
+    setDeleteDialogOpen(false);
   };
+
+  const columns: IColumn[] = [
+    {
+      field: "brandtitle",
+      label: "Brand Name",
+      align: "left",
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: IBrand) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            onClick={() => {
+              setSelected(row);
+              handleClickOpen();
+            }}
+          >
+            <ModeEditOutlineOutlined />
+          </Button>
+
+          <Button
+            color="warning"
+            onClick={() => {
+              setSelected(row);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteOutline />
+          </Button>
+        </ButtonGroup>
+      ),
+    },
+  ];
 
   return (
     <Layout>
@@ -81,61 +121,61 @@ function Brand({}: Props) {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={status === "loading"}
-            options={getBrandFormattedData(data)}
+            loading={isLoading}
+            options={data?.data?.map((brand) => brand.brandtitle) || []}
+            // onChange={(e, value) => {
+            //   setBrandName(value || "");
+            // }}
             onInputChange={(e, value) => {
               setBrandName(value);
             }}
-            renderInput={(params) => <TextField {...params} placeholder="search brands" variant="outlined" />}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                placeholder="search brands"
+                variant="outlined"
+              />
+            )}
           />
-          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/brand/create")}>
+          <Button
+            startIcon={<AddOutlined />}
+            onClick={() => router.push("/brand/create")}
+          >
             Add Brands
           </Button>
         </Box>
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Brand Name </TableCell>
-                {/* <TableCell align="right">Actions</TableCell> */}
-              </TableRow>
-            </TableHead>
-            {status === "loading" ? (
-              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <CircularProgress />
-              </TableBody>
-            ) : (
-              <>
-                {data?.pages.map((group, i) => (
-                  <TableBody key={i}>
-                    {group?.brands.map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell>{row.brandtitle}</TableCell>
-                        {/* <TableCell align="right">
-                          <ButtonGroup size="small">
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickOpen();
-                              }}
-                            >
-                              <ModeEditOutlineOutlinedIcon />
-                            </Button>
-                          </ButtonGroup>
-                        </TableCell> */}
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                ))}
-              </>
-            )}
-          </Table>
-        </TableContainer>
+
+        <DataTable
+          isLoading={isLoading}
+          columns={columns}
+          rows={data?.data || []}
+          pagination={true}
+          total={data?.meta?.total}
+          paginationOptions={{
+            page,
+            limit,
+            handleChangePage: (e, page) => setPage(page),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
       </Stack>
 
-      {selected && <EditBrandDialog onClose={handleClose} open={open} brand={selected} key={selected._id} />}
+      {selected && (
+        <EditBrandDialog
+          onClose={handleClose}
+          open={open}
+          brand={selected}
+          key={selected._id}
+        />
+      )}
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Brand"
+        text="Are you sure you want to delete this brand?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
     </Layout>
   );
 }

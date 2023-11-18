@@ -1,12 +1,20 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, ButtonGroup, Container, Dialog, DialogContent, DialogTitle, Grid, TextField } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Grid,
+  TextField,
+} from "@mui/material";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { Brand, updateBrand } from "../apis/brand-service";
+import { IBrand, updateBrand } from "../../apis/brand-service";
 
 interface EditBrandDialogProps {
-  brand: Brand;
+  brand: IBrand;
   open: boolean;
   onClose: () => void;
 }
@@ -15,16 +23,15 @@ function EditBrandDialog({ onClose, open, brand }: EditBrandDialogProps) {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation(updateBrand, {
     onSuccess: (data) => {
-      notify(data.msg);
-      queryClient.invalidateQueries("brand");
+      toast.success(data.message);
+      queryClient.invalidateQueries(["brands"]);
       reset();
       onClose();
     },
+    onError: (error: any) => {
+      toast.error(error.message || "Something wen't wrong");
+    },
   });
-
-  const notify = (msg: string) => {
-    toast.success(msg);
-  };
 
   const { register, handleSubmit, reset, getValues } = useForm({
     defaultValues: {
@@ -46,12 +53,23 @@ function EditBrandDialog({ onClose, open, brand }: EditBrandDialogProps) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={12}>
-              <TextField required id="BrandName" label="Brand Name" fullWidth {...register("brandtitle")} />
+              <TextField
+                required
+                id="BrandName"
+                label="Brand Name"
+                fullWidth
+                {...register("brandtitle")}
+              />
             </Grid>
 
             <Grid item xs={12} sm={12}>
               <ButtonGroup>
-                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                <LoadingButton
+                  color="success"
+                  variant="contained"
+                  type="submit"
+                  loading={isLoading}
+                >
                   Submit
                 </LoadingButton>
                 <Button color="error" onClick={onClose}>

@@ -1,21 +1,19 @@
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import React, { useEffect } from "react";
+import useUserStore from "../store/userStore";
+import { getCookie } from "cookies-next";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useAuth();
+  const { user } = useUserStore((state) => state);
+  const accessToken = getCookie("token");
   const router = useRouter();
-  const [isAdmin, setIsAdmin] = useState<string | null>(null);
 
   useEffect(() => {
-    const admin = localStorage.getItem("is-admin");
-    const accessToken = localStorage.getItem("token");
-    setIsAdmin(admin);
-    if (admin !== "admin" || !accessToken) {
+    if (user?.role !== "admin" || !accessToken) {
       router.push("/login").then();
     }
-  }, [router.pathname, user, router]);
+  }, [user, router, accessToken]);
 
-  return <>{isAdmin === "admin" ? children : null}</>;
+  return <>{user?.role === "admin" ? children : null}</>;
 };
 export default ProtectedRoute;

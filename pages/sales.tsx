@@ -23,8 +23,12 @@ import { Box } from "@mui/system";
 import { Fragment, useEffect } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
 import { Customers, getCustomers } from "../apis/customer-service";
-import { getAndSearchProduct, Product, Products } from "../apis/product-service";
-import AddCustomerDialog from "../components/AddCustomerDialog";
+import {
+  getAndSearchProduct,
+  IProduct,
+  Products,
+} from "../apis/product-service";
+import AddCustomerDialog from "../components/Customer/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 import useDebounce from "../hooks/useDebounce";
@@ -68,7 +72,14 @@ function Sales({}: Props) {
   const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
   const debouncedCustomerNameSearchQuery = useDebounce(customerName, 500);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    status,
+    refetch,
+  } = useInfiniteQuery(
     [
       "searchedProducts",
       debouncedProductNameSearchQuery,
@@ -94,17 +105,27 @@ function Sales({}: Props) {
   }, [queryClient, productName, brandName, categoryName]);
 
   const getBrandFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const brands = data?.pages.flatMap((page) => page.products.map((product) => product.brand));
+    const brands = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.brand)
+    );
     return [...new Set(brands)];
   };
 
-  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+  const getProductFormattedData = (
+    data: InfiniteData<Products> | undefined
+  ) => {
+    const productName = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.name)
+    );
     return [...new Set(productName)];
   };
 
-  const getCategoryFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const categoryName = data?.pages.flatMap((page) => page.products.map((product) => product.category));
+  const getCategoryFormattedData = (
+    data: InfiniteData<Products> | undefined
+  ) => {
+    const categoryName = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.category)
+    );
     return [...new Set(categoryName)];
   };
 
@@ -122,8 +143,12 @@ function Sales({}: Props) {
     }
   );
 
-  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
-    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+  const getCustomerFormattedData = (
+    data: InfiniteData<Customers> | undefined
+  ) => {
+    const customers = data?.pages.flatMap((page) =>
+      page.customer.map((c) => c.customerName)
+    );
     return [...new Set(customers)];
   };
 
@@ -133,7 +158,7 @@ function Sales({}: Props) {
     queryClient.refetchQueries("customers", { active: true });
   };
 
-  const isAvailable = (product: Product) => {
+  const isAvailable = (product: IProduct) => {
     const c = cartItems.find((item: any) => item._id === product._id);
 
     if (c) {
@@ -187,7 +212,10 @@ function Sales({}: Props) {
                     {cartItems?.map((product: any) => (
                       <TableRow key={product._id} hover>
                         <TableCell align="left">
-                          <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
+                          <IconButton
+                            size="small"
+                            onClick={() => deleteItemFromCart(product._id)}
+                          >
                             <DeleteIcon fontSize="inherit" />
                           </IconButton>
                         </TableCell>
@@ -235,13 +263,21 @@ function Sales({}: Props) {
                             value={Number(product.sell_price).toString()}
                           />
                         </TableCell>
-                        <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
+                        <TableCell>
+                          {parseFloat(
+                            (product.sell_price * product.qty).toString()
+                          ).toFixed(2)}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
-              <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
+              <PaymentDetailsDialog
+                onSuccess={onPaymentSuccess}
+                customerName={customerName}
+                cartItems={cartItems}
+              />
             </Box>
           </Box>
         </Grid>
@@ -328,11 +364,24 @@ function Sales({}: Props) {
                 {data?.pages.map((group, i) => (
                   <Fragment key={i}>
                     {group?.products.map((row) => (
-                      <Grid key={row._id} item xs={12} sm={12} md={12} lg={6} xl={4}>
+                      <Grid
+                        key={row._id}
+                        item
+                        xs={12}
+                        sm={12}
+                        md={12}
+                        lg={6}
+                        xl={4}
+                      >
                         <Card
                           sx={{
                             boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-                            cursor: row.qty <= 0 ? "not-allowed" : !isAvailable(row) ? "not-allowed" : "pointer",
+                            cursor:
+                              row.qty <= 0
+                                ? "not-allowed"
+                                : !isAvailable(row)
+                                ? "not-allowed"
+                                : "pointer",
                           }}
                           onClick={() =>
                             row.qty <= 0
@@ -363,7 +412,10 @@ function Sales({}: Props) {
                             <Typography variant="h6" component="div">
                               {row.name}
                             </Typography>
-                            <Stack direction="row" justifyContent="space-between">
+                            <Stack
+                              direction="row"
+                              justifyContent="space-between"
+                            >
                               <Typography sx={{ lineHeight: 1 }} variant="h6">
                                 ৳{row.sell_price}
                               </Typography>

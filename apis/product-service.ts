@@ -1,50 +1,82 @@
+import { IAllGetResponse, IGetResponse } from "../interfaces/common";
+import { IBrand } from "./brand-service";
+import { ICategory } from "./category-service";
 import http from "./http-common";
 
-export interface Product {
+export interface IProduct {
   _id: string;
   name: string;
+  category: ICategory;
+  brand: IBrand;
   reorder_limit: string;
-  brand: string;
-  category: string;
   image: string;
   qty: number;
   sell_price: number;
   buy_price: number;
-  available: number;
 }
 
-export interface Products {
-  products: Product[];
-  count: number;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalProducts: number;
-}
-
-export const createProduct = async (formData: any) => {
+export const createProduct = async (input: Omit<IProduct, "_id">) => {
   try {
-    const { data } = await http.post<{ msg: string }>("/products", formData);
+    const { data } = await http.post<IGetResponse<IProduct>>(
+      "/api/v1/product",
+      input
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const getProducts = async ({ pageParam = 0 }) => {
+export const getProduct = async (id: string) => {
   try {
-    const { data } = await http.get<Products>("/products", {
-      params: {
-        page: pageParam,
-      },
-    });
+    const { data } = await http.get<IGetResponse<IProduct>>(
+      "/api/v1/product/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const getAndSearchProduct = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+export const getProducts = async ({
+  page,
+  limit,
+  searchTerm,
+  brand,
+  category,
+}: {
+  page: number;
+  limit: number;
+  searchTerm?: string;
+  brand?: string;
+  category?: string;
+}) => {
+  try {
+    const { data } = await http.get<IAllGetResponse<IProduct[]>>(
+      "/api/v1/product",
+      {
+        params: {
+          page,
+          limit,
+          searchTerm: searchTerm ? searchTerm : undefined,
+          brand: brand ? brand : undefined,
+          category: category ? category : undefined,
+        },
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};
+
+export const getAndSearchProduct = async ({
+  queryKey,
+  pageParam = 0,
+}: {
+  queryKey: string[];
+  pageParam?: number;
+}) => {
   const name = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const brand = queryKey[2]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const category = queryKey[3]; // queryKey[0] is the original query key 'infiniteLookupDefs'
@@ -63,17 +95,27 @@ export const getAndSearchProduct = async ({ queryKey, pageParam = 0 }: { queryKe
     params.page = pageParam;
   }
 
-  const { data } = await http.get<Products>("/search-product", {
-    params: params,
-  });
+  const { data } = await http.get<IAllGetResponse<IProduct[]>>(
+    "/search-product",
+    {
+      params: params,
+    }
+  );
   return data;
 };
 
-export const updateProduct = async ({ formData, id }: any) => {
+export const updateProduct = async ({
+  id,
+  info,
+}: {
+  id: string;
+  info: Omit<IProduct, "_id">;
+}) => {
   try {
-    const { data } = await http.patch<{
-      msg: string;
-    }>("/products/" + id, formData);
+    const { data } = await http.patch<IGetResponse<IProduct>>(
+      "/api/v1/product/" + id,
+      info
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -82,7 +124,9 @@ export const updateProduct = async ({ formData, id }: any) => {
 
 export const deleteProduct = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/products/" + id);
+    const { data } = await http.delete<{ msg: string }>(
+      "/api/v1/product/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);

@@ -20,12 +20,13 @@ import { deleteAdmin, getAdmin } from "../apis/admin-service";
 import AddAdminDialog from "../components/AddAdminDialog";
 import Layout from "../components/Layout/Layout";
 import { useAuth } from "../context/AuthContext";
+import useUserStore from "../store/userStore";
 
 function Admin() {
-
-  const { user } = useAuth();
+  const { user } = useUserStore((state) => state);
+  // const { user } = useAuth();
   // const [email, setEmail] = useState("");
-   
+
   // const addAdmin = async () => {
   //   const response = await fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/admin`,{
   //     method: "POST",
