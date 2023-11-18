@@ -22,80 +22,44 @@ import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import {
-  InfiniteData,
-  useInfiniteQuery,
-  useMutation,
-  useQueryClient,
-} from "react-query";
+import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import {
-  deleteProduct,
-  getAndSearchProduct,
-  IProduct,
-} from "../../apis/product-service";
-import EditProductDialog from "../../components/Product/EditProductDialog";
+import { deleteProduct, getAndSearchProduct, Product, Products } from "../../apis/product-service";
+import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
 import useDebounce from "../../hooks/useDebounce";
-import { useProducts } from "../../hooks/useProducts";
-import { IColumn } from "../../interfaces/common";
-import DataTable from "../../components/Table/DataTable";
-import DeleteDialog from "../../components/DeleteDialog";
 
 const Products: NextPage = () => {
   const router = useRouter();
   const [productName, setProductName] = useState("");
   const [open, setOpen] = React.useState(false);
-  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [selected, setSelected] = useState<null | IProduct>(null);
-  const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
-
-  const { data, isLoading } = useProducts({
-    page: page + 1,
-    limit,
-    searchTerm: productName,
-  });
-
+  const [selected, setSelected] = useState<null | Product>(null);
   const debouncedSearchQuery = useDebounce(productName, 500);
 
-  // const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
-  //   useInfiniteQuery(
-  //     ["searchedProducts", debouncedSearchQuery],
-  //     getAndSearchProduct,
-  //     {
-  //       getNextPageParam: (lastPage, pages) => {
-  //         if (pages.length === lastPage.totalPages) {
-  //           return undefined;
-  //         } else {
-  //           return pages.length;
-  //         }
-  //       },
-  //     }
-  //   );
-
-  const queryClient = useQueryClient();
-
-  const { mutateAsync, isLoading: deleteLoading } = useMutation(
-    "deleteProduct",
-    deleteProduct,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
+    ["searchedProducts", debouncedSearchQuery],
+    getAndSearchProduct,
     {
-      onSuccess: (data) => {
-        toast.success(data.msg, {
-          toastId: "delete-product" + selected?._id,
-        });
-        queryClient.invalidateQueries(["products"]);
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Something wen't wrong");
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
       },
     }
   );
 
-  const handleDelete = async () => {
-    await mutateAsync(selected?._id as string);
-    setDeleteDialogOpen(false);
-  };
+  const queryClient = useQueryClient();
+
+  const { mutateAsync } = useMutation("deleteProduct", deleteProduct, {
+    onSuccess: (data) => {
+      toast.success(data.msg, {
+        toastId: "delete-product" + selected?._id,
+      });
+      queryClient.invalidateQueries("searchedProducts");
+    },
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -106,70 +70,10 @@ const Products: NextPage = () => {
     setSelected(null);
   };
 
-  const columns: IColumn[] = [
-    {
-      field: "name",
-      label: "Name",
-      align: "left",
-    },
-    {
-      field: "sell_price",
-      label: "Sell Price",
-    },
-    {
-      field: "buy_price",
-      label: "Buy Price",
-    },
-    {
-      field: "brand",
-      label: "Brand",
-      render: (row: IProduct) => (
-        <Typography variant="body2">{row?.brand?.brandtitle}</Typography>
-      ),
-    },
-    {
-      field: "category",
-      label: "Category",
-      render: (row: IProduct) => (
-        <Typography variant="body2">{row?.category?.categorytitle}</Typography>
-      ),
-    },
-    {
-      field: "qty",
-      label: "Qty",
-    },
-    {
-      field: "reorder_limit",
-      label: "Re-order Limit",
-    },
-    {
-      field: "actions",
-      label: "Actions",
-      align: "right",
-      render: (row: IProduct) => (
-        <ButtonGroup size="small">
-          <Button
-            color="info"
-            onClick={() => {
-              setSelected(row);
-              handleClickOpen();
-            }}
-          >
-            <ModeEditOutlineOutlinedIcon />
-          </Button>
-          <Button
-            color="warning"
-            onClick={() => {
-              setSelected(row);
-              setDeleteDialogOpen(true);
-            }}
-          >
-            <DeleteOutlineOutlinedIcon />
-          </Button>
-        </ButtonGroup>
-      ),
-    },
-  ];
+  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+    return [...new Set(productName)];
+  };
 
   return (
     <Layout>
@@ -188,10 +92,10 @@ const Products: NextPage = () => {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={isLoading}
-            options={data?.data?.map((product) => product.name) || []}
-            onChange={(e, value) => {
-              setProductName(value || "");
+            loading={status === "loading"}
+            options={getProductFormattedData(data)}
+            onInputChange={(e, value) => {
+              setProductName(value);
             }}
             renderInput={(params) => (
               <TextField
@@ -202,9 +106,7 @@ const Products: NextPage = () => {
                   ...params.InputProps,
                   endAdornment: (
                     <React.Fragment>
-                      {isLoading ? (
-                        <CircularProgress color="inherit" size={20} />
-                      ) : null}
+                      {status === "loading" ? <CircularProgress color="inherit" size={20} /> : null}
                       {params.InputProps.endAdornment}
                     </React.Fragment>
                   ),
@@ -212,46 +114,95 @@ const Products: NextPage = () => {
               />
             )}
           />
-          <Button
-            onClick={() => router.push("/products/create")}
-            startIcon={<AddOutlinedIcon />}
-          >
+          <Button onClick={() => router.push("/products/create")} startIcon={<AddOutlinedIcon />}>
             Add Product
           </Button>
         </Box>
 
-        <DataTable
-          columns={columns}
-          rows={data?.data || []}
-          isLoading={isLoading}
-          pagination={true}
-          total={data?.meta?.total || 0}
-          paginationOptions={{
-            page,
-            limit,
-            handleChangePage: (e, page) => setPage(page),
-            handleChangePageSize: (e) => setLimit(+e.target.value),
-          }}
-        />
+        <TableContainer component={Paper} sx={{ maxWidth: "100vw" }}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Sell Price</TableCell>
+                <TableCell>Buy Price</TableCell>
+                <TableCell>Brand</TableCell>
+                <TableCell>Category</TableCell>
+                <TableCell>Qty</TableCell>
+                <TableCell>Re-order Limit</TableCell>
+                <TableCell align="right">Actions</TableCell>
+              </TableRow>
+            </TableHead>
+            {status === "loading" ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <CircularProgress />
+              </TableBody>
+            ) : (
+              <>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.products.map((row) => (
+                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell>
+                          {/* <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box> */}
+                          {row.sell_price}
+                        </TableCell>
+                        <TableCell>{row.buy_price}</TableCell>
+                        <TableCell>{row.brand}</TableCell>
+                        <TableCell>{row.category}</TableCell>
+                        <TableCell>{row.qty}</TableCell>
+                        <TableCell
+                          sx={{ color: Number(row.reorder_limit) < row.qty ? "black" : "red", fontWeight: "bold" }}
+                        >
+                          {row.reorder_limit}
+                        </TableCell>
+                        <TableCell align="right">
+                          <ButtonGroup size="small">
+                            <Button
+                              color="info"
+                              variant="contained"
+                              onClick={() => {
+                                setSelected(row);
+                                handleClickOpen();
+                              }}
+                            >
+                              <ModeEditOutlineOutlinedIcon />
+                            </Button>
+                            <Button
+                              color="error"
+                              variant="contained"
+                              onClick={() => {
+                                mutateAsync(row._id);
+                              }}
+                            >
+                              <DeleteOutlineOutlinedIcon />
+                            </Button>
+                          </ButtonGroup>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                ))}
+              </>
+            )}
+          </Table>
+        </TableContainer>
+        <Box textAlign="center">
+          {hasNextPage && (
+            <LoadingButton
+              variant="contained"
+              loading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              Load More
+            </LoadingButton>
+          )}
+        </Box>
       </Stack>
 
-      {selected && (
-        <EditProductDialog
-          onClose={handleClose}
-          open={open}
-          product={selected}
-          key={selected._id}
-        />
-      )}
-
-      <DeleteDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        title="Delete Product"
-        text="Are you sure you want to delete this product?"
-        handleDelete={handleDelete}
-        deleteLoading={deleteLoading}
-      />
+      {selected && <EditProductDialog onClose={handleClose} open={open} product={selected} key={selected._id} />}
     </Layout>
   );
 };

@@ -13,47 +13,28 @@ import {
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { IProduct, updateProduct } from "../../apis/product-service";
-import { useState } from "react";
-import useDebounce from "../../hooks/useDebounce";
-import { useBrands } from "../../hooks/useBrands";
-import { useCategories } from "../../hooks/useCategories";
+import { Product, updateProduct } from "../apis/product-service";
 
 interface EditProductDialogProps {
-  product: IProduct;
+  product: Product;
   open: boolean;
   onClose: () => void;
 }
 
 function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
-  const [categoryName, setCategoryName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [brandName, setBrandName] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
-
-  const debouncedCategoryName = useDebounce(categoryName, 500);
-  const debouncedBrandName = useDebounce(brandName, 500);
-
-  // Data
-  const { data: brands, isLoading: brandLoading } = useBrands({
-    searchTerm: debouncedBrandName,
-  });
-  const { data: categories, isLoading: categoryLoading } = useCategories({
-    searchTerm: debouncedCategoryName,
-  });
-
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation(updateProduct, {
     onSuccess: (data) => {
-      toast.success(data?.message || "Product updated successfully");
-      queryClient.invalidateQueries(["products"]);
+      notify(data.msg);
+      queryClient.refetchQueries("searchedProducts");
       reset();
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error?.message || "Something wen't wrong");
-    },
   });
+
+  const notify = (msg: string) => {
+    toast.success(msg);
+  };
 
   const { register, handleSubmit, reset, getValues } = useForm({
     defaultValues: {
@@ -69,12 +50,19 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   });
 
   const onSubmit = async (data: any) => {
-    data.category = selectedCategory;
-    data.brand = selectedBrand;
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("brand", data.brand);
+    formData.append("category", data.category);
+    formData.append("reorder_limit", data.reorder_limit);
+    data.file && formData.append("file", data.file[0]);
+    formData.append("sell_price", data.sell_price);
+    formData.append("buy_price", data.buy_price);
+    formData.append("qty", data.qty);
 
     await mutateAsync({
+      formData,
       id: product._id,
-      info: data,
     });
   };
 
@@ -86,55 +74,24 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  id="productName"
-                  label="Product Name"
-                  fullWidth
-                  {...register("name")}
-                />
+                <TextField required id="productName" label="Product Name" fullWidth {...register("name")} />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Autocomplete
-                  loading={categoryLoading}
-                  options={categories?.data || []}
-                  getOptionLabel={(category) => category?.categorytitle}
-                  defaultValue={product?.category}
-                  isOptionEqualToValue={(option, value) =>
-                    option?._id === value?._id
-                  }
-                  onInputChange={(e, value) => {
-                    setCategoryName(value);
-                  }}
-                  onChange={(e, value) => {
-                    if (value) {
-                      setSelectedCategory(value._id);
-                    }
-                  }}
+                  disablePortal
+                  options={["Ata", "Moyda", "Suzi"]}
+                  defaultValue={product.category}
                   renderInput={(params) => (
-                    <TextField {...params} label="Search category" required />
+                    <TextField defaultValue={product.category} {...register("category")} {...params} label="Category" />
                   )}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Autocomplete
-                  loading={brandLoading}
-                  options={brands?.data || []}
-                  getOptionLabel={(brand) => brand?.brandtitle}
-                  isOptionEqualToValue={(option, value) =>
-                    option?._id === value?._id
-                  }
-                  onInputChange={(e, value) => {
-                    setBrandName(value);
-                  }}
-                  onChange={(e, value) => {
-                    if (value) {
-                      setSelectedBrand(value._id);
-                    }
-                  }}
-                  renderInput={(params) => (
-                    <TextField {...params} label="Search brand" required />
-                  )}
+                  disablePortal
+                  options={["Apple", "Banana", "Orange", "Mango", "Lichi"]}
+                  defaultValue={product.brand}
+                  renderInput={(params) => <TextField {...register("brand")} {...params} label="Brand" />}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -184,12 +141,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   {...register("qty")}
                 />
               </Grid>
-              {/* <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <Button fullWidth variant="contained" component="label">
                   <label htmlFor="files" style={{ width: "100%" }}>
-                    {getValues("file")[0]
-                      ? (getValues("file")[0] as any).name
-                      : "Please choose a image"}
+                    {getValues("file")[0] ? (getValues("file")[0] as any).name : "Please choose a image"}
                   </label>
                   <input
                     id="files"
@@ -201,15 +156,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                     accept="image/*"
                   />
                 </Button>
-              </Grid> */}
-              <Grid item xs={12} sm={6} sx={{ textAlign: "start" }}>
+              </Grid>
+              <Grid item xs={12} sm={6} sx={{ textAlign: "end" }}>
                 <ButtonGroup>
-                  <LoadingButton
-                    color="success"
-                    variant="contained"
-                    type="submit"
-                    loading={isLoading}
-                  >
+                  <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
                     Submit
                   </LoadingButton>
                   <Button color="error" onClick={onClose}>

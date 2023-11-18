@@ -1,13 +1,10 @@
 import { Box, Button, Typography } from "@mui/material";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import useUserStore from "../../store/userStore";
-import { setCookie } from "cookies-next";
-import { appConfig } from "../../config/appConfig";
-import { useLogin } from "../../hooks/user";
-import { ILoginResponse } from "../../interfaces/auth";
+import { auth } from "../../config/firebase";
+import { checkAdmin, useAuth } from "../../context/AuthContext";
 
 type Inputs = {
   email: string;
@@ -21,38 +18,53 @@ const EmailLogin = () => {
     formState: { errors, isSubmitting },
     reset,
   } = useForm<Inputs>();
-  const { setUser } = useUserStore((state) => state);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const { setUser } = useAuth();
   const router = useRouter();
 
-  const handleSuccess = (data: ILoginResponse) => {
-    const { accessToken, user } = data;
-    console.log(user);
-    if (user?.role === "admin") {
-      setUser({
-        email: user.email,
-        id: user._id,
-        role: user.role,
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    setLoading(true);
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then((user) => {
+        setUser(user.user);
+        fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/login`, {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+          },
+          body: JSON.stringify(user.user),
+        })
+          .then((res) => {
+            if (res.ok) return res.json();
+          })
+          .then((data) => {
+            checkAdmin(user.user.email, data.accessToken).then((res) => {
+              if (res?.admin) {
+                localStorage.setItem("token", data.accessToken);
+                localStorage.setItem("is-admin", "admin");
+                router.push("/");
+                setLoading(false);
+              } else {
+                alert("You are not admin");
+                setLoading(false);
+              }
+            });
+            reset();
+          })
+          .catch((error) => {
+            console.log(error);
+            setLoading(false);
+            reset();
+          });
+      })
+      .catch((error) => {
+        if (error.code === "auth/wrong-password")
+          alert("Wrong password. Please try again with correct password.");
+        setLoading(false);
+        reset();
       });
-      setCookie("token", accessToken, {
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      });
-      reset();
-      router.push("/");
-    } else {
-      toast.error("You are not admin");
-    }
-  };
-
-  const { mutate: login, isLoading } = useLogin({
-    handleSuccess,
-  });
-
-  const onSubmit: SubmitHandler<Inputs> = (input) => {
-    const { email, password } = input;
-    login({
-      email,
-      password,
-    });
   };
 
   return (
@@ -113,12 +125,12 @@ const EmailLogin = () => {
         <Box sx={{ width: "100%" }}>
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             sx={{
               width: "100%",
             }}
           >
-            {isLoading ? "Loading..." : "Login"}
+            {loading ? "Loading..." : "Login"}
           </Button>
         </Box>
       </Box>

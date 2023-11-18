@@ -1,113 +1,69 @@
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import DeleteOutlined from "@mui/icons-material/DeleteOutlined";
-import ModeEditOutlineOutlined from "@mui/icons-material/ModeEditOutlineOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
+import SearchIcon from "@mui/icons-material/Search";
+import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Button,
   ButtonGroup,
+  CircularProgress,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
+import React, { Fragment, useState } from "react";
+import { InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { ISupplier, deleteSupplier } from "../../apis/supplier-service";
-import DeleteDialog from "../../components/DeleteDialog";
-import EditSupplierDialog from "../../components/Supplier/EditSupplierDialog";
+import { deleteSupplier, getSupplier, Supplier, Suppliers } from "../../apis/supplier-service";
+import EditSupplierDialog from "../../components/EditSupplierDialog";
 import Layout from "../../components/Layout/Layout";
-import DataTable from "../../components/Table/DataTable";
 import useDebounce from "../../hooks/useDebounce";
-import { useSuppliers } from "../../hooks/useSuppliers";
-import { IColumn } from "../../interfaces/common";
 type Props = {};
 
 function Suppliers({}: Props) {
   const router = useRouter();
-  const queryClient = useQueryClient();
-
-  const [editModal, setEditModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<boolean>(false);
-  const [selected, setSelected] = useState<null | ISupplier>(null);
+  const [open, setOpen] = React.useState(false);
+  const [selected, setSelected] = useState<null | Supplier>(null);
   const [supplierName, setSupplierName] = useState("");
-  const debouncedSupplierName = useDebounce(supplierName, 500);
-  const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const debouncedSupplierNameSearchQuery = useDebounce(supplierName, 500);
 
-  const { data, isLoading } = useSuppliers({
-    page: page + 1,
-    limit,
-    searchTerm: debouncedSupplierName,
-  });
-
-  const { mutateAsync, isLoading: deleteLoading } = useMutation(
-    deleteSupplier,
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
+    ["suppliers", debouncedSupplierNameSearchQuery],
+    getSupplier,
     {
-      onSuccess: (data) => {
-        console.log(data);
-        toast.success("Supplier deleted successfully");
-        queryClient.invalidateQueries(["suppliers"]);
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
       },
-      onError: (error: any) => {
-        toast.error(error.message || "Something wen't wrong");
-      },
+      onSuccess: () => {},
     }
   );
 
-  const handleDelete = async () => {
-    await mutateAsync(selected?._id as string);
-    setDeleteModal(false);
+  const handleClickOpen = () => {
+    setOpen(true);
   };
 
-  const columns: IColumn[] = [
-    {
-      field: "name",
-      label: "Supplier Name",
-      align: "left",
-    },
-    {
-      field: "email",
-      label: "Email",
-    },
-    {
-      field: "phone",
-      label: "Phone",
-    },
-    {
-      field: "address",
-      label: "Address",
-    },
-    {
-      field: "actions",
-      label: "Actions",
-      align: "right",
-      render: (row: ISupplier) => (
-        <ButtonGroup size="small">
-          <Button
-            color="info"
-            onClick={() => {
-              setSelected(row);
-              setEditModal(true);
-            }}
-          >
-            <ModeEditOutlineOutlined />
-          </Button>
+  const handleClose = () => {
+    setOpen(false);
+    setSelected(null);
+  };
 
-          <Button
-            color="warning"
-            onClick={() => {
-              setSelected(row);
-              setDeleteModal(true);
-            }}
-          >
-            <DeleteOutlined />
-          </Button>
-        </ButtonGroup>
-      ),
-    },
-  ];
+  const getSupplierFormattedData = (data: InfiniteData<Suppliers> | undefined) => {
+    const brands = data?.pages.flatMap((page) => page.supplier.map((sp) => sp.name));
+    return [...new Set(brands)];
+  };
 
   return (
     <Layout>
@@ -126,59 +82,77 @@ function Suppliers({}: Props) {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={isLoading}
-            options={
-              data?.data?.map((supplier: ISupplier) => supplier?.name) || []
-            }
+            loading={status === "loading"}
+            options={getSupplierFormattedData(data)}
             onInputChange={(e, value) => {
               setSupplierName(value);
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="search suppliers"
-                variant="outlined"
-              />
-            )}
+            renderInput={(params) => <TextField {...params} placeholder="search supplier" variant="outlined" />}
           />
 
-          <Button
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => router.push("/suppliers/create")}
-          >
+          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/suppliers/create")}>
             Add Supplier
           </Button>
         </Box>
-        <DataTable
-          isLoading={isLoading}
-          columns={columns}
-          rows={data?.data || []}
-          total={data?.meta?.total}
-          pagination={true}
-          paginationOptions={{
-            page,
-            limit,
-            handleChangePage: (e, page) => setPage(page),
-            handleChangePageSize: (e) => setLimit(+e.target.value),
-          }}
-        />
+        <TableContainer sx={{ width: "100%", overflow: "hidden" }} component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Supplier Name</TableCell>
+                <TableCell>Email </TableCell>
+                <TableCell sx={{ minWidth: "200px" }}>Contact No.</TableCell>
+                <TableCell>Full Address</TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
+              </TableRow>
+            </TableHead>
+            {status === "loading" ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <CircularProgress />
+              </TableBody>
+            ) : (
+              <Fragment>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.supplier.map((row) => (
+                      <TableRow key={row._id}>
+                        <TableCell>{row.name}</TableCell>
+                        <TableCell>{row.email}</TableCell>
+                        <TableCell>{row.phone}</TableCell>
+                        <TableCell>{row.address}</TableCell>
+                        {/* <TableCell align="right">
+                          <ButtonGroup size="small">
+                            <Button
+                              color="info"
+                              variant="contained"
+                              onClick={() => {
+                                setSelected(row);
+                                handleClickOpen();
+                              }}
+                            >
+                              <ModeEditOutlineOutlinedIcon />
+                            </Button>
+                          </ButtonGroup>
+                        </TableCell> */}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                ))}
+              </Fragment>
+            )}
+          </Table>
+        </TableContainer>
+        {data?.pages[0].totalProducts !== 0 && hasNextPage && (
+          <LoadingButton
+            variant="contained"
+            loading={isFetchingNextPage}
+            onClick={() => fetchNextPage()}
+            disabled={!hasNextPage || isFetchingNextPage}
+          >
+            Load More
+          </LoadingButton>
+        )}
       </Stack>
-      {selected ? (
-        <EditSupplierDialog
-          onClose={() => setEditModal(false)}
-          open={editModal}
-          supplier={selected}
-        />
-      ) : null}
-
-      <DeleteDialog
-        open={deleteModal}
-        onClose={() => setDeleteModal(false)}
-        title="Delete Supplier"
-        text="Are you sure you want to delete this supplier?"
-        handleDelete={handleDelete}
-        deleteLoading={deleteLoading}
-      />
+      {selected && <EditSupplierDialog onClose={handleClose} open={open} supplier={selected} key={selected._id} />}
     </Layout>
   );
 }
