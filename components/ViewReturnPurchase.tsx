@@ -18,38 +18,51 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { createReturnPurchase, deletePurchase, Purchase } from "../apis/purchase-service";
+import {
+  createReturnPurchase,
+  deletePurchase,
+  Purchase,
+} from "../apis/purchase-service";
+import { IPurchase } from "../interfaces/purchase";
 
 interface ViewPurchaseProps {
-  purchase: Purchase;
+  purchase: IPurchase;
   open: boolean;
   onClose: () => void;
 }
 
 function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
   const queryClient = useQueryClient();
-  const { mutateAsync: deleteAsync } = useMutation("deleteProduct", deletePurchase, {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries("purchases");
-      toast.success("Return Successful");
-    },
-  });
+  const { mutateAsync: deleteAsync } = useMutation(
+    "deleteProduct",
+    deletePurchase,
+    {
+      onSuccess: (data) => {
+        queryClient.invalidateQueries("purchases");
+        toast.success("Return Successful");
+      },
+    }
+  );
 
-  const { mutateAsync, isLoading } = useMutation("createReturnPurchase", createReturnPurchase, {
-    onSuccess: async (data) => {
-      await deleteAsync(purchase._id);
-    },
-    onError: (error: any) => {
-      toast.error(error.response.data.msg);
-    },
-  });
+  const { mutateAsync, isLoading } = useMutation(
+    "createReturnPurchase",
+    createReturnPurchase,
+    {
+      onSuccess: async (data) => {
+        await deleteAsync(purchase._id);
+      },
+      onError: (error: any) => {
+        toast.error(error.response.data.msg);
+      },
+    }
+  );
 
-  const purchaseReturn = async () => {
-    await mutateAsync({
-      ...purchase,
-    });
-    onClose();
-  };
+  // const purchaseReturn = async () => {
+  //   await mutateAsync({
+  //     ...purchase,
+  //   });
+  //   onClose();
+  // };
 
   return (
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
@@ -65,13 +78,18 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         <TableContainer>
           <Table size="small" aria-label="simple table">
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Supplier:</TableCell>
-              <TableCell>{purchase.supplier}</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Supplier:
+              </TableCell>
+              <TableCell>{purchase?.supplier?.name}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
 
-        <Typography sx={{ marginLeft: "16px", paddingTop: "10px" }} variant="h6">
+        <Typography
+          sx={{ marginLeft: "16px", paddingTop: "10px" }}
+          variant="h6"
+        >
           Products
         </Typography>
 
@@ -99,9 +117,9 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         </TableContainer>
 
         <DialogActions>
-          <LoadingButton variant="contained" loading={isLoading} onClick={purchaseReturn}>
+          {/* <LoadingButton variant="contained" loading={isLoading} onClick={purchaseReturn}>
             Return
-          </LoadingButton>
+          </LoadingButton> */}
           <Button color="error" onClick={onClose}>
             close
           </Button>

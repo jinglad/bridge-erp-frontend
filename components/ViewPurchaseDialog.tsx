@@ -15,10 +15,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Purchase } from "../apis/purchase-service";
+import { IPurchase } from "../interfaces/purchase";
 
 interface ViewPurchaseProps {
-  purchase: Purchase;
+  purchase: IPurchase;
   open: boolean;
   onClose: () => void;
 }
@@ -38,13 +38,18 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         <TableContainer>
           <Table size="small" aria-label="simple table">
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Supplier:</TableCell>
-              <TableCell>{purchase.supplier}</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Supplier:
+              </TableCell>
+              <TableCell>{purchase?.supplier?.name}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
 
-        <Typography sx={{ marginLeft: "16px", paddingTop: "10px" }} variant="h6">
+        <Typography
+          sx={{ marginLeft: "16px", paddingTop: "10px" }}
+          variant="h6"
+        >
           Products
         </Typography>
 

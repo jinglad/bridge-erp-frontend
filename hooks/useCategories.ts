@@ -17,7 +17,7 @@ export const useCategories = ({
     () => getCategories({ page, limit, searchTerm }),
     {
       keepPreviousData: true,
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnWindowFocus: false,
       retry: 0,
       onError: (error: IError) => {

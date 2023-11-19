@@ -13,14 +13,17 @@ import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createCategory } from "../../apis/category-service";
 import Layout from "../../components/Layout/Layout";
+import { useCategories } from "../../hooks/useCategories";
 
 type Props = {};
 
 function Create({}: Props) {
   const queryClient = useQueryClient();
+
   const { mutateAsync, isLoading } = useMutation("categories", createCategory, {
     onSuccess: (data) => {
       toast.success(data.message);
+      queryClient.invalidateQueries("categories");
       reset();
       queryClient.invalidateQueries(["categories"]);
     },

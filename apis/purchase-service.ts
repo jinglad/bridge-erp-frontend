@@ -1,3 +1,5 @@
+import { IAllGetResponse } from "../interfaces/common";
+import { IPurchase } from "../interfaces/purchase";
 import http from "./http-common";
 import { ISupplier } from "./supplier-service";
 
@@ -19,14 +21,14 @@ export interface Purchase {
   createdDate: Date;
 }
 
-export interface Purchases {
-  purchase: Purchase[];
-  count: number;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalPurchase: number;
-}
+// export interface Purchases {
+//   purchase: Purchase[];
+//   count: number;
+//   page: string;
+//   size: number;
+//   totalPages: number;
+//   totalPurchase: number;
+// }
 
 export interface ReturnPurchases {
   purchaseReturns: Purchase[];
@@ -74,25 +76,26 @@ export const getReturnPurchases = async ({
   return data;
 };
 export const getPurchases = async ({
-  queryKey,
-  pageParam = 0,
+  createdDate,
+  page,
+  limit,
 }: {
-  queryKey: any[];
-  pageParam?: number;
+  createdDate: string | null;
+  page: number;
+  limit: number;
 }) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
+  const params = {
+    createdDate: createdDate ? createdDate : null,
+    page,
+    limit,
+  };
 
-  if (createdDate) {
-    params.createdDate = createdDate;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<Purchases>("/purchase", {
-    params: params,
-  });
+  const { data } = await http.get<IAllGetResponse<IPurchase[]>>(
+    "/api/v1/purchase",
+    {
+      params: params,
+    }
+  );
   return data;
 };
 
