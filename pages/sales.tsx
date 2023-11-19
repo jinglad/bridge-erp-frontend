@@ -22,17 +22,17 @@ import TableRow from "@mui/material/TableRow";
 import { Box } from "@mui/system";
 import { Fragment, useEffect } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
-import { Customers, getCustomers } from "../apis/customer-service";
-import {
-  getAndSearchProduct,
-  IProduct,
-  Products,
-} from "../apis/product-service";
+import { getCustomers } from "../apis/customer-service";
+import { getAndSearchProduct, IProduct } from "../apis/product-service";
 import AddCustomerDialog from "../components/Customer/AddCustomerDialog";
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 import useDebounce from "../hooks/useDebounce";
 import useSalesStore from "../store/salesStore";
+import { useCustomers } from "../hooks/useCustomers";
+import { useProducts } from "../hooks/useProducts";
+import { useCategories } from "../hooks/useCategories";
+import { useBrands } from "../hooks/useBrands";
 
 type Props = {};
 
@@ -72,85 +72,24 @@ function Sales({}: Props) {
   const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
   const debouncedCustomerNameSearchQuery = useDebounce(customerName, 500);
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    status,
-    refetch,
-  } = useInfiniteQuery(
-    [
-      "searchedProducts",
-      debouncedProductNameSearchQuery,
-      debouncedBrandNameSearchQuery,
-      debouncedCategoryNameSearchQuery,
-    ],
-    getAndSearchProduct,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
+  const { data, isLoading } = useProducts({
+    searchTerm: debouncedProductNameSearchQuery,
+  });
+  const { data: customerData, isLoading: customerLoading } = useCustomers({
+    searchTerm: debouncedCustomerNameSearchQuery,
+  });
+  const { data: categoryData, isLoading: categoryLoading } = useCategories({
+    searchTerm: debouncedCategoryNameSearchQuery,
+  });
+  const { data: brandData, isLoading: brandLoading } = useBrands({
+    searchTerm: debouncedBrandNameSearchQuery,
+  });
 
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    queryClient.refetchQueries("searchedProducts", { active: true });
-  }, [queryClient, productName, brandName, categoryName]);
-
-  const getBrandFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const brands = data?.pages.flatMap((page) =>
-      page.products.map((product) => product.brand)
-    );
-    return [...new Set(brands)];
-  };
-
-  const getProductFormattedData = (
-    data: InfiniteData<Products> | undefined
-  ) => {
-    const productName = data?.pages.flatMap((page) =>
-      page.products.map((product) => product.name)
-    );
-    return [...new Set(productName)];
-  };
-
-  const getCategoryFormattedData = (
-    data: InfiniteData<Products> | undefined
-  ) => {
-    const categoryName = data?.pages.flatMap((page) =>
-      page.products.map((product) => product.category)
-    );
-    return [...new Set(categoryName)];
-  };
-
-  const { data: customerData, status: customerStatus } = useInfiniteQuery(
-    ["customers", debouncedCustomerNameSearchQuery],
-    getCustomers,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
-
-  const getCustomerFormattedData = (
-    data: InfiniteData<Customers> | undefined
-  ) => {
-    const customers = data?.pages.flatMap((page) =>
-      page.customer.map((c) => c.customerName)
-    );
-    return [...new Set(customers)];
-  };
+  // useEffect(() => {
+  //   queryClient.refetchQueries("searchedProducts", { active: true });
+  // }, [queryClient, productName, brandName, categoryName]);
 
   const onPaymentSuccess = () => {
     reset();
@@ -178,12 +117,16 @@ function Sales({}: Props) {
             <Stack spacing={2}>
               <Autocomplete
                 freeSolo={true}
-                loading={customerStatus === "loading"}
-                options={getCustomerFormattedData(customerData)}
+                loading={customerLoading}
+                options={
+                  customerData?.data?.map(
+                    (customer) => customer.customerName
+                  ) || []
+                }
                 defaultValue={customerName}
                 value={customerName}
-                onChange={(e, value) => {
-                  value ? setCustomerName(value) : setCustomerName("");
+                onInputChange={(e, value) => {
+                  setCustomerName(value);
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -285,11 +228,11 @@ function Sales({}: Props) {
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
               freeSolo={true}
-              loading={status === "loading"}
-              options={getProductFormattedData(data)}
+              loading={isLoading}
+              options={data?.data?.map((product) => product?.name) || []}
               disablePortal
-              onChange={(e, value) => {
-                value ? setProductName(value) : setProductName("");
+              onInputChange={(e, value) => {
+                setProductName(value);
               }}
               value={productName}
               renderInput={(params) => (
@@ -305,11 +248,15 @@ function Sales({}: Props) {
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
               freeSolo={true}
-              loading={status === "loading"}
-              options={getCategoryFormattedData(data)}
+              loading={categoryLoading}
+              options={
+                categoryData?.data?.map(
+                  (category) => category?.categorytitle
+                ) || []
+              }
               disablePortal
-              onChange={(e, value) => {
-                value ? setCategoryName(value) : setCategoryName("");
+              onInputChange={(e, value) => {
+                setCategoryName(value);
               }}
               value={categoryName}
               renderInput={(params) => (
@@ -324,12 +271,10 @@ function Sales({}: Props) {
           </Grid>
           <Grid item xs={12} sm={12} md={6} lg={4}>
             <Autocomplete
-              loading={status === "loading"}
-              options={getBrandFormattedData(data)}
+              loading={brandLoading}
+              options={brandData?.data?.map((brand) => brand?.brandtitle) || []}
               disablePortal
-              onChange={(e, value) => {
-                value ? setBrandName(value) : setBrandName("");
-              }}
+              onInputChange={(e, value) => setBrandName(value)}
               value={brandName}
               renderInput={(params) => (
                 <TextField
@@ -347,7 +292,7 @@ function Sales({}: Props) {
             </Typography>
           </Grid>
           <Grid item container spacing={1} xs={12}>
-            {status === "loading" ? (
+            {isLoading ? (
               <Grid item xs={12}>
                 <Box
                   sx={{
@@ -361,41 +306,39 @@ function Sales({}: Props) {
               </Grid>
             ) : (
               <Fragment>
-                {data?.pages.map((group, i) => (
-                  <Fragment key={i}>
-                    {group?.products.map((row) => (
-                      <Grid
-                        key={row._id}
-                        item
-                        xs={12}
-                        sm={12}
-                        md={12}
-                        lg={6}
-                        xl={4}
-                      >
-                        <Card
-                          sx={{
-                            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
-                            cursor:
-                              row.qty <= 0
-                                ? "not-allowed"
-                                : !isAvailable(row)
-                                ? "not-allowed"
-                                : "pointer",
-                          }}
-                          onClick={() =>
-                            row.qty <= 0
-                              ? null
-                              : !isAvailable(row)
-                              ? null
-                              : addToCart({
-                                  ...row,
-                                  qty: 1,
-                                  available: row.qty,
-                                })
-                          }
-                        >
-                          {/* {row.image ? (
+                {data?.data?.map((product, i) => (
+                  <Grid
+                    key={product._id}
+                    item
+                    xs={12}
+                    sm={12}
+                    md={12}
+                    lg={6}
+                    xl={4}
+                  >
+                    <Card
+                      sx={{
+                        boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+                        cursor:
+                          product.qty <= 0
+                            ? "not-allowed"
+                            : !isAvailable(product)
+                            ? "not-allowed"
+                            : "pointer",
+                      }}
+                      onClick={() =>
+                        product.qty <= 0
+                          ? null
+                          : !isAvailable(product)
+                          ? null
+                          : addToCart({
+                              ...product,
+                              qty: 1,
+                              available: product.qty,
+                            })
+                      }
+                    >
+                      {/* {row.image ? (
                             <CardMedia
                               component="img"
                               height="200"
@@ -408,48 +351,24 @@ function Sales({}: Props) {
                               image="/placeholder-image.png"
                             />
                           )} */}
-                          <CardContent sx={{ padding: "8px" }}>
-                            <Typography variant="h6" component="div">
-                              {row.name}
-                            </Typography>
-                            <Stack
-                              direction="row"
-                              justifyContent="space-between"
-                            >
-                              <Typography sx={{ lineHeight: 1 }} variant="h6">
-                                ৳{row.sell_price}
-                              </Typography>
-                              <Typography sx={{ lineHeight: 1 }} variant="h6">
-                                Qty {row.qty}
-                              </Typography>
-                            </Stack>
-                          </CardContent>
-                        </Card>
-                      </Grid>
-                    ))}
-                  </Fragment>
+                      <CardContent sx={{ padding: "8px" }}>
+                        <Typography variant="h6" component="div">
+                          {product.name}
+                        </Typography>
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography sx={{ lineHeight: 1 }} variant="h6">
+                            ৳{product.sell_price}
+                          </Typography>
+                          <Typography sx={{ lineHeight: 1 }} variant="h6">
+                            Qty {product.qty}
+                          </Typography>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
                 ))}
               </Fragment>
             )}
-            <Grid
-              item
-              xs={12}
-              container
-              sx={{
-                justifyContent: "center",
-              }}
-            >
-              {hasNextPage && (
-                <LoadingButton
-                  variant="contained"
-                  loading={isFetchingNextPage}
-                  onClick={() => fetchNextPage()}
-                  disabled={!hasNextPage || isFetchingNextPage}
-                >
-                  Load More
-                </LoadingButton>
-              )}
-            </Grid>
           </Grid>
         </Grid>
       </Grid>

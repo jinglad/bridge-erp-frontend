@@ -4,14 +4,14 @@ import { getProduct, getProducts } from "../apis/product-service";
 import { IError } from "../interfaces/common";
 
 export const useProducts = ({
-  page,
-  limit,
+  page = 1,
+  limit = 10,
   searchTerm,
   brand,
   category,
 }: {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   searchTerm?: string;
   brand?: string;
   category?: string;

@@ -50,7 +50,7 @@ function EditSupplierDialog({
 
   const onSubmit = async (data: any) => {
     console.log(data);
-    await mutateAsync({ id: supplier._id, info: data });
+    await mutateAsync({ id: supplier._id, input: data });
     reset();
   };
 
