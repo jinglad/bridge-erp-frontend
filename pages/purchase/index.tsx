@@ -23,8 +23,8 @@ import {
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import router from "next/router";
 import { useState } from "react";
-import { useInfiniteQuery } from "react-query";
-import { getPurchases } from "../../apis/purchase-service";
+import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import { deletePurchase, getPurchases } from "../../apis/purchase-service";
 import Layout from "../../components/Layout/Layout";
 import ViewPurchase from "../../components/ViewPurchaseDialog";
 import ViewReturnPurchase from "../../components/ViewReturnPurchase";
@@ -33,6 +33,8 @@ import { IColumn } from "../../interfaces/common";
 import { IPurchase } from "../../interfaces/purchase";
 import { DeleteOutline, ModeEditOutlineOutlined } from "@mui/icons-material";
 import DataTable from "../../components/Table/DataTable";
+import DeleteDialog from "../../components/DeleteDialog";
+import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -45,6 +47,7 @@ const Purchase = (props: Props) => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const {
     data: purchase,
@@ -58,7 +61,23 @@ const Purchase = (props: Props) => {
     page: page,
   });
 
-  // console.log({ purchase: data });
+  const { mutateAsync, isLoading: deleteLoading } = useMutation(
+    deletePurchase,
+    {
+      onSuccess: (data) => {
+        toast.success("Purchase deleted successfully");
+        queryClient.invalidateQueries(["purchases"]);
+      },
+      onError: (error: any) => {
+        toast.error(error.message || "Something wen't wrong");
+      },
+    }
+  );
+
+  const handleDelete = async () => {
+    await mutateAsync(selected?._id as string);
+    setDeleteDialogOpen(false);
+  };
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -211,6 +230,15 @@ const Purchase = (props: Props) => {
           key={selected._id + 1}
         />
       )}
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Purchase"
+        text="Are you sure you want to delete this purchase?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
     </Layout>
   );
 };

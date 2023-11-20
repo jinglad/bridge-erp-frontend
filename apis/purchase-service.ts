@@ -40,14 +40,14 @@ export interface ReturnPurchases {
 }
 
 export const createPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/purchase", {
+  const { data } = await http.post<{ msg: string }>("/api/v1/purchase", {
     ...formData,
   });
   return data;
 };
 
 export const createReturnPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/purchase-return", {
+  const { data } = await http.post<{ msg: string }>("/api/v1/purchase-return", {
     ...formData,
   });
   return data;
@@ -70,7 +70,7 @@ export const getReturnPurchases = async ({
     params.page = pageParam;
   }
 
-  const { data } = await http.get<ReturnPurchases>("/purchase-return", {
+  const { data } = await http.get<ReturnPurchases>("/api/v1/purchase-return", {
     params: params,
   });
   return data;
@@ -101,7 +101,7 @@ export const getPurchases = async ({
 
 export const deletePurchase = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/purchase/" + id);
+    const { data } = await http.delete<{ msg: string }>("/api/v1/purchase/" + id);
     return data;
   } catch (error: any) {
     throw Error(error);
