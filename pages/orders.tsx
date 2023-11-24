@@ -1,5 +1,12 @@
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
-import { Box, Button, Stack, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { useState } from "react";
 import Layout from "../components/Layout/Layout";
@@ -8,7 +15,7 @@ import DataTable from "../components/Table/DataTable";
 import ViewOrder from "../components/ViewOrderDialog";
 import { useOrders } from "../hooks/useOrders";
 import { IColumn } from "../interfaces/common";
-import { IOrder } from "../apis/order-service";
+import { IOrder } from "../interfaces/order.interface";
 
 type Props = {};
 
@@ -55,10 +62,10 @@ const Order = (props: Props) => {
 
   const columns: IColumn[] = [
     {
-      field: "supplier",
-      label: "Supplier",
+      field: "customer",
+      label: "Customer",
       align: "left",
-      render: (row) => row.supplier?.name,
+      render: (row: IOrder) => row?.customer?.customerName,
     },
     {
       field: "paid",
@@ -71,6 +78,31 @@ const Order = (props: Props) => {
     {
       field: "actions",
       label: "Actions",
+      align: "right",
+      render: (row: IOrder) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            variant="contained"
+            onClick={() => {
+              setSelected(row);
+              handleClickOpen();
+            }}
+          >
+            View
+          </Button>
+          <Button
+            color="warning"
+            variant="contained"
+            onClick={() => {
+              setSelected(row);
+              handleClickSalesOpen();
+            }}
+          >
+            Return
+          </Button>
+        </ButtonGroup>
+      ),
     },
   ];
 
@@ -121,19 +153,21 @@ const Order = (props: Props) => {
         </Box>
       </Stack>
 
-      <DataTable
-        isLoading={isLoading}
-        rows={data?.data || []}
-        columns={columns}
-        total={data?.meta?.total}
-        pagination
-        paginationOptions={{
-          page,
-          limit,
-          handleChangePage: (e, page) => setPage(page),
-          handleChangePageSize: (e) => setLimit(+e.target.value),
-        }}
-      />
+      <Box sx={{ mt: 4 }}>
+        <DataTable
+          isLoading={isLoading}
+          rows={data?.data || []}
+          columns={columns}
+          total={data?.meta?.total}
+          pagination
+          paginationOptions={{
+            page,
+            limit,
+            handleChangePage: (e, page) => setPage(page),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
+      </Box>
 
       {selected && (
         <ViewOrder

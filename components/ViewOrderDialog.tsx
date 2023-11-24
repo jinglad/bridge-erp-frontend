@@ -19,12 +19,13 @@ import moment from "moment";
 import { Router, useRouter } from "next/router";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
-import { Order } from "../apis/order-service";
+
 import { PrintContext } from "../context/PrintContext";
 import { OrderToPrint } from "./OrderToPrint";
+import { IOrder } from "../interfaces/order.interface";
 
 interface ViewOrderProps {
-  order: Order;
+  order: IOrder;
   open: boolean;
   onClose: () => void;
 }
@@ -61,7 +62,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       paid: Number(order.paid),
       to_be_paid: order.to_be_paid,
       products: order.products,
-      customer: order.customer,
+      customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
     });
     router.push("/print-memo").then();
@@ -85,7 +86,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
                   Customer:
                 </TableCell>
-                <TableCell>{order.customer}</TableCell>
+                <TableCell>{order?.customer?.customerName}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>

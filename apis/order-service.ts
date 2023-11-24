@@ -1,21 +1,8 @@
 import { IAllGetResponse } from "../interfaces/common";
-import { ICustomer } from "./customer-service";
+import { IOrder } from "../interfaces/order.interface";
 import http from "./http-common";
 import { IProduct } from "./product-service";
-import { ISupplier } from "./supplier-service";
 
-export interface IOrder {
-  _id: string;
-  customer: string | ICustomer;
-  products: IProduct[];
-  to_be_paid: number;
-  paid: number;
-  payment_method: string;
-  discount: number;
-  order_return: boolean;
-  buy_total: number;
-  createdDate?: Date;
-}
 export interface CreateOrderProps {
   customer: string;
   products: IProduct[];
@@ -33,10 +20,14 @@ export const createOrder = async (order: any) => {
 };
 
 export const salesReturn = async (order: CreateOrderProps) => {
-  const { data } = await http.post<{ msg: string }>("/api/v1/sales-return", {
-    ...order,
-  });
-  return data;
+  try {
+    const { data } = await http.post<{ msg: string }>("/api/v1/sales-return", {
+      ...order,
+    });
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.msg);
+  }
 };
 
 // Get all orders
@@ -67,10 +58,17 @@ export const getOrders = async ({
     converted_date: converted_date ? converted_date : undefined,
   };
 
-  const { data } = await http.get<IAllGetResponse<IOrder[]>>("/api/v1/order", {
-    params,
-  });
-  return data;
+  try {
+    const { data } = await http.get<IAllGetResponse<IOrder[]>>(
+      "/api/v1/order",
+      {
+        params,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.msg);
+  }
 };
 
 export const getSalesReturn = async ({
@@ -99,7 +97,7 @@ export const getSalesReturn = async ({
 
 export const deleteOrder = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/order/" + id);
+    const { data } = await http.delete<{ msg: string }>("/api/v1/order/" + id);
     return data;
   } catch (error: any) {
     throw Error(error);
