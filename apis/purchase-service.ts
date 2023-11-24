@@ -79,15 +79,27 @@ export const getPurchases = async ({
   createdDate,
   page,
   limit,
+  searchTerm,
+  supplier,
+  purchase_return,
+  converted_date,
 }: {
   createdDate: string | null;
   page: number;
   limit: number;
+  searchTerm?: string;
+  supplier?: string;
+  purchase_return?: boolean;
+  converted_date?: string;
 }) => {
   const params = {
     createdDate: createdDate ? createdDate : null,
     page,
     limit,
+    searchTerm: searchTerm ? searchTerm : undefined,
+    supplier: supplier ? supplier : undefined,
+    purchase_return: purchase_return ? purchase_return : undefined,
+    converted_date: converted_date ? converted_date : undefined,
   };
 
   const { data } = await http.get<IAllGetResponse<IPurchase[]>>(
@@ -101,7 +113,9 @@ export const getPurchases = async ({
 
 export const deletePurchase = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/api/v1/purchase/" + id);
+    const { data } = await http.delete<{ msg: string }>(
+      "/api/v1/purchase/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error);

@@ -1,44 +1,19 @@
-import { LoadingButton } from "@mui/lab";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  CircularProgress,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Button, ButtonGroup, Stack, Typography } from "@mui/material";
 import { useState } from "react";
-import { useInfiniteQuery } from "react-query";
-import { getReturnPurchases, Purchase } from "../apis/purchase-service";
 import Layout from "../components/Layout/Layout";
+import DataTable from "../components/Table/DataTable";
 import ViewPurchase from "../components/ViewPurchaseDialog";
+import { usePurchase } from "../hooks/usePurchase";
+import { IColumn } from "../interfaces/common";
+import { IPurchase } from "../interfaces/purchase";
 
-type Props = {};
-
-const Purchase = (props: Props) => {
+const Purchase = () => {
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<null | Purchase>(null);
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["return-purchases"],
-    getReturnPurchases,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-      onSuccess: () => {},
-    }
-  );
+  const [selected, setSelected] = useState<null | IPurchase>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const { data, isLoading } = usePurchase({ purchase_return: true });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -49,14 +24,83 @@ const Purchase = (props: Props) => {
     setSelected(null);
   };
 
+  const columns: IColumn[] = [
+    {
+      field: "supplier",
+      label: "Supplier",
+      align: "left",
+      render: (row: IPurchase) => <>{row.supplier?.name}</>,
+    },
+    {
+      field: "paid",
+      label: "Paid Amount",
+      align: "center",
+      render: (row: IPurchase) => <>{row.paid?.toFixed(2)}</>,
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: IPurchase) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            variant="contained"
+            onClick={() => {
+              setSelected(row);
+              handleClickOpen();
+            }}
+          >
+            View
+          </Button>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
   return (
     <Layout>
       <Stack spacing={2}>
         <Typography fontWeight="bold" variant="h5" textAlign="center">
           All Return Purchase
         </Typography>
+      </Stack>
 
-        <TableContainer component={Paper}>
+      <Box sx={{ mt: 4 }}>
+        <DataTable
+          isLoading={isLoading}
+          rows={data?.data || []}
+          columns={columns}
+          total={data?.meta?.total}
+          pagination={true}
+          paginationOptions={{
+            limit,
+            page: page - 1,
+            handleChangePage: (e, page) => setPage(page + 1),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
+      </Box>
+
+      {selected && (
+        <ViewPurchase
+          onClose={handleClose}
+          open={open}
+          purchase={selected}
+          key={selected._id}
+        />
+      )}
+    </Layout>
+  );
+};
+
+export default Purchase;
+
+{
+  /*
+  *
+  *
+  *  <TableContainer component={Paper}>
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -65,57 +109,41 @@ const Purchase = (props: Props) => {
                 <TableCell align="right">Actions</TableCell>
               </TableRow>
             </TableHead>
-            {status === "loading" ? (
+            {isLoading ? (
               <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
                 <CircularProgress />
               </TableBody>
             ) : (
               <>
-                {data?.pages.map((group, i) => (
+                {data?.data?.map((item, i) => (
                   <TableBody key={i}>
-                    {group?.purchaseReturns.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
-                        <TableCell>{row.supplier}</TableCell>
-                        <TableCell>{row.paid ? row.paid : null}</TableCell>
-                        <TableCell align="right">
-                          <ButtonGroup size="small">
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickOpen();
-                              }}
-                            >
-                              View
-                            </Button>
-                          </ButtonGroup>
-                        </TableCell>
-                      </TableRow>
-                    ))}
+                    <TableRow
+                      key={item._id}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                      }}
+                    >
+                      <TableCell>{item?.supplier?.name}</TableCell>
+                      <TableCell>{item?.paid ? item?.paid : null}</TableCell>
+                      <TableCell align="right">
+                        <ButtonGroup size="small">
+                          <Button
+                            color="info"
+                            variant="contained"
+                            onClick={() => {
+                              setSelected(item);
+                              handleClickOpen();
+                            }}
+                          >
+                            View
+                          </Button>
+                        </ButtonGroup>
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 ))}
               </>
             )}
           </Table>
-        </TableContainer>
-        <Box textAlign="center">
-          {data?.pages[0].totalPurchaseReturn !== 0 && hasNextPage && (
-            <LoadingButton
-              variant="contained"
-              loading={isFetchingNextPage}
-              onClick={() => fetchNextPage()}
-              disabled={!hasNextPage || isFetchingNextPage}
-            >
-              Load More
-            </LoadingButton>
-          )}
-        </Box>
-      </Stack>
-
-      {selected && <ViewPurchase onClose={handleClose} open={open} purchase={selected} key={selected._id} />}
-    </Layout>
-  );
-};
-
-export default Purchase;
+        </TableContainer> */
+}

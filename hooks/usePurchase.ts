@@ -17,17 +17,43 @@ import { getPurchases } from "../apis/purchase-service";
 // );
 
 export const usePurchase = ({
-  createdDate,
-  page,
-  limit,
+  createdDate = null,
+  page = 1,
+  limit = 10,
+  searchTerm,
+  supplier,
+  purchase_return = false,
+  converted_date,
 }: {
-  createdDate: string | null;
-  page: number;
-  limit: number;
+  createdDate?: string | null;
+  page?: number;
+  limit?: number;
+  searchTerm?: string;
+  supplier?: string;
+  purchase_return?: boolean;
+  converted_date?: string;
 }) => {
   return useQuery({
-    queryKey: ["purchases", createdDate, page, limit],
-    queryFn: () => getPurchases({ createdDate, page, limit }),
+    queryKey: [
+      "purchases",
+      createdDate,
+      page,
+      limit,
+      searchTerm,
+      supplier,
+      purchase_return,
+      converted_date,
+    ],
+    queryFn: () =>
+      getPurchases({
+        createdDate,
+        page,
+        limit,
+        searchTerm,
+        supplier,
+        purchase_return,
+        converted_date,
+      }),
     keepPreviousData: true,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
