@@ -1,40 +1,28 @@
+import { DeleteOutline, ModeEditOutlineOutlined } from "@mui/icons-material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import {
-  DesktopDatePicker,
-  LoadingButton,
-  LocalizationProvider,
-} from "@mui/lab";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import {
   Box,
   Button,
   ButtonGroup,
-  CircularProgress,
-  Paper,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import router from "next/router";
 import { useState } from "react";
-import { useInfiniteQuery, useMutation, useQueryClient } from "react-query";
-import { deletePurchase, getPurchases } from "../../apis/purchase-service";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import { deletePurchase } from "../../apis/purchase-service";
+import DeleteDialog from "../../components/DeleteDialog";
 import Layout from "../../components/Layout/Layout";
+import DataTable from "../../components/Table/DataTable";
 import ViewPurchase from "../../components/ViewPurchaseDialog";
 import ViewReturnPurchase from "../../components/ViewReturnPurchase";
 import { usePurchase } from "../../hooks/usePurchase";
 import { IColumn } from "../../interfaces/common";
 import { IPurchase } from "../../interfaces/purchase";
-import { DeleteOutline, ModeEditOutlineOutlined } from "@mui/icons-material";
-import DataTable from "../../components/Table/DataTable";
-import DeleteDialog from "../../components/DeleteDialog";
-import { toast } from "react-toastify";
 
 type Props = {};
 
@@ -44,7 +32,7 @@ const Purchase = (props: Props) => {
   const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | IPurchase>(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -58,7 +46,7 @@ const Purchase = (props: Props) => {
   } = usePurchase({
     createdDate,
     limit: 10,
-    page: page,
+    page: page + 1,
   });
 
   const { mutateAsync, isLoading: deleteLoading } = useMutation(

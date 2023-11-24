@@ -10,10 +10,14 @@ import { IPurchase } from "../interfaces/purchase";
 const Purchase = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | IPurchase>(null);
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
 
-  const { data, isLoading } = usePurchase({ purchase_return: true });
+  const { data, isLoading } = usePurchase({
+    page: page + 1,
+    limit,
+    purchase_return: true,
+  });
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -74,9 +78,9 @@ const Purchase = () => {
           total={data?.meta?.total}
           pagination={true}
           paginationOptions={{
+            page,
             limit,
-            page: page - 1,
-            handleChangePage: (e, page) => setPage(page + 1),
+            handleChangePage: (e, page) => setPage(page),
             handleChangePageSize: (e) => setLimit(+e.target.value),
           }}
         />

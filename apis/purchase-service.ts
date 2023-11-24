@@ -93,12 +93,12 @@ export const getPurchases = async ({
   converted_date?: string;
 }) => {
   const params = {
-    createdDate: createdDate ? createdDate : null,
     page,
     limit,
+    purchase_return,
+    createdDate: createdDate ? createdDate : null,
     searchTerm: searchTerm ? searchTerm : undefined,
     supplier: supplier ? supplier : undefined,
-    purchase_return: purchase_return ? purchase_return : undefined,
     converted_date: converted_date ? converted_date : undefined,
   };
 

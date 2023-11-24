@@ -1,17 +1,20 @@
+import { IAllGetResponse } from "../interfaces/common";
+import { ICustomer } from "./customer-service";
 import http from "./http-common";
 import { IProduct } from "./product-service";
 import { ISupplier } from "./supplier-service";
 
-export interface Order {
+export interface IOrder {
   _id: string;
-  customer: string;
+  customer: string | ICustomer;
   products: IProduct[];
   to_be_paid: number;
-  buy_total: number;
   paid: number;
   payment_method: string;
-  createdDate?: Date;
   discount: number;
+  order_return: boolean;
+  buy_total: number;
+  createdDate?: Date;
 }
 export interface CreateOrderProps {
   customer: string;
@@ -22,49 +25,51 @@ export interface CreateOrderProps {
   discount: number;
 }
 
-export interface Orders {
-  orders: any;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalOrder: number;
-}
-
-export const createOrder = async (order: CreateOrderProps) => {
-  const { data } = await http.post<{ msg: string }>("/order", {
+export const createOrder = async (order: any) => {
+  const { data } = await http.post<{ msg: string }>("/api/v1/order", {
     ...order,
   });
   return data;
 };
 
 export const salesReturn = async (order: CreateOrderProps) => {
-  const { data } = await http.post<{ msg: string }>("/sales-return", {
+  const { data } = await http.post<{ msg: string }>("/api/v1/sales-return", {
     ...order,
   });
   return data;
 };
 
+// Get all orders
 export const getOrders = async ({
-  queryKey,
-  pageParam = 0,
+  createdDate,
+  page,
+  limit,
+  searchTerm,
+  supplier,
+  order_return,
+  converted_date,
 }: {
-  queryKey: any[];
-  pageParam?: number;
+  createdDate: string | Date | null;
+  page: number;
+  limit: number;
+  searchTerm?: string;
+  supplier?: string;
+  order_return?: boolean;
+  converted_date?: string;
 }) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
+  const params = {
+    page,
+    limit,
+    order_return,
+    createdDate: createdDate ? createdDate : null,
+    searchTerm: searchTerm ? searchTerm : undefined,
+    supplier: supplier ? supplier : undefined,
+    converted_date: converted_date ? converted_date : undefined,
+  };
 
-  if (createdDate) {
-    params.createdDate = createdDate;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<any>("/order", {
-    params: params,
+  const { data } = await http.get<IAllGetResponse<IOrder[]>>("/api/v1/order", {
+    params,
   });
-
   return data;
 };
 
