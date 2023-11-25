@@ -20,7 +20,7 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import { Box } from "@mui/system";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
 import { getCustomers } from "../apis/customer-service";
 import { getAndSearchProduct, IProduct } from "../apis/product-service";
@@ -41,10 +41,10 @@ function Sales({}: Props) {
     cartItems,
     setCartItems,
     deleteItemFromCart,
-    customerName,
+    customer,
     addToCart,
     reset,
-    setCustomerName,
+    setCustomer,
     productName,
     setProductName,
     brandName,
@@ -54,11 +54,11 @@ function Sales({}: Props) {
   } = useSalesStore((state: any) => ({
     cartItems: state.cartItems,
     deleteItemFromCart: state.deleteItemFromCart,
-    customerName: state.customerName,
+    customer: state.customer,
     addToCart: state.addToCart,
     reset: state.reset,
     setCartItems: state.setCartItems,
-    setCustomerName: state.setCustomerName,
+    setCustomer: state.setCustomer,
     productName: state.productName,
     setProductName: state.setProductName,
     brandName: state.brandName,
@@ -66,6 +66,8 @@ function Sales({}: Props) {
     categoryName: state.categoryName,
     setCategoryName: state.setCategoryName,
   }));
+
+  const [customerName, setCustomerName] = useState("");
 
   const debouncedBrandNameSearchQuery = useDebounce(brandName, 500);
   const debouncedProductNameSearchQuery = useDebounce(productName, 500);
@@ -107,8 +109,6 @@ function Sales({}: Props) {
     return true;
   };
 
-  // console.log(productName);
-
   return (
     <Layout>
       <Grid container spacing={3}>
@@ -118,22 +118,23 @@ function Sales({}: Props) {
               <Autocomplete
                 freeSolo={true}
                 loading={customerLoading}
-                options={
-                  customerData?.data?.map(
-                    (customer) => customer.customerName
-                  ) || []
+                options={customerData?.data || []}
+                getOptionLabel={(option) => option?.customerName}
+                isOptionEqualToValue={(option, value) =>
+                  option._id === value._id
                 }
-                defaultValue={customerName}
-                value={customerName}
+                value={customer}
                 onInputChange={(e, value) => {
                   setCustomerName(value);
+                }}
+                onChange={(e, value) => {
+                  setCustomer(value);
                 }}
                 renderInput={(params) => (
                   <TextField
                     {...params}
                     placeholder="search customer"
                     variant="outlined"
-                    onChange={(e) => setCustomerName(e.target.value)}
                   />
                 )}
               />
@@ -218,7 +219,7 @@ function Sales({}: Props) {
               </TableContainer>
               <PaymentDetailsDialog
                 onSuccess={onPaymentSuccess}
-                customerName={customerName}
+                customerId={customer?._id}
                 cartItems={cartItems}
               />
             </Box>

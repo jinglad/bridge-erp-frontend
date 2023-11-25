@@ -67,7 +67,7 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
               {purchase.products.map((product) => (
                 <TableRow key={product._id}>
                   <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.qty}</TableCell>
+                  <TableCell>{product?.purchase_qty}</TableCell>
                   <TableCell>{product.buy_price}</TableCell>
                   <TableCell>{product.sell_price}</TableCell>
                 </TableRow>

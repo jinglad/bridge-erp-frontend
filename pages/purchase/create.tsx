@@ -42,7 +42,7 @@ const PurchaseCreate = () => {
   //   setPurchaseForm(data);
   // });
 
-  const { mutate, mutateAsync, isLoading } = useMutation(
+  const { mutateAsync, isLoading } = useMutation(
     "createPurchase",
     createPurchase,
     {

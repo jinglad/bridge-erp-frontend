@@ -11,6 +11,7 @@ export interface IProduct {
   reorder_limit: string;
   image: string;
   qty: number;
+  purchase_qty?: number;
   sell_price: number;
   buy_price: number;
 }

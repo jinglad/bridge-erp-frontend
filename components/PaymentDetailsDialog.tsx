@@ -34,13 +34,13 @@ import { PrintContext } from "../context/PrintContext";
 
 type PaymentDetailsDialogProps = {
   cartItems: IProduct[];
-  customerName: string;
+  customerId: string;
   onSuccess: () => void;
 };
 
 const PaymentDetailsDialog = ({
   cartItems,
-  customerName,
+  customerId,
   onSuccess,
 }: PaymentDetailsDialogProps) => {
   const [open, setOpen] = useState(false);
@@ -114,8 +114,21 @@ const PaymentDetailsDialog = ({
           ).toString()
         ).toFixed(2)
       ),
-      products: cartItems,
-      customer: customerName,
+      buy_total: Number(
+        parseFloat(
+          cartItems
+            .reduce((acc, curr) => acc + curr.buy_price * curr.qty, 0)
+            .toString()
+        ).toFixed(2)
+      ),
+      products: cartItems?.map((item) => ({
+        ...item,
+        category: item.category?._id,
+        brand: item.brand?._id,
+      })),
+      customer: customerId,
+      converted_date: new Date().toISOString(),
+      createdDate: new Date().toISOString(),
     });
     handleClose();
   };
@@ -153,7 +166,7 @@ const PaymentDetailsDialog = ({
         cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
         Number(getValues("paid")),
       products: cartItems,
-      customer: customerName,
+      customer: customerId,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     });
     router.push("/print-memo").then();
@@ -164,7 +177,7 @@ const PaymentDetailsDialog = ({
       <Button
         sx={{ marginTop: ".5rem" }}
         onClick={() => {
-          if (!customerName) {
+          if (!customerId) {
             toast.error("Please select a customer");
           } else {
             handleOpen();

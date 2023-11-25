@@ -2,10 +2,11 @@ import { createTrackedSelector } from "react-tracked";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { IProduct } from "../apis/product-service";
+import { ICustomer } from "../apis/customer-service";
 
 interface SalesStore {
-  customerName: string;
-  setCustomerName: (name: string) => void;
+  customer: ICustomer | string;
+  setCustomer: (name: string) => void;
   setProductName: (name: string) => void;
   productName: string;
   setBrandName: (name: string) => void;
@@ -23,8 +24,8 @@ const useSalesStore = create<SalesStore>()(
   devtools(
     persist(
       (set) => ({
-        customerName: "",
-        setCustomerName: (name: string) => set({ customerName: name }),
+        customer: "",
+        setCustomer: (data: string) => set({ customer: data }),
         productName: "",
         setProductName: (name: string) => set({ productName: name }),
         brandName: "",
@@ -63,7 +64,7 @@ const useSalesStore = create<SalesStore>()(
         reset: () => {
           set((state) => ({
             cartItems: [],
-            customerName: "",
+            customer: "",
           }));
         },
       }),
