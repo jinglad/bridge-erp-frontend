@@ -1,16 +1,15 @@
 import { ThemeProvider } from "@mui/material";
-
 import type { AppProps } from "next/app";
 import Head from "next/head";
-import { useRouter } from "next/router";
-
+import { Router, useRouter } from "next/router";
 import { QueryClient, QueryClientProvider } from "react-query";
-
 import ProtectedRoute from "../components/ProtectedRoute";
 import { AuthContextProvider } from "../context/AuthContext";
+import NProgress from "nprogress";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
+import "../styles/nprogress.css";
 
 import { ToastContainer } from "react-toastify";
 import { theme } from "../theme/theme";
@@ -24,6 +23,10 @@ const queryClient = new QueryClient({
   },
 });
 
+Router.events.on("routeChangeStart", () => NProgress.start());
+Router.events.on("routeChangeComplete", () => NProgress.done());
+Router.events.on("routeChangeError", () => NProgress.done());
+
 function MyApp({ Component, pageProps }: AppProps) {
   const noAuthRequired = ["/login"];
   const router = useRouter();
@@ -36,24 +39,24 @@ function MyApp({ Component, pageProps }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>
           <PrintContextProvider>
-          <ThemeProvider theme={theme}>
-            {router.pathname === "/login" ? (
-              <Component {...pageProps} />
-            ) : (
-              <ProtectedRoute>
+            <ThemeProvider theme={theme}>
+              {router.pathname === "/login" ? (
                 <Component {...pageProps} />
-              </ProtectedRoute>
-            )}
-            <ToastContainer
-              position="top-right"
-              autoClose={8000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              draggable={false}
-              closeOnClick
-              pauseOnHover
-            />
-          </ThemeProvider>
+              ) : (
+                <ProtectedRoute>
+                  <Component {...pageProps} />
+                </ProtectedRoute>
+              )}
+              <ToastContainer
+                position="top-right"
+                autoClose={8000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                draggable={false}
+                closeOnClick
+                pauseOnHover
+              />
+            </ThemeProvider>
           </PrintContextProvider>
         </AuthContextProvider>
       </QueryClientProvider>
