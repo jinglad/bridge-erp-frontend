@@ -25,7 +25,7 @@ authFetch.interceptors.response.use(
   (error) => {
     if (error.response.status === 401 || error.response.status === 403) {
       useUserStore.getState().logout();
-      toast.error("Your session has expired, please login again");
+      // toast.error("Your session has expired, please login again");
     }
     return Promise.reject(error);
   }
