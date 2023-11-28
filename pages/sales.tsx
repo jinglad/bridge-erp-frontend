@@ -73,9 +73,13 @@ function Sales({}: Props) {
   const debouncedProductNameSearchQuery = useDebounce(productName, 500);
   const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
   const debouncedCustomerNameSearchQuery = useDebounce(customerName, 500);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<any>(null);
+  const [selectedBrandId, setSelectedBrandId] = useState<any>(null);
 
   const { data, isLoading } = useProducts({
     searchTerm: debouncedProductNameSearchQuery,
+    category: selectedCategoryId,
+    brand: selectedBrandId,
   });
   const { data: customerData, isLoading: customerLoading } = useCustomers({
     searchTerm: debouncedCustomerNameSearchQuery,
@@ -259,10 +263,17 @@ function Sales({}: Props) {
               onInputChange={(e, value) => {
                 setCategoryName(value);
               }}
+              onChange={(e, value) => {
+                setSelectedCategoryId(
+                  categoryData?.data?.find(
+                    (category) => category?.categorytitle === value
+                  )?._id
+                );
+              }}
               value={categoryName}
               renderInput={(params) => (
                 <TextField
-                  onChange={(e) => setCategoryName(e.target.value)}
+                  // onChange={(e) => setCategoryName(e.target.value)}
                   placeholder="search category"
                   variant="outlined"
                   {...params}
@@ -276,10 +287,16 @@ function Sales({}: Props) {
               options={brandData?.data?.map((brand) => brand?.brandtitle) || []}
               disablePortal
               onInputChange={(e, value) => setBrandName(value)}
+              onChange={(e, value) => {
+                setSelectedBrandId(
+                  brandData?.data?.find((brand) => brand?.brandtitle === value)
+                    ?._id
+                );
+              }}
               value={brandName}
               renderInput={(params) => (
                 <TextField
-                  onChange={(e) => setBrandName(e.target.value)}
+                  // onChange={(e) => setBrandName(e.target.value)}
                   placeholder="search brand"
                   variant="outlined"
                   {...params}
