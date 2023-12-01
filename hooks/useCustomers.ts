@@ -16,7 +16,7 @@ export const useCustomers = ({
     ["customers", page, limit, searchTerm],
     () => getCustomers({ page, limit, searchTerm }),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       onError: (error: IError) => {

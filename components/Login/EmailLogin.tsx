@@ -26,7 +26,7 @@ const EmailLogin = () => {
 
   const handleSuccess = (data: ILoginResponse) => {
     const { accessToken, user } = data;
-    console.log(user);
+    // console.log(user);
     if (user?.role === "admin") {
       setUser({
         email: user.email,

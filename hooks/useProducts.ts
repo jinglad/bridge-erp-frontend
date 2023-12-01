@@ -20,7 +20,7 @@ export const useProducts = ({
     ["products", page, limit, searchTerm, brand, category],
     () => getProducts({ page, limit, searchTerm, brand, category }),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       retry: 0,

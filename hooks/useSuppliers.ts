@@ -16,7 +16,7 @@ export const useSuppliers = ({
     ["suppliers", page, limit, searchTerm],
     () => getSuppliers({ page, limit, searchTerm }),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
       onError: (error: IError) => {

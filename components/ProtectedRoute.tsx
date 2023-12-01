@@ -8,11 +8,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const accessToken = getCookie("token");
   const router = useRouter();
 
+  // console.log(user);
+
   useEffect(() => {
-    if (user?.role !== "admin" || !accessToken) {
+    if (!user || user?.role !== "admin" || !accessToken) {
       router.push("/login").then();
     }
-  }, [user, router, accessToken]);
+  }, [user, accessToken]);
 
   return <>{user?.role === "admin" ? children : null}</>;
 };

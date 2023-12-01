@@ -26,7 +26,6 @@ export const getServerSideProps = async (ctx: {
   req: { cookies: { token: string } };
 }) => {
   const { token } = ctx.req.cookies;
-  console.log(token);
   if (token) {
     return {
       redirect: {

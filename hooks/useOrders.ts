@@ -39,7 +39,7 @@ export const useOrders = ({
         order_return,
         converted_date,
       }),
-    keepPreviousData: true,
+    keepPreviousData: false,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
     retry: 0,

@@ -16,7 +16,7 @@ export const useCategories = ({
     ["categories", page, limit, searchTerm],
     () => getCategories({ page, limit, searchTerm }),
     {
-      keepPreviousData: true,
+      keepPreviousData: false,
       refetchOnMount: true,
       refetchOnWindowFocus: false,
       retry: 0,
