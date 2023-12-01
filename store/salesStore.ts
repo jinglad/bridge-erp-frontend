@@ -5,8 +5,8 @@ import { IProduct } from "../apis/product-service";
 import { ICustomer } from "../apis/customer-service";
 
 interface SalesStore {
-  customer: ICustomer | string;
-  setCustomer: (name: string) => void;
+  customer: ICustomer | string | null;
+  setCustomer: (data: string) => void;
   setProductName: (name: string) => void;
   productName: string;
   setBrandName: (name: string) => void;
@@ -24,7 +24,7 @@ const useSalesStore = create<SalesStore>()(
   devtools(
     persist(
       (set) => ({
-        customer: "",
+        customer: null,
         setCustomer: (data: string) => set({ customer: data }),
         productName: "",
         setProductName: (name: string) => set({ productName: name }),
@@ -64,7 +64,7 @@ const useSalesStore = create<SalesStore>()(
         reset: () => {
           set((state) => ({
             cartItems: [],
-            customer: "",
+            customer: null,
           }));
         },
       }),

@@ -21,20 +21,3 @@ const Login = () => {
 };
 
 export default Login;
-
-export const getServerSideProps = async (ctx: {
-  req: { cookies: { token: string } };
-}) => {
-  const { token } = ctx.req.cookies;
-  if (token) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-  return {
-    props: {},
-  };
-};

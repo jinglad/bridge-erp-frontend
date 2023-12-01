@@ -128,7 +128,8 @@ const PaymentDetailsDialog = ({
       })),
       customer: customerId,
       converted_date: new Date().toISOString(),
-      createdDate: new Date().toISOString(),
+      // createdDate: new Date().toISOString(),
+      createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     });
     handleClose();
   };
