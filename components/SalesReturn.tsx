@@ -18,7 +18,12 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { deleteOrder, salesReturn } from "../apis/order-service";
+import {
+  createOrder,
+  createOrderReturn,
+  deleteOrder,
+  salesReturn,
+} from "../apis/order-service";
 import { IOrder } from "../interfaces/order.interface";
 
 interface SalesReturnProps {
@@ -30,27 +35,35 @@ interface SalesReturnProps {
 function SalesReturn({ onClose, open, order }: SalesReturnProps) {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries("orders");
-      toast.success("Return Successful");
-    },
-  });
+  // const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
+  //   onSuccess: (data) => {
+  //     queryClient.invalidateQueries("orders");
+  //     toast.success("Return Successful");
+  //   },
+  // });
 
-  const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
-    onSuccess: async (data) => {
-      await deleteAsync(order._id);
+  // const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
+  //   onSuccess: async (data) => {
+  //     await deleteAsync(order._id);
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error?.msg || "Something went wrong");
+  //   },
+  // });
+
+  const { mutateAsync, isLoading } = useMutation(createOrderReturn, {
+    onSuccess: (data) => {
+      // toast.success(data?.msg);
+      console.log(data);
+      queryClient.invalidateQueries("orders");
     },
     onError: (error: any) => {
-      toast.error(error?.msg || "Something went wrong");
+      toast.error(error.response.data.msg);
     },
   });
 
   const saleReturn = async () => {
-    await mutateAsync({
-      ...order,
-      customer: order.customer._id,
-    });
+    await mutateAsync(order?._id);
     onClose();
   };
 

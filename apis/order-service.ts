@@ -13,6 +13,13 @@ export const createOrder = async (order: any) => {
   return data;
 };
 
+export const createOrderReturn = async (id: string) => {
+  const { data } = await http.post<{ msg: string }>("/api/v1/order/return", {
+    id,
+  });
+  return data;
+};
+
 export const salesReturn = async (order: CreateOrderProps) => {
   console.log(order);
   try {

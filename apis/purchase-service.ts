@@ -46,9 +46,15 @@ export const createPurchase = async (formData: Purchase) => {
   return data;
 };
 
-export const createReturnPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/api/v1/purchase-return", {
-    ...formData,
+// export const createReturnPurchase = async (formData: Purchase) => {
+//   const { data } = await http.post<{ msg: string }>("/api/v1/purchase-return", {
+//     ...formData,
+//   });
+//   return data;
+// };
+export const createReturnPurchase = async (id: string) => {
+  const { data } = await http.post<{ msg: string }>("/api/v1/purchase/return", {
+    id,
   });
   return data;
 };

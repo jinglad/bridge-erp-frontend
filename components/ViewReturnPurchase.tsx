@@ -44,25 +44,21 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
     }
   );
 
-  const { mutateAsync, isLoading } = useMutation(
-    "createReturnPurchase",
-    createReturnPurchase,
-    {
-      onSuccess: async (data) => {
-        await deleteAsync(purchase._id);
-      },
-      onError: (error: any) => {
-        toast.error(error.response.data.msg);
-      },
-    }
-  );
+  const { mutateAsync, isLoading } = useMutation(createReturnPurchase, {
+    onSuccess: (data) => {
+      // toast.success(data?.msg);
+      console.log(data);
+      queryClient.invalidateQueries("orders");
+    },
+    onError: (error: any) => {
+      toast.error(error.response.data.msg);
+    },
+  });
 
-  // const purchaseReturn = async () => {
-  //   await mutateAsync({
-  //     ...purchase,
-  //   });
-  //   onClose();
-  // };
+  const purchaseReturn = async () => {
+    await mutateAsync(purchase._id);
+    onClose();
+  };
 
   return (
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
@@ -117,9 +113,13 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         </TableContainer>
 
         <DialogActions>
-          {/* <LoadingButton variant="contained" loading={isLoading} onClick={purchaseReturn}>
+          <LoadingButton
+            variant="contained"
+            loading={isLoading}
+            onClick={purchaseReturn}
+          >
             Return
-          </LoadingButton> */}
+          </LoadingButton>
           <Button color="error" onClick={onClose}>
             close
           </Button>

@@ -100,7 +100,7 @@ const PaymentDetailsDialog = ({
       return;
     }
 
-    await mutateAsync({
+    const newOrder = {
       payment_method: data.payment_method,
       discount: Number(data.discount),
       paid: Number(parseFloat(data.paid).toFixed(2)),
@@ -127,10 +127,12 @@ const PaymentDetailsDialog = ({
         brand: item.brand?._id,
       })),
       customer: customerId,
-      converted_date: new Date().toISOString(),
-      // createdDate: new Date().toISOString(),
-      createdDate: moment(new Date()).format("ddd MMM D YYYY"),
-    });
+      converted_date: new Date(),
+      createdDate: new Date().toDateString(),
+      // createdDate: moment(new Date()).format("ddd MMM D YYYY"),
+    };
+    // console.log(newOrder);
+    await mutateAsync(newOrder);
     handleClose();
   };
 
