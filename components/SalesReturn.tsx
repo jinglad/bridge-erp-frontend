@@ -42,7 +42,7 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
       await deleteAsync(order._id);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.msg);
+      toast.error(error?.msg || "Something went wrong");
     },
   });
 

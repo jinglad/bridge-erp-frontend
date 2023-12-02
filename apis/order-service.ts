@@ -1,15 +1,9 @@
 import { IAllGetResponse } from "../interfaces/common";
 import { IOrder } from "../interfaces/order.interface";
 import http from "./http-common";
-import { IProduct } from "./product-service";
 
-export interface CreateOrderProps {
+export interface CreateOrderProps extends Omit<IOrder, "customer"> {
   customer: string;
-  products: IProduct[];
-  to_be_paid: number;
-  paid: number;
-  payment_method: string;
-  discount: number;
 }
 
 export const createOrder = async (order: any) => {
@@ -20,10 +14,14 @@ export const createOrder = async (order: any) => {
 };
 
 export const salesReturn = async (order: CreateOrderProps) => {
+  console.log(order);
   try {
-    const { data } = await http.post<{ msg: string }>("/api/v1/sales-return", {
-      ...order,
-    });
+    const { data } = await http.post<{ msg: string }>(
+      `/api/v1/order/return?id=${order?._id}`,
+      {
+        ...order,
+      }
+    );
     return data;
   } catch (error: any) {
     throw new Error(error?.response?.data?.msg);
