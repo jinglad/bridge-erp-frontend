@@ -76,10 +76,14 @@ function Sales({}: Props) {
   const [selectedCategoryId, setSelectedCategoryId] = useState<any>(null);
   const [selectedBrandId, setSelectedBrandId] = useState<any>(null);
 
+  const [productPage, setProductPage] = useState(1);
+
   const { data, isLoading } = useProducts({
     searchTerm: debouncedProductNameSearchQuery,
     category: selectedCategoryId,
     brand: selectedBrandId,
+    page: productPage,
+    limit: 10,
   });
   const { data: customerData, isLoading: customerLoading } = useCustomers({
     searchTerm: debouncedCustomerNameSearchQuery,
@@ -99,7 +103,8 @@ function Sales({}: Props) {
 
   const onPaymentSuccess = () => {
     reset();
-    queryClient.refetchQueries("searchedProducts", { active: true });
+    // queryClient.refetchQueries("searchedProducts", { active: true });
+    queryClient.invalidateQueries("products", { active: true });
     queryClient.refetchQueries("customers", { active: true });
   };
 
@@ -113,6 +118,9 @@ function Sales({}: Props) {
     return true;
   };
 
+  const hasNextPage =
+    data?.meta?.limit! * data?.meta?.page! < data?.meta?.total!;
+
   return (
     <Layout>
       <Grid container spacing={3}>
@@ -123,7 +131,7 @@ function Sales({}: Props) {
                 freeSolo={true}
                 loading={customerLoading}
                 options={customerData?.data || []}
-                getOptionLabel={(option) => option?.customerName}
+                getOptionLabel={(option) => option?.customerName || ""}
                 isOptionEqualToValue={(option, value) =>
                   option._id === value._id
                 }
@@ -238,6 +246,7 @@ function Sales({}: Props) {
               disablePortal
               onInputChange={(e, value) => {
                 setProductName(value);
+                setProductPage(1);
               }}
               value={productName}
               renderInput={(params) => (
@@ -269,6 +278,7 @@ function Sales({}: Props) {
                     (category) => category?.categorytitle === value
                   )?._id
                 );
+                setProductPage(1);
               }}
               value={categoryName}
               renderInput={(params) => (
@@ -292,6 +302,7 @@ function Sales({}: Props) {
                   brandData?.data?.find((brand) => brand?.brandtitle === value)
                     ?._id
                 );
+                setProductPage(1);
               }}
               value={brandName}
               renderInput={(params) => (
@@ -388,6 +399,25 @@ function Sales({}: Props) {
               </Fragment>
             )}
           </Grid>
+          {hasNextPage && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                mt: 3,
+                width: "100%",
+              }}
+            >
+              <LoadingButton
+                // sx={{ width: "100%" }}
+                loading={isLoading}
+                variant="contained"
+                onClick={() => setProductPage(productPage + 1)}
+              >
+                Load More
+              </LoadingButton>
+            </Box>
+          )}
         </Grid>
       </Grid>
     </Layout>

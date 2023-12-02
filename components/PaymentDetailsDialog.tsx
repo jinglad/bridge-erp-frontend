@@ -89,7 +89,7 @@ const PaymentDetailsDialog = ({
     let isValid = true;
 
     for (let i = 0; i < cartItems.length; i++) {
-      if (cartItems[i].qty > Number(cartItems[i].reorder_limit)) {
+      if (cartItems[i].qty > Number(cartItems[i]?.available)) {
         toast.error("Quantity not available for " + cartItems[i].name);
         isValid = false;
       }

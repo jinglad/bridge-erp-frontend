@@ -14,6 +14,7 @@ export interface IProduct {
   purchase_qty?: number;
   sell_price: number;
   buy_price: number;
+  available?: number;
 }
 
 export const createProduct = async (input: Omit<IProduct, "_id">) => {

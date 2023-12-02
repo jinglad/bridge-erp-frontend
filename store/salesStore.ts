@@ -2,11 +2,15 @@ import { createTrackedSelector } from "react-tracked";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { IProduct } from "../apis/product-service";
-import { ICustomer } from "../apis/customer-service";
+
+interface ICustomer {
+  _id: string;
+  customerName: string;
+}
 
 interface SalesStore {
-  customer: ICustomer | string | null;
-  setCustomer: (data: string) => void;
+  customer: ICustomer | null;
+  setCustomer: (data: ICustomer | null) => void;
   setProductName: (name: string) => void;
   productName: string;
   setBrandName: (name: string) => void;
@@ -25,7 +29,7 @@ const useSalesStore = create<SalesStore>()(
     persist(
       (set) => ({
         customer: null,
-        setCustomer: (data: string) => set({ customer: data }),
+        setCustomer: (data: ICustomer | null) => set({ customer: data }),
         productName: "",
         setProductName: (name: string) => set({ productName: name }),
         brandName: "",
