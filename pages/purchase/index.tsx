@@ -1,4 +1,3 @@
-import { DeleteOutline, ModeEditOutlineOutlined } from "@mui/icons-material";
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import {
@@ -12,14 +11,10 @@ import {
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import router from "next/router";
 import { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import { deletePurchase } from "../../apis/purchase-service";
-import DeleteDialog from "../../components/DeleteDialog";
 import Layout from "../../components/Layout/Layout";
+import ViewPurchase from "../../components/Purchase/ViewPurchaseDialog";
+import ViewReturnPurchase from "../../components/Purchase/ViewReturnPurchase";
 import DataTable from "../../components/Table/DataTable";
-import ViewPurchase from "../../components/ViewPurchaseDialog";
-import ViewReturnPurchase from "../../components/ViewReturnPurchase";
 import { usePurchase } from "../../hooks/usePurchase";
 import { IColumn } from "../../interfaces/common";
 import { IPurchase } from "../../interfaces/purchase";
@@ -27,49 +22,19 @@ import { IPurchase } from "../../interfaces/purchase";
 type Props = {};
 
 const Purchase = (props: Props) => {
-  const [saleOpen, setSaleOpen] = useState(false);
   const [date, setDate] = useState<Date | null>(null);
   const [createdDate, setCreatedDate] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | IPurchase>(null);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(10);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const queryClient = useQueryClient();
+  const [returnDialogOpen, setReturnDialogOpen] = useState(false);
 
-  const {
-    data: purchase,
-    isLoading,
-    isError,
-    error,
-    status,
-  } = usePurchase({
+  const { data: purchase, isLoading } = usePurchase({
     createdDate,
-    limit: 10,
+    limit,
     page: page + 1,
   });
-
-  const { mutateAsync, isLoading: deleteLoading } = useMutation(
-    deletePurchase,
-    {
-      onSuccess: (data) => {
-        toast.success("Purchase deleted successfully");
-        queryClient.invalidateQueries(["purchases"]);
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Something wen't wrong");
-      },
-    }
-  );
-
-  const handleDelete = async () => {
-    await mutateAsync(selected?._id as string);
-    setDeleteDialogOpen(false);
-  };
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = () => {
     setOpen(false);
@@ -81,15 +46,6 @@ const Purchase = (props: Props) => {
     if (newValue) {
       setCreatedDate(newValue.toDateString());
     }
-  };
-
-  const handleClickSalesOpen = () => {
-    setSaleOpen(true);
-  };
-
-  const handleSalesClose = () => {
-    setSaleOpen(false);
-    setSelected(null);
   };
 
   const columns: IColumn[] = [
@@ -118,16 +74,16 @@ const Purchase = (props: Props) => {
               setOpen(true);
             }}
           >
-            <ModeEditOutlineOutlined />
+            View
           </Button>
           <Button
             color="warning"
             onClick={() => {
               setSelected(row);
-              setDeleteDialogOpen(true);
+              setReturnDialogOpen(true);
             }}
           >
-            <DeleteOutline />
+            Return
           </Button>
         </ButtonGroup>
       ),
@@ -191,7 +147,7 @@ const Purchase = (props: Props) => {
           isLoading={isLoading}
           columns={columns}
           rows={purchase?.data || []}
-          pagination={purchase?.meta?.page! > 1}
+          pagination={true}
           total={purchase?.meta?.total}
           paginationOptions={{
             page,
@@ -212,21 +168,12 @@ const Purchase = (props: Props) => {
       )}
       {selected && (
         <ViewReturnPurchase
-          onClose={handleSalesClose}
-          open={saleOpen}
+          onClose={() => setReturnDialogOpen(false)}
+          open={returnDialogOpen}
           purchase={selected}
           key={selected._id + 1}
         />
       )}
-
-      <DeleteDialog
-        open={deleteDialogOpen}
-        onClose={() => setDeleteDialogOpen(false)}
-        title="Delete Purchase"
-        text="Are you sure you want to delete this purchase?"
-        handleDelete={handleDelete}
-        deleteLoading={deleteLoading}
-      />
     </Layout>
   );
 };

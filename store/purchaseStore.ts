@@ -13,7 +13,7 @@ interface IProductForm {
 
 export interface PurchaseForm {
   products: IProductForm[];
-  supplier: ISupplier;
+  supplier: ISupplier | null;
 }
 
 interface PurchaseStore {
@@ -26,8 +26,10 @@ const usePurchaseStore = create<PurchaseStore>()(
   persist(
     (set) => ({
       purchaseForm: {
-        products: [{ name: "", purchase_qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
-        supplier: { _id: "", name: "" } as ISupplier,
+        products: [
+          { name: "", purchase_qty: 1, buy_price: 0, sell_price: 0, _id: "" },
+        ],
+        supplier: null,
       },
       setPurchaseForm: (purchaseForm: PurchaseForm) => {
         set({
@@ -43,7 +45,7 @@ const usePurchaseStore = create<PurchaseStore>()(
         set({
           purchaseForm: {
             products: newProducts,
-            supplier: { _id: "", name: "" } as ISupplier,
+            supplier: null,
           },
         });
       },

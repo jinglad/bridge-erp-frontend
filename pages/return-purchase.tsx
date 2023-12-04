@@ -2,7 +2,7 @@ import { Box, Button, ButtonGroup, Stack, Typography } from "@mui/material";
 import { useState } from "react";
 import Layout from "../components/Layout/Layout";
 import DataTable from "../components/Table/DataTable";
-import ViewPurchase from "../components/ViewPurchaseDialog";
+import ViewPurchase from "../components/Purchase/ViewPurchaseDialog";
 import { usePurchase } from "../hooks/usePurchase";
 import { IColumn } from "../interfaces/common";
 import { IPurchase } from "../interfaces/purchase";

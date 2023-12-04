@@ -1,4 +1,4 @@
-import { IAllGetResponse } from "../interfaces/common";
+import { IAllGetResponse, IGetResponse } from "../interfaces/common";
 import { IPurchase } from "../interfaces/purchase";
 import http from "./http-common";
 import { ISupplier } from "./supplier-service";
@@ -21,15 +21,6 @@ export interface Purchase {
   createdDate: Date;
 }
 
-// export interface Purchases {
-//   purchase: Purchase[];
-//   count: number;
-//   page: string;
-//   size: number;
-//   totalPages: number;
-//   totalPurchase: number;
-// }
-
 export interface ReturnPurchases {
   purchaseReturns: Purchase[];
   count: number;
@@ -40,47 +31,31 @@ export interface ReturnPurchases {
 }
 
 export const createPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/api/v1/purchase", {
-    ...formData,
-  });
-  return data;
+  try {
+    const { data } = await http.post<IGetResponse<IPurchase>>(
+      "/api/v1/purchase",
+      {
+        ...formData,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message);
+  }
 };
 
-// export const createReturnPurchase = async (formData: Purchase) => {
-//   const { data } = await http.post<{ msg: string }>("/api/v1/purchase-return", {
-//     ...formData,
-//   });
-//   return data;
-// };
 export const createReturnPurchase = async (id: string) => {
-  const { data } = await http.post<{ msg: string }>("/api/v1/purchase/return", {
-    id,
-  });
-  return data;
+  try {
+    const { data } = await http.post<IGetResponse<IPurchase>>(
+      "/api/v1/purchase/return",
+      { id }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message);
+  }
 };
 
-export const getReturnPurchases = async ({
-  queryKey,
-  pageParam = 0,
-}: {
-  queryKey: any[];
-  pageParam?: number;
-}) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
-
-  if (createdDate) {
-    params.createdDate = createdDate;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<ReturnPurchases>("/api/v1/purchase-return", {
-    params: params,
-  });
-  return data;
-};
 export const getPurchases = async ({
   createdDate,
   page,

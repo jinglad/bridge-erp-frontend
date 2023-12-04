@@ -18,12 +18,8 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import {
-  createReturnPurchase,
-  deletePurchase,
-  Purchase,
-} from "../apis/purchase-service";
-import { IPurchase } from "../interfaces/purchase";
+import { createReturnPurchase } from "../../apis/purchase-service";
+import { IPurchase } from "../../interfaces/purchase";
 
 interface ViewPurchaseProps {
   purchase: IPurchase;
@@ -33,25 +29,15 @@ interface ViewPurchaseProps {
 
 function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
   const queryClient = useQueryClient();
-  const { mutateAsync: deleteAsync } = useMutation(
-    "deleteProduct",
-    deletePurchase,
-    {
-      onSuccess: (data) => {
-        queryClient.invalidateQueries("purchases");
-        toast.success("Return Successful");
-      },
-    }
-  );
 
   const { mutateAsync, isLoading } = useMutation(createReturnPurchase, {
     onSuccess: (data) => {
-      // toast.success(data?.msg);
       console.log(data);
-      queryClient.invalidateQueries("orders");
+      toast.success(data?.message || "Purchase returned successfully");
+      queryClient.invalidateQueries(["purchases"]);
     },
     onError: (error: any) => {
-      toast.error(error.response.data.msg);
+      toast.error(error?.message || "Something wen't wrong");
     },
   });
 
@@ -103,7 +89,7 @@ function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
               {purchase.products.map((product) => (
                 <TableRow key={product._id}>
                   <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.qty}</TableCell>
+                  <TableCell>{product.purchase_qty}</TableCell>
                   <TableCell>{product.buy_price}</TableCell>
                   <TableCell>{product.sell_price}</TableCell>
                 </TableRow>

@@ -9,10 +9,9 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createPurchase } from "../../apis/purchase-service";
-import { ISupplier } from "../../apis/supplier-service";
 import Layout from "../../components/Layout/Layout";
 import useDebounce from "../../hooks/useDebounce";
 import { useProducts } from "../../hooks/useProducts";
@@ -20,6 +19,7 @@ import { useSuppliers } from "../../hooks/useSuppliers";
 import { useTrackedPurchaseStore } from "../../store/purchaseStore";
 
 const PurchaseCreate = () => {
+  const queryClient = useQueryClient();
   const [productName, setProductName] = useState("");
   const [supplierName, setSupplierName] = useState("");
   const debouncedSupplierName = useDebounce(supplierName, 500);
@@ -37,17 +37,17 @@ const PurchaseCreate = () => {
     name: "products",
   });
 
-  // watch((data, { name, type }) => {
-  //   //@ts-ignore-next-line
-  //   setPurchaseForm(data);
-  // });
+  watch((data, { name, type }) => {
+    //@ts-ignore-next-line
+    setPurchaseForm(data);
+  });
 
   const { mutateAsync, isLoading } = useMutation(
     "createPurchase",
     createPurchase,
     {
       onSuccess: async (data) => {
-        toast.success(data.msg);
+        toast.success(data?.message || "Purchase Created Successfully");
         resetField("products", {
           defaultValue: [
             { name: "", purchase_qty: 0, sell_price: 0, buy_price: 0, _id: "" },
@@ -57,9 +57,10 @@ const PurchaseCreate = () => {
           defaultValue: "",
         });
         resetPurchaseForm();
+        queryClient.invalidateQueries(["purchases"]);
       },
       onError: (error: any) => {
-        toast.error(error.response.data.msg);
+        toast.error(error?.message || "Something wen't wrong");
       },
     }
   );
@@ -108,30 +109,15 @@ const PurchaseCreate = () => {
                   }
                   onChange={(e, value) => {
                     if (value) {
-                      console.log(value);
-                      setPurchaseForm({ ...purchaseForm, supplier: value });
-                      setSupplierName("");
+                      setValue("supplier", value);
                     }
                   }}
                   onInputChange={(event, newInputValue, reason) => {
-                    // if (reason === "clear") {
-                    //   setPurchaseForm({ ...purchaseForm, supplier: "" });
-                    // }
                     setSupplierName(newInputValue);
                   }}
-                  value={
-                    purchaseForm?.supplier !== undefined &&
-                    purchaseForm?.supplier
-                      ? purchaseForm?.supplier
-                      : ({ name: "", _id: "" } as ISupplier)
-                  }
+                  value={purchaseForm?.supplier}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="suppliers"
-                      {...register(`supplier`)}
-                      required
-                    />
+                    <TextField {...params} placeholder="suppliers" required />
                   )}
                 />
               </Grid>
@@ -151,31 +137,16 @@ const PurchaseCreate = () => {
                         }}
                         onChange={(e, value) => {
                           if (value) {
-                            // setValue(`products.${index}.name`, value.name);
-                            // setValue(`products.${index}._id`, value._id);
-                            // setValue(
-                            //   `products.${index}.buy_price`,
-                            //   Number(value.buy_price)
-                            // );
-                            // setValue(
-                            //   `products.${index}.sell_price`,
-                            //   Number(value.sell_price)
-                            // );
-                            setPurchaseForm({
-                              ...purchaseForm,
-                              products: purchaseForm.products?.map((p, i) => {
-                                if (i === index) {
-                                  return {
-                                    ...p,
-                                    name: value.name,
-                                    _id: value._id,
-                                    buy_price: Number(value.buy_price),
-                                    sell_price: Number(value.sell_price),
-                                  };
-                                }
-                                return p;
-                              }),
-                            });
+                            setValue(`products.${index}.name`, value.name);
+                            setValue(`products.${index}._id`, value._id);
+                            setValue(
+                              `products.${index}.buy_price`,
+                              Number(value.buy_price)
+                            );
+                            setValue(
+                              `products.${index}.sell_price`,
+                              Number(value.sell_price)
+                            );
                             setProductName("");
                           }
                         }}

@@ -15,7 +15,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { IPurchase } from "../interfaces/purchase";
+import { IPurchase } from "../../interfaces/purchase";
 
 interface ViewPurchaseProps {
   purchase: IPurchase;
