@@ -1,6 +1,12 @@
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import Link from "next/link";
@@ -8,25 +14,33 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { createExpense, Expense } from "../../apis/profit-service";
+import { createExpense } from "../../apis/profit-service";
 import Layout from "../../components/Layout/Layout";
+import { IExpense } from "../../interfaces/profit.interface";
 
 type Props = {};
 
 function CreateExpensePage({}: Props) {
   const queryClient = useQueryClient();
-  const { mutateAsync, isLoading } = useMutation("createExpense", createExpense, {
-    onSuccess: (data) => {
-      toast.success(data.msg);
-      reset();
-      queryClient.invalidateQueries("searchedProducts");
-    },
-  });
+  const { mutateAsync, isLoading } = useMutation(
+    "createExpense",
+    createExpense,
+    {
+      onSuccess: (data) => {
+        toast.success(data.message || "Expense created successfully");
+        reset();
+        queryClient.invalidateQueries(["profit"]);
+      },
+      onError: (err: any) => {
+        toast.error(err?.message || "something went wrong!");
+      },
+    }
+  );
 
   const { register, handleSubmit, reset } = useForm();
 
   const onSubmit = async (data: any) => {
-    let expenses: Expense[] = [];
+    let expenses: IExpense[] = [];
 
     if (data.wages) {
       expenses.push({
@@ -85,27 +99,63 @@ function CreateExpensePage({}: Props) {
                   inputFormat="MM/dd/yyyy"
                   value={date}
                   onChange={handleChange}
-                  renderInput={(params) => <TextField required variant="outlined" fullWidth {...params} />}
+                  renderInput={(params) => (
+                    <TextField
+                      required
+                      variant="outlined"
+                      fullWidth
+                      {...params}
+                    />
+                  )}
                 />
               </LocalizationProvider>
             </Grid>
 
             <Grid item xs={12} sm={12}>
-              <TextField type="number" id="wages" label="Wages" fullWidth {...register("wages")} />
+              <TextField
+                type="number"
+                id="wages"
+                label="Wages"
+                fullWidth
+                {...register("wages")}
+              />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <TextField type="number" id="electricity" label="Electricity" fullWidth {...register("electricity")} />
+              <TextField
+                type="number"
+                id="electricity"
+                label="Electricity"
+                fullWidth
+                {...register("electricity")}
+              />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <TextField type="number" id="rent" label="Rent" fullWidth {...register("rent")} />
+              <TextField
+                type="number"
+                id="rent"
+                label="Rent"
+                fullWidth
+                {...register("rent")}
+              />
             </Grid>
             <Grid item xs={12} sm={12}>
-              <TextField type="number" id="others" label="Others" fullWidth {...register("others")} />
+              <TextField
+                type="number"
+                id="others"
+                label="Others"
+                fullWidth
+                {...register("others")}
+              />
             </Grid>
 
             <Grid item xs={12} sm={12}>
               <ButtonGroup>
-                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                <LoadingButton
+                  color="success"
+                  variant="contained"
+                  type="submit"
+                  loading={isLoading}
+                >
                   Submit
                 </LoadingButton>
                 <Button color="error">

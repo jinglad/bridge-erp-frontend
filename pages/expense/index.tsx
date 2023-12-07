@@ -1,46 +1,59 @@
-import { LoadingButton } from "@mui/lab";
-import {
-  Button,
-  CircularProgress,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Button, Stack, Typography } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
-import { useInfiniteQuery } from "react-query";
 import Layout from "../../components/Layout/Layout";
 
 import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
-import { getProfitList } from "../../apis/profit-service";
+import { useState } from "react";
+import DataTable from "../../components/Table/DataTable";
+import { useProfitList } from "../../hooks/useProfits";
+import { IColumn } from "../../interfaces/common";
+import { IProfit } from "../../interfaces/profit.interface";
 
 function ExpensePage() {
   const router = useRouter();
-
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    status,
-  } = useInfiniteQuery(["customers"], getProfitList, {
-    getNextPageParam: (lastPage, pages) => {
-      if (pages.length === lastPage.totalPages) {
-        return undefined;
-      } else {
-        return pages.length;
-      }
-    },
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(10);
+  const { data, isLoading } = useProfitList({
+    page: page + 1,
+    limit,
   });
 
-  // console.log(data);
+  const columns: IColumn[] = [
+    {
+      field: "date",
+      label: "Date",
+    },
+    {
+      field: "expenses",
+      label: "Expenses ",
+      render: (row: IProfit) => (
+        <>
+          {row.expenses.map((expense: any) => (
+            <div key={expense.name}>
+              {expense.name} - ৳{expense.spent}
+            </div>
+          ))}
+        </>
+      ),
+    },
+    {
+      field: "expenseTotal",
+      label: "Monthly Total",
+    },
+    {
+      field: "monthlyProfit",
+      label: "Monthly Profit",
+    },
+    {
+      field: "monthlyBuys",
+      label: "Monthly Buys",
+    },
+    {
+      field: "monthlySales",
+      label: "Monthly Sales",
+    },
+  ];
 
   return (
     <Layout>
@@ -64,67 +77,74 @@ function ExpensePage() {
           </Button>
         </Box>
 
-        <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Date</TableCell>
-                <TableCell>Expenses</TableCell>
-                <TableCell>Expense Total</TableCell>
-                <TableCell>Monthly Profit</TableCell>
-                <TableCell>Monthly Buys</TableCell>
-                <TableCell>Monthly Sales</TableCell>
-              </TableRow>
-            </TableHead>
-
-            {status === "loading" ? (
-              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <CircularProgress />
-              </TableBody>
-            ) : (
-              <>
-                {data?.pages.map((group, i) => (
-                  <TableBody key={i}>
-                    {group?.profits.map((row) => (
-                      <TableRow key={row._id}>
-                        <TableCell>{row.date}</TableCell>
-                        <TableCell>
-                          {row.expenses.map((expense: any) => (
-                            <div key={expense.name}>
-                              {expense.name} - ৳{expense.spent}
-                            </div>
-                          ))}
-                        </TableCell>
-
-                        <TableCell>
-                          {Number(row.expenseTotal).toFixed(2)}
-                        </TableCell>
-                        <TableCell>{row.monthlyProfit.toFixed(2)}</TableCell>
-                        <TableCell>{row.monthlyBuys.toFixed(2)}</TableCell>
-                        <TableCell>{row.monthlySales.toFixed(2)}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                ))}
-              </>
-            )}
-          </Table>
-        </TableContainer>
-        <Box textAlign="center">
-          {hasNextPage && (
-            <LoadingButton
-              variant="contained"
-              loading={isFetchingNextPage}
-              onClick={() => fetchNextPage()}
-              disabled={!hasNextPage || isFetchingNextPage}
-            >
-              Load More
-            </LoadingButton>
-          )}
-        </Box>
+        <DataTable
+          isLoading={isLoading}
+          columns={columns}
+          rows={data?.data || []}
+          total={data?.meta?.total}
+          pagination={true}
+          paginationOptions={{
+            page,
+            limit,
+            handleChangePage: (e, page) => setPage(page),
+            handleChangePageSize: (e) => setLimit(+e.target.value),
+          }}
+        />
       </Stack>
     </Layout>
   );
 }
 
 export default ExpensePage;
+
+{
+  /*
+   *
+  *
+  * <TableContainer component={Paper}>
+<Table aria-label="simple table">
+  <TableHead>
+    <TableRow>
+      <TableCell>Date</TableCell>
+      <TableCell>Expenses</TableCell>
+      <TableCell>Expense Total</TableCell>
+      <TableCell>Monthly Profit</TableCell>
+      <TableCell>Monthly Buys</TableCell>
+      <TableCell>Monthly Sales</TableCell>
+    </TableRow>
+  </TableHead>
+
+  {status === "loading" ? (
+    <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+      <CircularProgress />
+    </TableBody>
+  ) : (
+    <>
+      {data?.pages.map((group, i) => (
+        <TableBody key={i}>
+          {group?.profits.map((row) => (
+            <TableRow key={row._id}>
+              <TableCell>{row.date}</TableCell>
+              <TableCell>
+                {row.expenses.map((expense: any) => (
+                  <div key={expense.name}>
+                    {expense.name} - ৳{expense.spent}
+                  </div>
+                ))}
+              </TableCell>
+
+              <TableCell>
+                {Number(row.expenseTotal).toFixed(2)}
+              </TableCell>
+              <TableCell>{row.monthlyProfit.toFixed(2)}</TableCell>
+              <TableCell>{row.monthlyBuys.toFixed(2)}</TableCell>
+              <TableCell>{row.monthlySales.toFixed(2)}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      ))}
+    </>
+  )}
+</Table>
+</TableContainer> */
+}
