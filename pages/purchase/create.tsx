@@ -57,10 +57,10 @@ const PurchaseCreate = () => {
           defaultValue: "",
         });
         resetPurchaseForm();
-        queryClient.invalidateQueries(["purchases"]);
+        // queryClient.invalidateQueries(["purchases"]);
       },
       onError: (error: any) => {
-        toast.error(error?.message || "Something wen't wrong");
+        toast.error(error?.message || "Something went wrong");
       },
     }
   );
@@ -69,11 +69,11 @@ const PurchaseCreate = () => {
     const inputData = {
       ...data,
       supplier: data.supplier._id,
-      to_be_paid: data.products.reduce(
+      paid: data.products.reduce(
         (acc: number, cur: any) => acc + cur.buy_price * cur.purchase_qty,
         0
       ),
-      paid: 0,
+      to_be_paid: 0,
       createdDate: new Date().toDateString(),
       converted_date: new Date().toISOString(),
       payment_method: "cash",

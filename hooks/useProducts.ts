@@ -21,7 +21,7 @@ export const useProducts = ({
     () => getProducts({ page, limit, searchTerm, brand, category }),
     {
       keepPreviousData: false,
-      refetchOnMount: false,
+      refetchOnMount: true,
       refetchOnWindowFocus: false,
       retry: 0,
       onError: (error: IError) => {

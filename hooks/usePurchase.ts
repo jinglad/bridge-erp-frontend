@@ -55,7 +55,7 @@ export const usePurchase = ({
         converted_date,
       }),
     keepPreviousData: false,
-    refetchOnMount: false,
+    refetchOnMount: true,
     refetchOnWindowFocus: false,
     retry: 0,
     onError: (error: any) => {
