@@ -8,6 +8,7 @@ import {
   CircularProgress,
   Grid,
   IconButton,
+  Pagination,
   Stack,
   TextField,
   Typography,
@@ -118,8 +119,11 @@ function Sales({}: Props) {
     return true;
   };
 
-  const hasNextPage =
-    data?.meta?.limit! * data?.meta?.page! < data?.meta?.total!;
+  // const hasNextPage =
+  //   data?.meta?.limit! * data?.meta?.page! < data?.meta?.total!;
+
+  const isGreaterThanOne =
+    Math.ceil(data?.meta?.total! / data?.meta?.limit!) > 1;
 
   return (
     <Layout>
@@ -399,25 +403,23 @@ function Sales({}: Props) {
               </Fragment>
             )}
           </Grid>
-          {hasNextPage && (
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                mt: 3,
-                width: "100%",
-              }}
-            >
-              <LoadingButton
-                // sx={{ width: "100%" }}
-                loading={isLoading}
-                variant="contained"
-                onClick={() => setProductPage(productPage + 1)}
-              >
-                Load More
-              </LoadingButton>
-            </Box>
-          )}
+
+          <Box
+            sx={{
+              display: isGreaterThanOne ? "flex" : "none",
+              justifyContent: "center",
+              mt: 3,
+              width: "100%",
+            }}
+          >
+            <Pagination
+              sx={{ width: "100%" }}
+              count={Math.ceil(data?.meta?.total! / data?.meta?.limit!)}
+              page={productPage}
+              onChange={(e, value) => setProductPage(value)}
+              color="primary"
+            />
+          </Box>
         </Grid>
       </Grid>
     </Layout>
