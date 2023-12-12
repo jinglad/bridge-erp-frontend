@@ -102,7 +102,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
               </TableRow>
               <TableRow>
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
-                  Buy_Price_Total:
+                  Buy Total:
                 </TableCell>
                 <TableCell>{order?.buy_total}</TableCell>
               </TableRow>

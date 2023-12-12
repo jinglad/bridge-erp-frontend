@@ -28,7 +28,13 @@ function Suppliers({}: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
 
-  const [editModal, setEditModal] = useState(false);
+  const [editModal, setEditModal] = useState<{
+    open: boolean;
+    data: ISupplier | null;
+  }>({
+    open: false,
+    data: null,
+  });
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const [selected, setSelected] = useState<null | ISupplier>(null);
   const [supplierName, setSupplierName] = useState("");
@@ -89,7 +95,10 @@ function Suppliers({}: Props) {
             color="info"
             onClick={() => {
               setSelected(row);
-              setEditModal(true);
+              setEditModal({
+                open: true,
+                data: row,
+              });
             }}
           >
             <ModeEditOutlineOutlined />
@@ -163,11 +172,16 @@ function Suppliers({}: Props) {
           }}
         />
       </Stack>
-      {selected ? (
+      {editModal.open ? (
         <EditSupplierDialog
-          onClose={() => setEditModal(false)}
-          open={editModal}
-          supplier={selected}
+          onClose={() =>
+            setEditModal({
+              open: false,
+              data: null,
+            })
+          }
+          open={editModal.open}
+          supplier={editModal.data as ISupplier}
         />
       ) : null}
 

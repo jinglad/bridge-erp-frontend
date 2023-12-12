@@ -31,7 +31,7 @@ function EditSupplierDialog({
   const { mutateAsync, isLoading } = useMutation(updateSupplier, {
     onSuccess: (data) => {
       toast.success(data?.message || "Supplier updated successfully");
-      queryClient.invalidateQueries(["suppliers", supplier._id]);
+      queryClient.invalidateQueries(["suppliers"]);
       onClose();
     },
     onError: (error: any) => {
@@ -49,7 +49,7 @@ function EditSupplierDialog({
   });
 
   const onSubmit = async (data: any) => {
-    console.log(data);
+    // console.log(data);
     await mutateAsync({ id: supplier._id, input: data });
     reset();
   };

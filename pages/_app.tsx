@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import ProtectedRoute from "../components/ProtectedRoute";
 import { AuthContextProvider } from "../context/AuthContext";
 import NProgress from "nprogress";
+import { ReactQueryDevtools } from "react-query/devtools";
 
 import "react-toastify/dist/ReactToastify.css";
 import "../styles/globals.css";
@@ -57,6 +58,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 closeOnClick
                 pauseOnHover
               />
+              <ReactQueryDevtools initialIsOpen={false} />
             </ThemeProvider>
           </PrintContextProvider>
         </AuthContextProvider>

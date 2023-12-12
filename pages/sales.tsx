@@ -84,7 +84,7 @@ function Sales({}: Props) {
     category: selectedCategoryId,
     brand: selectedBrandId,
     page: productPage,
-    limit: 10,
+    limit: 20,
   });
   const { data: customerData, isLoading: customerLoading } = useCustomers({
     searchTerm: debouncedCustomerNameSearchQuery,
@@ -407,13 +407,13 @@ function Sales({}: Props) {
           <Box
             sx={{
               display: isGreaterThanOne ? "flex" : "none",
-              justifyContent: "center",
-              mt: 3,
+              justifyContent: "end",
+              mt: 7,
               width: "100%",
             }}
           >
             <Pagination
-              sx={{ width: "100%" }}
+              // sx={{ width: "100%" }}
               count={Math.ceil(data?.meta?.total! / data?.meta?.limit!)}
               page={productPage}
               onChange={(e, value) => setProductPage(value)}
