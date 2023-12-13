@@ -13,18 +13,16 @@ import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createCustomer } from "../../apis/customer-service";
 import Layout from "../../components/Layout/Layout";
-import { useCustomers } from "../../hooks/useCustomers";
 
 type Props = {};
 
 function Create({}: Props) {
   const queryClient = useQueryClient();
-  const {} = useCustomers({});
 
   const { mutateAsync, isLoading } = useMutation(createCustomer, {
     onSuccess: (data) => {
       toast.success(data?.message || "Customer created successfully");
-      queryClient.invalidateQueries(["customers"]);
+
       reset();
     },
     onError: (error: any) => {

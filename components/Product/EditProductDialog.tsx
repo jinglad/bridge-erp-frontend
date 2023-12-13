@@ -18,6 +18,8 @@ import { useState } from "react";
 import useDebounce from "../../hooks/useDebounce";
 import { useBrands } from "../../hooks/useBrands";
 import { useCategories } from "../../hooks/useCategories";
+import { ICategory } from "../../apis/category-service";
+import { IBrand } from "../../apis/brand-service";
 
 interface EditProductDialogProps {
   product: IProduct;
@@ -27,9 +29,11 @@ interface EditProductDialogProps {
 
 function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   const [categoryName, setCategoryName] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState<ICategory>(
+    product?.category
+  );
   const [brandName, setBrandName] = useState("");
-  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<IBrand>(product?.brand);
 
   const debouncedCategoryName = useDebounce(categoryName, 500);
   const debouncedBrandName = useDebounce(brandName, 500);
@@ -55,11 +59,13 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
     },
   });
 
+  // console.log(product);
+
   const { register, handleSubmit, reset, getValues } = useForm({
     defaultValues: {
       name: product.name,
-      brand: product.brand,
-      category: product.category,
+      brand: product.brand?._id,
+      category: product.category?._id,
       reorder_limit: product.reorder_limit,
       file: "",
       sell_price: product.sell_price,
@@ -69,8 +75,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   });
 
   const onSubmit = async (data: any) => {
-    data.category = selectedCategory;
-    data.brand = selectedBrand;
+    data.category = selectedCategory?._id;
+    data.brand = selectedBrand?._id;
+
+    // console.log(data);
 
     await mutateAsync({
       id: product._id,
@@ -79,7 +87,7 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} scroll="body" fullScreen>
+    <Dialog open={open} onClose={onClose} scroll="body">
       <Container maxWidth="md">
         <DialogTitle>Update Product</DialogTitle>
         <DialogContent>
@@ -99,7 +107,8 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   loading={categoryLoading}
                   options={categories?.data || []}
                   getOptionLabel={(category) => category?.categorytitle}
-                  defaultValue={product?.category}
+                  // defaultValue={product?.category}
+                  value={selectedCategory}
                   isOptionEqualToValue={(option, value) =>
                     option?._id === value?._id
                   }
@@ -108,7 +117,7 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   }}
                   onChange={(e, value) => {
                     if (value) {
-                      setSelectedCategory(value._id);
+                      setSelectedCategory(value);
                     }
                   }}
                   renderInput={(params) => (
@@ -124,12 +133,13 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   isOptionEqualToValue={(option, value) =>
                     option?._id === value?._id
                   }
+                  value={selectedBrand}
                   onInputChange={(e, value) => {
                     setBrandName(value);
                   }}
                   onChange={(e, value) => {
                     if (value) {
-                      setSelectedBrand(value._id);
+                      setSelectedBrand(value);
                     }
                   }}
                   renderInput={(params) => (

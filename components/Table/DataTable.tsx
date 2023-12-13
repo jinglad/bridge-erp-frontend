@@ -102,10 +102,10 @@ const DataTable = ({
           onPageChange={handleChangePage || (() => {})}
           rowsPerPage={limit || 10}
           onRowsPerPageChange={handleChangePageSize}
-          rowsPerPageOptions={[10, 30, 50]}
+          rowsPerPageOptions={[limit!, 10, 30, 50]}
           labelRowsPerPage="Data per page:"
           sx={{
-            display: Number(total) > 10 ? "block" : "none",
+            display: Number(total) > limit! ? "block" : "none",
           }}
         />
       )}

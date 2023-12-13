@@ -27,7 +27,13 @@ function Customer() {
   const queryClient = useQueryClient();
   const [customerName, setCustomerName] = useState("");
   const [selected, setSelected] = useState<null | ICustomer>(null);
-  const [editModal, setEditModal] = useState<boolean>(false);
+  const [editModal, setEditModal] = useState<{
+    open: boolean;
+    data: ICustomer | null;
+  }>({
+    open: false,
+    data: null,
+  });
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
   const debouncedCustomerName = useDebounce(customerName, 500);
   const [page, setPage] = useState<number>(0);
@@ -74,7 +80,10 @@ function Customer() {
             color="info"
             onClick={() => {
               setSelected(row);
-              setEditModal(true);
+              setEditModal({
+                open: true,
+                data: row,
+              });
             }}
           >
             <ModeEditOutlineOutlined />
@@ -151,11 +160,16 @@ function Customer() {
       </Stack>
 
       {/* Edit & delete modal */}
-      {selected ? (
+      {editModal.open ? (
         <EditCustomerDialog
-          open={editModal}
-          onClose={() => setEditModal(false)}
-          customer={selected}
+          open={editModal.open}
+          onClose={() =>
+            setEditModal({
+              open: false,
+              data: null,
+            })
+          }
+          customer={editModal.data as ICustomer}
         />
       ) : null}
       <DeleteDialog

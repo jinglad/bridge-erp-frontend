@@ -17,7 +17,7 @@ export const useBrands = ({
     () => getBrands({ page, limit, searchTerm }),
     {
       keepPreviousData: false,
-      refetchOnMount: false,
+      // refetchOnMount: false,
       refetchOnWindowFocus: false,
       retry: 0,
       onError: (error: IError) => {

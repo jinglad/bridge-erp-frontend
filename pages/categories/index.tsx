@@ -31,6 +31,13 @@ function Categories({}: Props) {
   const router = useRouter();
   const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+  const [editModal, setEditModal] = useState<{
+    open: boolean;
+    data: ICategory | null;
+  }>({
+    open: false,
+    data: null,
+  });
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [categoryName, setCategoryName] = useState("");
   const debouncedCategoryName = useDebounce(categoryName, 500);
@@ -83,7 +90,11 @@ function Categories({}: Props) {
             color="info"
             onClick={() => {
               setSelected(row);
-              setOpen(true);
+              // setOpen(true);
+              setEditModal({
+                open: true,
+                data: row,
+              });
             }}
           >
             <ModeEditOutlineOutlined />
@@ -161,12 +172,11 @@ function Categories({}: Props) {
         />
       </Stack>
 
-      {selected && (
+      {editModal.open && (
         <EditcategoryDialog
-          onClose={handleClose}
-          open={open}
-          category={selected}
-          key={selected._id}
+          onClose={() => setEditModal({ open: false, data: null })}
+          open={editModal.open}
+          category={editModal.data as ICategory}
         />
       )}
 

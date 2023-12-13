@@ -17,7 +17,7 @@ export const useCustomers = ({
     () => getCustomers({ page, limit, searchTerm }),
     {
       keepPreviousData: false,
-      refetchOnMount: false,
+      // refetchOnMount: false,
       refetchOnWindowFocus: false,
       onError: (error: IError) => {
         toast.error(error?.response?.data?.message);
