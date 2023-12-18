@@ -7,7 +7,9 @@ export interface IProduct {
   _id: string;
   name: string;
   category: ICategory;
+  categoryName?: string;
   brand: IBrand;
+  brandName?: string;
   reorder_limit: string;
   image: string;
   qty: number;

@@ -43,6 +43,12 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
               </TableCell>
               <TableCell>{purchase?.supplier?.name}</TableCell>
             </TableRow>
+            <TableRow>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Created Date:
+              </TableCell>
+              <TableCell>{purchase?.createdDate}</TableCell>
+            </TableRow>
           </Table>
         </TableContainer>
 

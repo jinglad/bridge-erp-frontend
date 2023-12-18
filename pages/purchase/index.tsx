@@ -27,7 +27,7 @@ const Purchase = (props: Props) => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | IPurchase>(null);
   const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(30);
   const [returnDialogOpen, setReturnDialogOpen] = useState(false);
 
   const { data: purchase, isLoading } = usePurchase({
@@ -45,6 +45,7 @@ const Purchase = (props: Props) => {
     setDate(newValue);
     if (newValue) {
       setCreatedDate(newValue.toDateString());
+      setPage(0);
     }
   };
 

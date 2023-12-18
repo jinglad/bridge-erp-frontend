@@ -26,7 +26,7 @@ const Order = (props: Props) => {
   const [saleOpen, setSaleOpen] = useState(false);
   const [selected, setSelected] = useState<null | IOrder>(null);
   const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(30);
 
   const { data, isLoading } = useOrders({
     page: page + 1,
@@ -57,6 +57,7 @@ const Order = (props: Props) => {
     setDate(newValue);
     if (newValue) {
       setCreatedDate(newValue.toDateString());
+      setPage(0);
     }
   };
 
@@ -65,7 +66,7 @@ const Order = (props: Props) => {
       field: "customer",
       label: "Customer",
       align: "left",
-      render: (row: IOrder) => row?.customer?.customerName,
+      render: (row: IOrder) => row?.customer?.customerName || row?.customerName,
     },
     {
       field: "paid",

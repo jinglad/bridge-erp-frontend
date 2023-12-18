@@ -118,6 +118,14 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
                 </TableCell>
                 <TableCell>{order.discount}</TableCell>
               </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Created Date:
+                </TableCell>
+                <TableCell>
+                  {moment(order.createdDate).format("ddd MMM D YYYY")}
+                </TableCell>
+              </TableRow>
             </TableBody>
           </Table>
         </TableContainer>

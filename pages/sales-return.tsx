@@ -11,7 +11,7 @@ const Order = () => {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState<null | IOrder>(null);
   const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(30);
 
   const { data, isLoading } = useOrders({
     order_return: true,
@@ -33,7 +33,7 @@ const Order = () => {
       field: "customer",
       label: "Customer",
       align: "left",
-      render: (row: IOrder) => row?.customer?.customerName,
+      render: (row: IOrder) => row?.customer?.customerName || row?.customerName,
     },
     {
       field: "paid",

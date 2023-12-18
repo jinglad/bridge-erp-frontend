@@ -22,7 +22,7 @@ export interface IColumn {
   field: string;
   label: string;
   align?: "left" | "right" | "center" | "justify" | "inherit";
-  render?: (row: any) => JSX.Element | string;
+  render?: (row: any) => JSX.Element | string | undefined;
 }
 
 export interface IPaginationOptions {
