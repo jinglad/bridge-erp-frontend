@@ -41,6 +41,7 @@ import { useProducts } from "../../hooks/useProducts";
 import { IColumn } from "../../interfaces/common";
 import DataTable from "../../components/Table/DataTable";
 import DeleteDialog from "../../components/DeleteDialog";
+import { set } from "nprogress";
 
 const Products: NextPage = () => {
   const router = useRouter();
@@ -192,6 +193,7 @@ const Products: NextPage = () => {
             options={data?.data?.map((product) => product.name) || []}
             onChange={(e, value) => {
               setProductName(value || "");
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField

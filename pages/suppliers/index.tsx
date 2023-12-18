@@ -141,6 +141,7 @@ function Suppliers({}: Props) {
             }
             onInputChange={(e, value) => {
               setSupplierName(value);
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField

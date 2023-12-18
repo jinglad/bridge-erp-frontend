@@ -128,6 +128,7 @@ function Brand({}: Props) {
             // }}
             onInputChange={(e, value) => {
               setBrandName(value);
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField

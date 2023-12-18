@@ -31,7 +31,7 @@ function ExpensePage() {
         <>
           {row.expenses.map((expense: any) => (
             <div key={expense.name}>
-              {expense.name} - ৳{expense.spent}
+              {expense.name} - ৳{expense.spent?.toFixed(2)}
             </div>
           ))}
         </>
@@ -40,18 +40,38 @@ function ExpensePage() {
     {
       field: "expenseTotal",
       label: "Monthly Total",
+      render: (row: IProfit) => (
+        <Typography fontWeight="bold">
+          ৳{Number(row.expenseTotal).toFixed(2)}
+        </Typography>
+      ),
     },
     {
       field: "monthlyProfit",
       label: "Monthly Profit",
+      render: (row: IProfit) => (
+        <Typography fontWeight="bold">
+          ৳{Number(row.monthlyProfit).toFixed(2)}
+        </Typography>
+      ),
     },
     {
       field: "monthlyBuys",
       label: "Monthly Buys",
+      render: (row: IProfit) => (
+        <Typography fontWeight="bold">
+          ৳{Number(row.monthlyBuys).toFixed(2)}
+        </Typography>
+      ),
     },
     {
       field: "monthlySales",
       label: "Monthly Sales",
+      render: (row: IProfit) => (
+        <Typography fontWeight="bold">
+          ৳{Number(row.monthlySales).toFixed(2)}
+        </Typography>
+      ),
     },
   ];
 
