@@ -126,6 +126,7 @@ function Customer() {
             }
             onInputChange={(e, value) => {
               setCustomerName(value);
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField

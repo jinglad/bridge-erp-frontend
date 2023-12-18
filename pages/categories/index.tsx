@@ -139,6 +139,7 @@ function Categories({}: Props) {
             // }}
             onInputChange={(e, value) => {
               setCategoryName(value);
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField
