@@ -29,16 +29,20 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
-import { Product } from "../apis/product-service";
+import { IProduct } from "../apis/product-service";
 import { PrintContext } from "../context/PrintContext";
 
 type PaymentDetailsDialogProps = {
-  cartItems: Product[];
-  customerName: string;
+  cartItems: IProduct[];
+  customerId: string;
   onSuccess: () => void;
 };
 
-const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDetailsDialogProps) => {
+const PaymentDetailsDialog = ({
+  cartItems,
+  customerId,
+  onSuccess,
+}: PaymentDetailsDialogProps) => {
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -55,20 +59,27 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     },
   });
 
-  const { register, handleSubmit, reset, setValue, getValues, watch } = useForm({
-    defaultValues: {
-      payment_method: "cash",
-      discount: 0,
-      paid: 0,
-      to_be_paid: 0,
-    },
-  });
+  const { register, handleSubmit, reset, setValue, getValues, watch } = useForm(
+    {
+      defaultValues: {
+        payment_method: "cash",
+        discount: 0,
+        paid: 0,
+        to_be_paid: 0,
+      },
+    }
+  );
   const watchDiscount = watch("discount"); // you can supply default value as second argument
 
   useEffect(() => {
     setValue(
       "paid",
-      Number((cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount).toFixed(2))
+      Number(
+        (
+          cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
+          watchDiscount
+        ).toFixed(2)
+      )
     );
   }, [watchDiscount, cartItems, setValue]);
 
@@ -78,7 +89,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
     let isValid = true;
 
     for (let i = 0; i < cartItems.length; i++) {
-      if (cartItems[i].qty > cartItems[i].available) {
+      if (cartItems[i].qty > Number(cartItems[i]?.available)) {
         toast.error("Quantity not available for " + cartItems[i].name);
         isValid = false;
       }
@@ -89,18 +100,39 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
       return;
     }
 
-    await mutateAsync({
+    const newOrder = {
       payment_method: data.payment_method,
       discount: Number(data.discount),
       paid: Number(parseFloat(data.paid).toFixed(2)),
       to_be_paid: Number(
         parseFloat(
-          (cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(data.paid)).toString()
+          (
+            cartItems.reduce(
+              (acc, curr) => acc + curr.sell_price * curr.qty,
+              0
+            ) - Number(data.paid)
+          ).toString()
         ).toFixed(2)
       ),
-      products: cartItems,
-      customer: customerName,
-    });
+      buy_total: Number(
+        parseFloat(
+          cartItems
+            .reduce((acc, curr) => acc + curr.buy_price * curr.qty, 0)
+            .toString()
+        ).toFixed(2)
+      ),
+      products: cartItems?.map((item) => ({
+        ...item,
+        category: item.category?._id,
+        brand: item.brand?._id,
+      })),
+      customer: customerId,
+      converted_date: new Date(),
+      createdDate: new Date().toDateString(),
+      // createdDate: moment(new Date()).format("ddd MMM D YYYY"),
+    };
+    // console.log(newOrder);
+    await mutateAsync(newOrder);
     handleClose();
   };
 
@@ -133,9 +165,11 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
       payment_method: getValues("payment_method"),
       discount: Number(getValues("discount")),
       paid: Number(getValues("paid")),
-      to_be_paid: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid")),
+      to_be_paid:
+        cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
+        Number(getValues("paid")),
       products: cartItems,
-      customer: customerName,
+      customer: customerId,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     });
     router.push("/print-memo").then();
@@ -146,7 +180,7 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
       <Button
         sx={{ marginTop: ".5rem" }}
         onClick={() => {
-          if (!customerName) {
+          if (!customerId) {
             toast.error("Please select a customer");
           } else {
             handleOpen();
@@ -187,12 +221,24 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                       <TableCell>{product.name}</TableCell>
                       <TableCell>{product.qty}</TableCell>
                       <TableCell>{product.sell_price}</TableCell>
-                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
-                      <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
+                      <TableCell>
+                        {parseFloat(
+                          (product.sell_price * product.qty).toString()
+                        ).toFixed(2)}
+                      </TableCell>
+                      <TableCell>
+                        {parseFloat(
+                          (product.sell_price * product.qty).toString()
+                        ).toFixed(2)}
+                      </TableCell>
                     </TableRow>
                   ))}
                   <TableRow>
-                    <TableCell colSpan={3} rowSpan={4} sx={{ maxWidth: "200px" }}>
+                    <TableCell
+                      colSpan={3}
+                      rowSpan={4}
+                      sx={{ maxWidth: "200px" }}
+                    >
                       <Grid container spacing={1}>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -205,7 +251,11 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             inputProps={{
                               min: 0,
                               max: Math.ceil(
-                                cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
+                                cartItems.reduce(
+                                  (acc, curr) =>
+                                    acc + curr.sell_price * curr.qty,
+                                  0
+                                ) - watchDiscount
                               ),
                               step: "any",
                             }}
@@ -221,7 +271,10 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                             defaultValue={0}
                             inputProps={{
                               min: 0,
-                              max: cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0),
+                              max: cartItems.reduce(
+                                (acc, curr) => acc + curr.sell_price * curr.qty,
+                                0
+                              ),
                               step: "any",
                             }}
                             {...register(`discount`)}
@@ -237,11 +290,13 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                               size="small"
                               label="Payment Method"
                             >
-                              {["Cash", "Bkash", "Rocket", "Nagad", "IIBL"].map((method: string) => (
-                                <MenuItem key={method} value={method}>
-                                  {method}
-                                </MenuItem>
-                              ))}
+                              {["Cash", "Bkash", "Rocket", "Nagad", "IIBL"].map(
+                                (method: string) => (
+                                  <MenuItem key={method} value={method}>
+                                    {method}
+                                  </MenuItem>
+                                )
+                              )}
                             </Select>
                           </FormControl>
                         </Grid>
@@ -252,7 +307,12 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
 
                     <TableCell>
                       {parseFloat(
-                        cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0).toString()
+                        cartItems
+                          .reduce(
+                            (acc, curr) => acc + curr.sell_price * curr.qty,
+                            0
+                          )
+                          .toString()
                       ).toFixed(2)}
                     </TableCell>
                   </TableRow>
@@ -266,8 +326,14 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
                     <TableCell id="netSalePrice">
                       {parseFloat(
                         (watchDiscount
-                          ? cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - watchDiscount
-                          : cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0)
+                          ? cartItems.reduce(
+                              (acc, curr) => acc + curr.sell_price * curr.qty,
+                              0
+                            ) - watchDiscount
+                          : cartItems.reduce(
+                              (acc, curr) => acc + curr.sell_price * curr.qty,
+                              0
+                            )
                         ).toString()
                       ).toFixed(2)}
                     </TableCell>
@@ -289,7 +355,12 @@ const PaymentDetailsDialog = ({ cartItems, customerName, onSuccess }: PaymentDet
             /> */}
           </DialogContent>
           <DialogActions>
-            <LoadingButton loading={isLoading} autoFocus type="submit" variant="contained">
+            <LoadingButton
+              loading={isLoading}
+              autoFocus
+              type="submit"
+              variant="contained"
+            >
               Complete Transaction
             </LoadingButton>
           </DialogActions>

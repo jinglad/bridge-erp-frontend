@@ -1,9 +1,15 @@
 import { LoadingButton } from "@mui/lab";
-import { Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { Box } from "@mui/system";
 import Link from "next/link";
 import { useForm } from "react-hook-form";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
 import { createCustomer } from "../../apis/customer-service";
 import Layout from "../../components/Layout/Layout";
@@ -11,10 +17,16 @@ import Layout from "../../components/Layout/Layout";
 type Props = {};
 
 function Create({}: Props) {
-  const { mutateAsync, isLoading } = useMutation("createCustomer", createCustomer, {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isLoading } = useMutation(createCustomer, {
     onSuccess: (data) => {
-      toast.success(data.msg);
+      toast.success(data?.message || "Customer created successfully");
+
       reset();
+    },
+    onError: (error: any) => {
+      toast.error(error.message || "Something wen't wrong");
     },
   });
 
@@ -33,12 +45,23 @@ function Create({}: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12} sm={6}>
-              <TextField required id="customerName" {...register("customerName")} label="customer Name" fullWidth />
+              <TextField
+                required
+                id="customerName"
+                {...register("customerName")}
+                label="customer Name"
+                fullWidth
+              />
             </Grid>
 
             <Grid item xs={12} sm={3}>
               <ButtonGroup>
-                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                <LoadingButton
+                  color="success"
+                  variant="contained"
+                  type="submit"
+                  loading={isLoading}
+                >
                   Submit
                 </LoadingButton>
                 <Button color="error">

@@ -70,9 +70,9 @@ export const menu = [
     title: "Sales Retrun",
     to: "/sales-return",
   },
-  {
-    icon: <Admin />,
-    title: "Admins",
-    to: "/admins",
-  },
+  // {
+  //   icon: <Admin />,
+  //   title: "Admins",
+  //   to: "/admins",
+  // },
 ];

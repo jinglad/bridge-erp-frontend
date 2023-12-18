@@ -1,71 +1,79 @@
+import { IAllGetResponse } from "../interfaces/common";
+import { IOrder } from "../interfaces/order.interface";
 import http from "./http-common";
-import { Product } from "./product-service";
-import { Supplier } from "./supplier-service";
 
-export interface Order {
-  _id: string;
+export interface CreateOrderProps extends Omit<IOrder, "customer"> {
   customer: string;
-  products: Product[];
-  to_be_paid: number;
-  buy_total: number;
-  paid: number;
-  payment_method: string;
-  createdDate?: Date;
-  discount: number;
-}
-export interface CreateOrderProps {
-  customer: string;
-  products: Product[];
-  to_be_paid: number;
-  paid: number;
-  payment_method: string;
-  discount: number;
 }
 
-export interface Orders {
-  orders: any;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalOrder: number;
-}
-
-export const createOrder = async (order: CreateOrderProps) => {
-  const { data } = await http.post<{ msg: string }>("/order", {
+export const createOrder = async (order: any) => {
+  const { data } = await http.post<{ msg: string }>("/api/v1/order", {
     ...order,
+  });
+  return data;
+};
+
+export const createOrderReturn = async (id: string) => {
+  const { data } = await http.post<{ msg: string }>("/api/v1/order/return", {
+    id,
   });
   return data;
 };
 
 export const salesReturn = async (order: CreateOrderProps) => {
-  const { data } = await http.post<{ msg: string }>("/sales-return", {
-    ...order,
-  });
-  return data;
+  console.log(order);
+  try {
+    const { data } = await http.post<{ msg: string }>(
+      `/api/v1/order/return?id=${order?._id}`,
+      {
+        ...order,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.msg);
+  }
 };
 
+// Get all orders
 export const getOrders = async ({
-  queryKey,
-  pageParam = 0,
+  createdDate,
+  page,
+  limit,
+  searchTerm,
+  supplier,
+  order_return,
+  converted_date,
 }: {
-  queryKey: any[];
-  pageParam?: number;
+  createdDate: string | Date | null;
+  page: number;
+  limit: number;
+  searchTerm?: string;
+  supplier?: string;
+  order_return?: boolean;
+  converted_date?: string;
 }) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
+  const params = {
+    page,
+    limit,
+    order_return,
+    createdDate: createdDate ? createdDate : null,
+    searchTerm: searchTerm ? searchTerm : undefined,
+    supplier: supplier ? supplier : undefined,
+    converted_date: converted_date ? converted_date : undefined,
+  };
 
-  if (createdDate) {
-    params.createdDate = createdDate;
+  try {
+    const { data } = await http.get<IAllGetResponse<IOrder[]>>(
+      "/api/v1/order",
+      {
+        params,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.msg);
   }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<any>("/order", {
-    params: params,
-  });
-
-  return data;
 };
 
 export const getSalesReturn = async ({
@@ -94,7 +102,7 @@ export const getSalesReturn = async ({
 
 export const deleteOrder = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/order/" + id);
+    const { data } = await http.delete<{ msg: string }>("/api/v1/order/" + id);
     return data;
   } catch (error: any) {
     throw Error(error);

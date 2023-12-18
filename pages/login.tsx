@@ -1,16 +1,7 @@
-import { Box, Button, Container } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Container } from "@mui/material";
 import EmailLogin from "../components/Login/EmailLogin";
-import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const { user, logout } = useAuth();
-  const [admin, setAdmin] = useState<null | string>(null);
-
-  useEffect(() => {
-    setAdmin(localStorage.getItem("is-admin"));
-  }, [user]);
-
   return (
     <Container>
       <Box
@@ -22,8 +13,7 @@ const Login = () => {
         }}
       >
         <Box>
-          {admin !== "admin" ? <EmailLogin /> : <Button onClick={() => logout()}>Logout</Button>}
-          {/* <EmailLogin /> */}
+          <EmailLogin />
         </Box>
       </Box>
     </Container>

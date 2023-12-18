@@ -1,5 +1,7 @@
+import { IAllGetResponse, IGetResponse } from "../interfaces/common";
+import { IPurchase } from "../interfaces/purchase";
 import http from "./http-common";
-import { Supplier } from "./supplier-service";
+import { ISupplier } from "./supplier-service";
 
 export interface Product {
   _id: string;
@@ -19,15 +21,6 @@ export interface Purchase {
   createdDate: Date;
 }
 
-export interface Purchases {
-  purchase: Purchase[];
-  count: number;
-  page: string;
-  size: number;
-  totalPages: number;
-  totalPurchase: number;
-}
-
 export interface ReturnPurchases {
   purchaseReturns: Purchase[];
   count: number;
@@ -38,55 +31,72 @@ export interface ReturnPurchases {
 }
 
 export const createPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/purchase", {
-    ...formData,
-  });
-  return data;
+  try {
+    const { data } = await http.post<IGetResponse<IPurchase>>(
+      "/api/v1/purchase",
+      {
+        ...formData,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message);
+  }
 };
 
-export const createReturnPurchase = async (formData: Purchase) => {
-  const { data } = await http.post<{ msg: string }>("/purchase-return", {
-    ...formData,
-  });
-  return data;
+export const createReturnPurchase = async (id: string) => {
+  try {
+    const { data } = await http.post<IGetResponse<IPurchase>>(
+      "/api/v1/purchase/return",
+      { id }
+    );
+    return data;
+  } catch (error: any) {
+    throw new Error(error?.response?.data?.message);
+  }
 };
 
-export const getReturnPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
+export const getPurchases = async ({
+  createdDate,
+  page,
+  limit,
+  searchTerm,
+  supplier,
+  purchase_return,
+  converted_date,
+}: {
+  createdDate: string | null;
+  page: number;
+  limit: number;
+  searchTerm?: string;
+  supplier?: string;
+  purchase_return?: boolean;
+  converted_date?: string;
+}) => {
+  const params = {
+    page,
+    limit,
+    purchase_return,
+    createdDate: createdDate ? createdDate : null,
+    searchTerm: searchTerm ? searchTerm : undefined,
+    supplier: supplier ? supplier : undefined,
+    converted_date: converted_date ? converted_date : undefined,
+  };
 
-  if (createdDate) {
-    params.createdDate = createdDate;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<ReturnPurchases>("/purchase-return", {
-    params: params,
-  });
-  return data;
-};
-export const getPurchases = async ({ queryKey, pageParam = 0 }: { queryKey: any[]; pageParam?: number }) => {
-  const createdDate = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
-  const params: any = {};
-
-  if (createdDate) {
-    params.createdDate = createdDate;
-  }
-  if (pageParam) {
-    params.page = pageParam;
-  }
-
-  const { data } = await http.get<Purchases>("/purchase", {
-    params: params,
-  });
+  const { data } = await http.get<IAllGetResponse<IPurchase[]>>(
+    "/api/v1/purchase",
+    {
+      params: params,
+    }
+  );
   return data;
 };
 
 export const deletePurchase = async (id: string) => {
   try {
-    const { data } = await http.delete<{ msg: string }>("/purchase/" + id);
+    const { data } = await http.delete<{ msg: string }>(
+      "/api/v1/purchase/" + id
+    );
     return data;
   } catch (error: any) {
     throw Error(error);

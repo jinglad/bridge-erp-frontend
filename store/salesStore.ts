@@ -1,21 +1,26 @@
 import { createTrackedSelector } from "react-tracked";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { Product } from "../apis/product-service";
+import { IProduct } from "../apis/product-service";
+
+interface ICustomer {
+  _id: string;
+  customerName: string;
+}
 
 interface SalesStore {
-  customerName: string;
-  setCustomerName: (name: string) => void;
+  customer: ICustomer | null;
+  setCustomer: (data: ICustomer | null) => void;
   setProductName: (name: string) => void;
   productName: string;
   setBrandName: (name: string) => void;
   brandName: string;
   setCategoryName: (name: string) => void;
   categoryName: string;
-  cartItems: Product[];
-  addToCart: (product: Product) => void;
+  cartItems: IProduct[];
+  addToCart: (product: IProduct) => void;
   reset: () => void;
-  setCartItems: (cartItems: Product[]) => void;
+  setCartItems: (cartItems: IProduct[]) => void;
   deleteItemFromCart: (productId: string) => void;
 }
 
@@ -23,8 +28,8 @@ const useSalesStore = create<SalesStore>()(
   devtools(
     persist(
       (set) => ({
-        customerName: "",
-        setCustomerName: (name: string) => set({ customerName: name }),
+        customer: null,
+        setCustomer: (data: ICustomer | null) => set({ customer: data }),
         productName: "",
         setProductName: (name: string) => set({ productName: name }),
         brandName: "",
@@ -32,9 +37,11 @@ const useSalesStore = create<SalesStore>()(
         categoryName: "",
         setCategoryName: (name: string) => set({ categoryName: name }),
         cartItems: [],
-        addToCart: (product: Product) => {
+        addToCart: (product: IProduct) => {
           set((state) => {
-            const item = state.cartItems.findIndex((item) => item._id === product._id);
+            const item = state.cartItems.findIndex(
+              (item) => item._id === product._id
+            );
 
             if (item !== -1) {
               const newCartItems = [...state.cartItems];
@@ -48,7 +55,7 @@ const useSalesStore = create<SalesStore>()(
             };
           });
         },
-        setCartItems: (cartItems: Product[]) => {
+        setCartItems: (cartItems: IProduct[]) => {
           set(() => ({
             cartItems,
           }));
@@ -61,7 +68,7 @@ const useSalesStore = create<SalesStore>()(
         reset: () => {
           set((state) => ({
             cartItems: [],
-            customerName: "",
+            customer: null,
           }));
         },
       }),
