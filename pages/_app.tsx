@@ -36,7 +36,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Bridge Erp</title>
+        <title>Amjadia</title>
       </Head>
       <QueryClientProvider client={queryClient}>
         <AuthContextProvider>

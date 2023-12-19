@@ -31,10 +31,11 @@ import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
 import { IProduct } from "../apis/product-service";
 import { PrintContext } from "../context/PrintContext";
+import { ICustomer } from "../apis/customer-service";
 
 type PaymentDetailsDialogProps = {
   cartItems: IProduct[];
-  customerId: string;
+  customerId: ICustomer;
   onSuccess: () => void;
 };
 
@@ -126,7 +127,7 @@ const PaymentDetailsDialog = ({
         category: item.category?._id,
         brand: item.brand?._id,
       })),
-      customer: customerId,
+      customer: customerId?._id,
       converted_date: new Date(),
       createdDate: new Date().toDateString(),
       // createdDate: moment(new Date()).format("ddd MMM D YYYY"),
@@ -169,7 +170,7 @@ const PaymentDetailsDialog = ({
         cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
         Number(getValues("paid")),
       products: cartItems,
-      customer: customerId,
+      customer: customerId?.customerName,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     });
     router.push("/print-memo").then();

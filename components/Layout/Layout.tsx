@@ -72,7 +72,7 @@ export default function Layout({ children }: LayoutProps) {
                 cursor: "pointer",
               }}
             >
-              Bridge ERP
+              Amjadia
             </Typography>
           </Link>
           <Box flexGrow={1}>
