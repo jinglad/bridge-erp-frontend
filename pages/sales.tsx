@@ -235,7 +235,7 @@ function Sales({}: Props) {
               </TableContainer>
               <PaymentDetailsDialog
                 onSuccess={onPaymentSuccess}
-                customerId={customer?._id}
+                customerId={customer}
                 cartItems={cartItems}
               />
             </Box>
