@@ -15,14 +15,16 @@ export interface IDataSummary {
 //   }
 // };
 
-// export const getTotalStocks = async () => {
-//   try {
-//     const { data } = await http.get<ITotalStocks>("/total_purchase");
-//     return data;
-//   } catch (error: any) {
-//     throw Error(error.response.data.message);
-//   }
-// };
+export const getTotalStocks = async () => {
+  try {
+    const { data } = await http.get<IGetResponse<IDataSummary>>(
+      "/api/v1/product/total-stock"
+    );
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};
 
 export const getTodaySales = async () => {
   try {

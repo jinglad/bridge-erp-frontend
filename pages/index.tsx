@@ -8,14 +8,15 @@ import {
   getMonthlyPurchases,
   getMonthlySales,
   getTodaySales,
+  getTotalStocks,
 } from "../apis/dashboard-service";
 import Layout from "../components/Layout/Layout";
 
 const Home: NextPage = () => {
-  // const { data: totalStock, isLoading: totalStockLoading } = useQuery(
-  //   "total-stocks",
-  //   getTotalStocks
-  // );
+  const { data: totalStock, isLoading: totalStockLoading } = useQuery(
+    "total-stocks",
+    getTotalStocks
+  );
   const { data: todaySale, isLoading: todaySaleLoading } = useQuery(
     "today-sales",
     getTodaySales
@@ -62,7 +63,7 @@ const Home: NextPage = () => {
             </CardContent>
           </Card>
         ) : null}
-        {/* {!totalStockLoading ? (
+        {!totalStockLoading ? (
           <Card>
             <CardContent>
               <Typography sx={{ fontSize: 16 }} gutterBottom>
@@ -74,11 +75,11 @@ const Home: NextPage = () => {
                 fontWeight="bold"
                 fontSize="18px"
               >
-                ৳{totalStock?.total_stock.toFixed(2)}
+                ৳{totalStock?.data?.total.toFixed(2)}
               </Typography>
             </CardContent>
           </Card>
-        ) : null} */}
+        ) : null}
         {!monthlySaleLoading ? (
           <Card>
             <CardContent>
