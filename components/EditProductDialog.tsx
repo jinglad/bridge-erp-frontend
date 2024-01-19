@@ -22,7 +22,7 @@ import { ICategory } from "../../apis/category-service";
 import { IBrand } from "../../apis/brand-service";
 
 interface EditProductDialogProps {
-  product: IProduct;
+  product: Product;
   open: boolean;
   onClose: () => void;
 }
@@ -49,13 +49,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation(updateProduct, {
     onSuccess: (data) => {
-      toast.success(data?.message || "Product updated successfully");
-      queryClient.invalidateQueries(["products"]);
+      notify(data.msg);
+      queryClient.refetchQueries("searchedProducts");
       reset();
       onClose();
-    },
-    onError: (error: any) => {
-      toast.error(error?.message || "Something wen't wrong");
     },
   });
 
@@ -81,8 +78,8 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
     // console.log(data);
 
     await mutateAsync({
+      formData,
       id: product._id,
-      info: data,
     });
   };
 
@@ -94,16 +91,11 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <TextField
-                  required
-                  id="productName"
-                  label="Product Name"
-                  fullWidth
-                  {...register("name")}
-                />
+                <TextField required id="productName" label="Product Name" fullWidth {...register("name")} />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Autocomplete
+<<<<<<< HEAD:components/Product/EditProductDialog.tsx
                   loading={categoryLoading}
                   options={categories?.data || []}
                   getOptionLabel={(category) => category?.categorytitle}
@@ -120,13 +112,19 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                       setSelectedCategory(value);
                     }
                   }}
+=======
+                  disablePortal
+                  options={["Ata", "Moyda", "Suzi"]}
+                  defaultValue={product.category}
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c:components/EditProductDialog.tsx
                   renderInput={(params) => (
-                    <TextField {...params} label="Search category" required />
+                    <TextField defaultValue={product.category} {...register("category")} {...params} label="Category" />
                   )}
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Autocomplete
+<<<<<<< HEAD:components/Product/EditProductDialog.tsx
                   loading={brandLoading}
                   options={brands?.data || []}
                   getOptionLabel={(brand) => brand?.brandtitle}
@@ -145,6 +143,12 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   renderInput={(params) => (
                     <TextField {...params} label="Search brand" required />
                   )}
+=======
+                  disablePortal
+                  options={["Apple", "Banana", "Orange", "Mango", "Lichi"]}
+                  defaultValue={product.brand}
+                  renderInput={(params) => <TextField {...register("brand")} {...params} label="Brand" />}
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c:components/EditProductDialog.tsx
                 />
               </Grid>
               <Grid item xs={12} sm={4}>
@@ -194,12 +198,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                   {...register("qty")}
                 />
               </Grid>
-              {/* <Grid item xs={12} sm={6}>
+              <Grid item xs={12} sm={6}>
                 <Button fullWidth variant="contained" component="label">
                   <label htmlFor="files" style={{ width: "100%" }}>
-                    {getValues("file")[0]
-                      ? (getValues("file")[0] as any).name
-                      : "Please choose a image"}
+                    {getValues("file")[0] ? (getValues("file")[0] as any).name : "Please choose a image"}
                   </label>
                   <input
                     id="files"
@@ -211,15 +213,10 @@ function EditProductDialog({ onClose, open, product }: EditProductDialogProps) {
                     accept="image/*"
                   />
                 </Button>
-              </Grid> */}
-              <Grid item xs={12} sm={6} sx={{ textAlign: "start" }}>
+              </Grid>
+              <Grid item xs={12} sm={6} sx={{ textAlign: "end" }}>
                 <ButtonGroup>
-                  <LoadingButton
-                    color="success"
-                    variant="contained"
-                    type="submit"
-                    loading={isLoading}
-                  >
+                  <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
                     Submit
                   </LoadingButton>
                   <Button color="error" onClick={onClose}>

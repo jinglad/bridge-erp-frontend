@@ -12,8 +12,7 @@ const authFetch = axios.create({
 });
 
 authFetch.interceptors.request.use((config) => {
-  const token = getCookie("token");
-  config.headers!.Authorization = `Bearer ${token}`;
+  config.headers!.Authorization = `Bearer ${localStorage.getItem("token")}`;
   return config;
 });
 

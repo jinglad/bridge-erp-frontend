@@ -1,7 +1,7 @@
 import { IAllGetResponse, IGetResponse } from "../interfaces/common";
 import { IPurchase } from "../interfaces/purchase";
 import http from "./http-common";
-import { ISupplier } from "./supplier-service";
+import { Supplier } from "./supplier-service";
 
 export interface Product {
   _id: string;

@@ -1,13 +1,10 @@
 import { Box, Button, Typography } from "@mui/material";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { toast } from "react-toastify";
-import useUserStore from "../../store/userStore";
-import { setCookie } from "cookies-next";
-import { appConfig } from "../../config/appConfig";
-import { useLogin } from "../../hooks/user";
-import { ILoginResponse } from "../../interfaces/auth";
+import { auth } from "../../config/firebase";
+import { checkAdmin, useAuth } from "../../context/AuthContext";
 
 type Inputs = {
   email: string;
@@ -21,7 +18,10 @@ const EmailLogin = () => {
     formState: { errors, isSubmitting },
     reset,
   } = useForm<Inputs>();
-  const { setUser } = useUserStore((state) => state);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const { setUser } = useAuth();
   const router = useRouter();
 
   const handleSuccess = (data: ILoginResponse) => {
@@ -33,26 +33,6 @@ const EmailLogin = () => {
         id: user._id,
         role: user.role,
       });
-      setCookie("token", accessToken, {
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-      });
-      reset();
-      router.push("/");
-    } else {
-      toast.error("You are not admin");
-    }
-  };
-
-  const { mutate: login, isLoading } = useLogin({
-    handleSuccess,
-  });
-
-  const onSubmit: SubmitHandler<Inputs> = (input) => {
-    const { email, password } = input;
-    login({
-      email,
-      password,
-    });
   };
 
   return (
@@ -113,12 +93,12 @@ const EmailLogin = () => {
         <Box sx={{ width: "100%" }}>
           <Button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             sx={{
               width: "100%",
             }}
           >
-            {isLoading ? "Loading..." : "Login"}
+            {loading ? "Loading..." : "Login"}
           </Button>
         </Box>
       </Box>

@@ -1,7 +1,7 @@
 import { createTrackedSelector } from "react-tracked";
 import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
-import { IProduct } from "../apis/product-service";
+import { Product } from "../apis/product-service";
 
 interface ICustomer {
   _id: string;
@@ -17,10 +17,10 @@ interface SalesStore {
   brandName: string;
   setCategoryName: (name: string) => void;
   categoryName: string;
-  cartItems: IProduct[];
-  addToCart: (product: IProduct) => void;
+  cartItems: Product[];
+  addToCart: (product: Product) => void;
   reset: () => void;
-  setCartItems: (cartItems: IProduct[]) => void;
+  setCartItems: (cartItems: Product[]) => void;
   deleteItemFromCart: (productId: string) => void;
 }
 
@@ -37,11 +37,9 @@ const useSalesStore = create<SalesStore>()(
         categoryName: "",
         setCategoryName: (name: string) => set({ categoryName: name }),
         cartItems: [],
-        addToCart: (product: IProduct) => {
+        addToCart: (product: Product) => {
           set((state) => {
-            const item = state.cartItems.findIndex(
-              (item) => item._id === product._id
-            );
+            const item = state.cartItems.findIndex((item) => item._id === product._id);
 
             if (item !== -1) {
               const newCartItems = [...state.cartItems];
@@ -55,7 +53,7 @@ const useSalesStore = create<SalesStore>()(
             };
           });
         },
-        setCartItems: (cartItems: IProduct[]) => {
+        setCartItems: (cartItems: Product[]) => {
           set(() => ({
             cartItems,
           }));

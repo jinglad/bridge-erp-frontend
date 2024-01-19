@@ -13,31 +13,27 @@ import {
 import { useForm } from "react-hook-form";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { ISupplier, updateSupplier } from "../../apis/supplier-service";
+import { Supplier, updateSupplier } from "../apis/supplier-service";
 
 interface EditSupplierDialogProps {
-  supplier: ISupplier;
+  supplier: Supplier;
   open: boolean;
   onClose: () => void;
 }
 
-function EditSupplierDialog({
-  onClose,
-  open,
-  supplier,
-}: EditSupplierDialogProps) {
+function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps) {
   const queryClient = useQueryClient();
-
   const { mutateAsync, isLoading } = useMutation(updateSupplier, {
     onSuccess: (data) => {
       toast.success(data?.message || "Supplier updated successfully");
       queryClient.invalidateQueries(["suppliers"]);
       onClose();
     },
-    onError: (error: any) => {
-      toast.error(error.message || "Something wen't wrong");
-    },
   });
+
+  const notify = (msg: string) => {
+    toast.success(msg);
+  };
 
   const { register, handleSubmit, reset, getValues } = useForm({
     defaultValues: {
@@ -49,9 +45,13 @@ function EditSupplierDialog({
   });
 
   const onSubmit = async (data: any) => {
+<<<<<<< HEAD:components/Supplier/EditSupplierDialog.tsx
     // console.log(data);
     await mutateAsync({ id: supplier._id, input: data });
     reset();
+=======
+    await mutateAsync({ _id: supplier._id, ...data });
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c:components/EditSupplierDialog.tsx
   };
 
   return (
@@ -61,31 +61,13 @@ function EditSupplierDialog({
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField
-                required
-                id="Supplier"
-                {...register("name")}
-                label="Supplier Name"
-                fullWidth
-              />
+              <TextField required id="Supplier" {...register("name")} label="Supplier Name" fullWidth />
             </Grid>
             <Grid item xs={12}>
-              <TextField
-                required
-                id="email"
-                {...register("email")}
-                label="Email Address"
-                fullWidth
-              />
+              <TextField required id="emailAddress" {...register("email")} label="Email Address" fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField
-                required
-                {...register("phone")}
-                id="contactNo"
-                label="Contact No"
-                fullWidth
-              />
+              <TextField required {...register("phone")} id="contactNo" label="Contact No" fullWidth />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -98,12 +80,7 @@ function EditSupplierDialog({
             </Grid>
             <Grid item xs={12} sm={3}>
               <ButtonGroup>
-                <LoadingButton
-                  color="success"
-                  variant="contained"
-                  type="submit"
-                  loading={isLoading}
-                >
+                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
                   Submit
                 </LoadingButton>
                 <Button color="error" onClick={onClose}>

@@ -12,9 +12,11 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { default as Link, default as NextLink } from "next/link";
-import { Fragment, ReactNode, useEffect, useState } from "react";
-import useUserStore from "../../store/userStore";
+import Link from "next/link";
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React, { Fragment, ReactNode, useEffect, useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 import { hasChildren } from "../../utils/hasChildren";
 import LoginButton from "../Login/LoginButton";
 import { menu } from "./menu";
@@ -52,7 +54,9 @@ export default function Layout({ children }: LayoutProps) {
     }
   }, [matches]);
 
-  const { user, logout } = useUserStore((state) => state);
+  const { user, logout } = useAuth();
+
+  const router = useRouter();
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -63,6 +67,7 @@ export default function Layout({ children }: LayoutProps) {
       >
         <Toolbar>
           <Link href="/">
+<<<<<<< HEAD
             <Typography
               variant="h6"
               fontWeight="bold"
@@ -73,6 +78,12 @@ export default function Layout({ children }: LayoutProps) {
               }}
             >
               Amjadia
+=======
+            <Typography variant="h6" fontWeight="bold" noWrap component="div" sx={{
+              cursor: "pointer",
+            }}>
+              Bridge ERP
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
             </Typography>
           </Link>
           <Box flexGrow={1}>

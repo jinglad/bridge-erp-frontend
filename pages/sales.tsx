@@ -23,9 +23,15 @@ import TableRow from "@mui/material/TableRow";
 import { Box } from "@mui/system";
 import { Fragment, useEffect, useState } from "react";
 import { InfiniteData, useInfiniteQuery, useQueryClient } from "react-query";
+<<<<<<< HEAD
 import { getCustomers } from "../apis/customer-service";
 import { getAndSearchProduct, IProduct } from "../apis/product-service";
 import AddCustomerDialog from "../components/Customer/AddCustomerDialog";
+=======
+import { Customers, getCustomers } from "../apis/customer-service";
+import { getAndSearchProduct, Product, Products } from "../apis/product-service";
+import AddCustomerDialog from "../components/AddCustomerDialog";
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
 import Layout from "../components/Layout/Layout";
 import PaymentDetailsDialog from "../components/PaymentDetailsDialog";
 import useDebounce from "../hooks/useDebounce";
@@ -77,6 +83,7 @@ function Sales({}: Props) {
   const [selectedCategoryId, setSelectedCategoryId] = useState<any>(null);
   const [selectedBrandId, setSelectedBrandId] = useState<any>(null);
 
+<<<<<<< HEAD
   const [productPage, setProductPage] = useState(1);
 
   const { data, isLoading } = useProducts({
@@ -101,6 +108,66 @@ function Sales({}: Props) {
   // useEffect(() => {
   //   queryClient.refetchQueries("searchedProducts", { active: true });
   // }, [queryClient, productName, brandName, categoryName]);
+=======
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status, refetch } = useInfiniteQuery(
+    [
+      "searchedProducts",
+      debouncedProductNameSearchQuery,
+      debouncedBrandNameSearchQuery,
+      debouncedCategoryNameSearchQuery,
+    ],
+    getAndSearchProduct,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
+
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    queryClient.refetchQueries("searchedProducts", { active: true });
+  }, [queryClient, productName, brandName, categoryName]);
+
+  const getBrandFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const brands = data?.pages.flatMap((page) => page.products.map((product) => product.brand));
+    return [...new Set(brands)];
+  };
+
+  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+    return [...new Set(productName)];
+  };
+
+  const getCategoryFormattedData = (data: InfiniteData<Products> | undefined) => {
+    const categoryName = data?.pages.flatMap((page) => page.products.map((product) => product.category));
+    return [...new Set(categoryName)];
+  };
+
+  const { data: customerData, status: customerStatus } = useInfiniteQuery(
+    ["customers", debouncedCustomerNameSearchQuery],
+    getCustomers,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
+
+  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
+    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+    return [...new Set(customers)];
+  };
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
 
   const onPaymentSuccess = () => {
     reset();
@@ -109,7 +176,7 @@ function Sales({}: Props) {
     queryClient.refetchQueries("customers", { active: true });
   };
 
-  const isAvailable = (product: IProduct) => {
+  const isAvailable = (product: Product) => {
     const c = cartItems.find((item: any) => item._id === product._id);
 
     if (c) {
@@ -172,10 +239,7 @@ function Sales({}: Props) {
                     {cartItems?.map((product: any) => (
                       <TableRow key={product._id} hover>
                         <TableCell align="left">
-                          <IconButton
-                            size="small"
-                            onClick={() => deleteItemFromCart(product._id)}
-                          >
+                          <IconButton size="small" onClick={() => deleteItemFromCart(product._id)}>
                             <DeleteIcon fontSize="inherit" />
                           </IconButton>
                         </TableCell>
@@ -223,21 +287,21 @@ function Sales({}: Props) {
                             value={Number(product.sell_price).toString()}
                           />
                         </TableCell>
-                        <TableCell>
-                          {parseFloat(
-                            (product.sell_price * product.qty).toString()
-                          ).toFixed(2)}
-                        </TableCell>
+                        <TableCell>{parseFloat((product.sell_price * product.qty).toString()).toFixed(2)}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
               </TableContainer>
+<<<<<<< HEAD
               <PaymentDetailsDialog
                 onSuccess={onPaymentSuccess}
                 customerId={customer}
                 cartItems={cartItems}
               />
+=======
+              <PaymentDetailsDialog onSuccess={onPaymentSuccess} customerName={customerName} cartItems={cartItems} />
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
             </Box>
           </Box>
         </Grid>
@@ -339,6 +403,7 @@ function Sales({}: Props) {
               </Grid>
             ) : (
               <Fragment>
+<<<<<<< HEAD
                 {data?.data?.map((product, i) => (
                   <Grid
                     key={product._id}
@@ -372,6 +437,30 @@ function Sales({}: Props) {
                       }
                     >
                       {/* {row.image ? (
+=======
+                {data?.pages.map((group, i) => (
+                  <Fragment key={i}>
+                    {group?.products.map((row) => (
+                      <Grid key={row._id} item xs={12} sm={12} md={12} lg={6} xl={4}>
+                        <Card
+                          sx={{
+                            boxShadow: "rgba(149, 157, 165, 0.2) 0px 8px 24px",
+                            cursor: row.qty <= 0 ? "not-allowed" : !isAvailable(row) ? "not-allowed" : "pointer",
+                          }}
+                          onClick={() =>
+                            row.qty <= 0
+                              ? null
+                              : !isAvailable(row)
+                              ? null
+                              : addToCart({
+                                  ...row,
+                                  qty: 1,
+                                  available: row.qty,
+                                })
+                          }
+                        >
+                          {/* {row.image ? (
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
                             <CardMedia
                               component="img"
                               height="200"
@@ -384,6 +473,7 @@ function Sales({}: Props) {
                               image="/placeholder-image.png"
                             />
                           )} */}
+<<<<<<< HEAD
                       <CardContent sx={{ padding: "8px" }}>
                         <Typography variant="h6" component="div">
                           {product.name}
@@ -399,6 +489,25 @@ function Sales({}: Props) {
                       </CardContent>
                     </Card>
                   </Grid>
+=======
+                          <CardContent sx={{ padding: "8px" }}>
+                            <Typography variant="h6" component="div">
+                              {row.name}
+                            </Typography>
+                            <Stack direction="row" justifyContent="space-between">
+                              <Typography sx={{ lineHeight: 1 }} variant="h6">
+                                ৳{row.sell_price}
+                              </Typography>
+                              <Typography sx={{ lineHeight: 1 }} variant="h6">
+                                Qty {row.qty}
+                              </Typography>
+                            </Stack>
+                          </CardContent>
+                        </Card>
+                      </Grid>
+                    ))}
+                  </Fragment>
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
                 ))}
               </Fragment>
             )}

@@ -29,7 +29,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "react-query";
 import { toast } from "react-toastify";
 import { createOrder } from "../apis/order-service";
-import { IProduct } from "../apis/product-service";
+import { Product } from "../apis/product-service";
 import { PrintContext } from "../context/PrintContext";
 import { ICustomer } from "../apis/customer-service";
 

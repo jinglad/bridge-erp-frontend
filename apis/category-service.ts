@@ -1,68 +1,49 @@
-import { IAllGetResponse, IGetResponse } from "../interfaces/common";
 import http from "./http-common";
 
-export interface ICategory {
+export interface Category {
   _id: string;
   categorytitle: string;
 }
 
+export interface Categories {
+  categories: Category[];
+  page: string;
+  size: number;
+  totalPages: number;
+  totalCategories: number;
+}
+
 export const createCategory = async (categorytitle: string) => {
   try {
-    const { data } = await http.post<IGetResponse<ICategory>>(
-      "/api/v1/category",
-      {
-        categorytitle,
-      }
-    );
+    const { data } = await http.post<{ msg: string }>("/category", { categorytitle });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
   }
 };
 
-export const getCategory = async (id: string) => {
-  try {
-    const { data } = await http.get<IGetResponse<ICategory>>(
-      +"/api/v1/category/" + id
-    );
-    return data;
-  } catch (error: any) {
-    throw Error(error.response.data.message);
-  }
-};
+export const getCategories = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+  const categorytitle = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
+  const params: any = {};
 
-export const getCategories = async ({
-  page,
-  limit,
-  searchTerm,
-}: {
-  page: number;
-  limit: number;
-  searchTerm?: string;
-}) => {
-  try {
-    const { data } = await http.get<IAllGetResponse<ICategory[]>>(
-      "/api/v1/category",
-      {
-        params: {
-          page,
-          limit,
-          searchTerm: searchTerm ? searchTerm : undefined,
-        },
-      }
-    );
-    return data;
-  } catch (error: any) {
-    throw Error(error.response.data.message);
+  if (categorytitle) {
+    params.categorytitle = categorytitle;
   }
+  if (pageParam) {
+    params.page = pageParam;
+  }
+
+  const { data } = await http.get<Categories>("/category", {
+    params: params,
+  });
+  return data;
 };
 
 export const updateCategory = async ({ id, categorytitle }: any) => {
   try {
-    const { data } = await http.patch<IGetResponse<ICategory>>(
-      "/api/v1/category/" + id,
-      { categorytitle }
-    );
+    const { data } = await http.patch<{
+      msg: string;
+    }>("/category/" + id, { categorytitle });
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);
@@ -71,9 +52,7 @@ export const updateCategory = async ({ id, categorytitle }: any) => {
 
 export const deleteCategory = async (id: string) => {
   try {
-    const { data } = await http.delete<{ message: string }>(
-      "/api/v1/category/" + id
-    );
+    const { data } = await http.delete<{ msg: string }>("/category/" + id);
     return data;
   } catch (error: any) {
     throw Error(error.response.data.message);

@@ -1,36 +1,38 @@
-import {
-  AddOutlined,
-  DeleteOutline,
-  ModeEditOutlineOutlined,
-} from "@mui/icons-material";
+import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
   Button,
   ButtonGroup,
+  CircularProgress,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import { ICategory, deleteCategory } from "../../apis/category-service";
-import DeleteDialog from "../../components/DeleteDialog";
-import EditcategoryDialog from "../../components/Category/EditCategoryDialog";
+import { InfiniteData, useInfiniteQuery } from "react-query";
+import { Categories, Category, getCategories } from "../../apis/category-service";
+import EditcategoryDialog from "../../components/EditCategoryDialog";
 import Layout from "../../components/Layout/Layout";
-import DataTable from "../../components/Table/DataTable";
-import { useCategories } from "../../hooks/useCategories";
+
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import useDebounce from "../../hooks/useDebounce";
-import { IColumn } from "../../interfaces/common";
 
 type Props = {};
 
 function Categories({}: Props) {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [open, setOpen] = React.useState(false);
+<<<<<<< HEAD
   const [editModal, setEditModal] = useState<{
     open: boolean;
     data: ICategory | null;
@@ -39,41 +41,41 @@ function Categories({}: Props) {
     data: null,
   });
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+=======
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
   const [categoryName, setCategoryName] = useState("");
-  const debouncedCategoryName = useDebounce(categoryName, 500);
-  const [selected, setSelected] = useState<null | ICategory>(null);
-  const [page, setPage] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(10);
+  const [selected, setSelected] = useState<null | Category>(null);
+  const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
 
-  const { data, isLoading } = useCategories({
-    page: page + 1,
-    limit,
-    searchTerm: debouncedCategoryName,
-  });
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
+    ["categories", debouncedCategoryNameSearchQuery],
+    getCategories,
+    {
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
+      },
+    }
+  );
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
 
   const handleClose = () => {
     setOpen(false);
     setSelected(null);
   };
 
-  const { mutateAsync, isLoading: deleteLoading } = useMutation(
-    deleteCategory,
-    {
-      onSuccess: (data) => {
-        toast.success("Category deleted successfully");
-        queryClient.invalidateQueries(["categories"]);
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Something wen't wrong");
-      },
-    }
-  );
-
-  const handleDelete = async () => {
-    await mutateAsync(selected?._id as string);
-    setDeleteDialogOpen(false);
+  const getCategoryFormattedData = (data: InfiniteData<Categories> | undefined) => {
+    const categoryName = data?.pages.flatMap((page) => page.categories.map((cat) => cat.categorytitle));
+    return [...new Set(categoryName)];
   };
 
+<<<<<<< HEAD
   const columns: IColumn[] = [
     {
       field: "categorytitle",
@@ -113,6 +115,8 @@ function Categories({}: Props) {
     },
   ];
 
+=======
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
   return (
     <Layout>
       <Stack spacing={2}>
@@ -130,49 +134,75 @@ function Categories({}: Props) {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={isLoading}
-            options={
-              data?.data?.map((category) => category.categorytitle) || []
-            }
-            // onChange={(e, value) => {
-            //   setCategoryName(value || "");
-            // }}
+            loading={status === "loading"}
+            options={getCategoryFormattedData(data)}
             onInputChange={(e, value) => {
               setCategoryName(value);
               setPage(0);
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="search category"
-                variant="outlined"
-              />
-            )}
+            renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
           />
 
-          <Button
-            startIcon={<AddOutlined />}
-            onClick={() => router.push("/categories/create")}
-          >
+          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/categories/create")}>
             Add Category
           </Button>
         </Box>
-
-        <DataTable
-          isLoading={isLoading}
-          columns={columns}
-          rows={data?.data || []}
-          pagination={true}
-          total={data?.meta?.total}
-          paginationOptions={{
-            page,
-            limit,
-            handleChangePage: (e, page) => setPage(page),
-            handleChangePageSize: (e) => setLimit(+e.target.value),
-          }}
-        />
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Category Name </TableCell>
+                {/* <TableCell align="right">Actions</TableCell> */}
+              </TableRow>
+            </TableHead>
+            {status === "loading" ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <CircularProgress />
+              </TableBody>
+            ) : (
+              <>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.categories.map((row) => (
+                      <TableRow key={row._id}>
+                        <TableCell>{row.categorytitle}</TableCell>
+                        {/* <TableCell align="right">
+                          <ButtonGroup size="small">
+                            <Button
+                              color="info"
+                              variant="contained"
+                              onClick={() => {
+                                setSelected(row);
+                                handleClickOpen();
+                              }}
+                            >
+                              <ModeEditOutlineOutlinedIcon />
+                            </Button>
+                          </ButtonGroup>
+                        </TableCell> */}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                ))}
+              </>
+            )}
+          </Table>
+        </TableContainer>
+        <Box textAlign="center">
+          {hasNextPage && (
+            <LoadingButton
+              variant="contained"
+              loading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              Load More
+            </LoadingButton>
+          )}
+        </Box>
       </Stack>
 
+<<<<<<< HEAD
       {editModal.open && (
         <EditcategoryDialog
           onClose={() => setEditModal({ open: false, data: null })}
@@ -189,6 +219,9 @@ function Categories({}: Props) {
         handleDelete={handleDelete}
         deleteLoading={deleteLoading}
       />
+=======
+      {selected && <EditcategoryDialog onClose={handleClose} open={open} category={selected} key={selected._id} />}
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
     </Layout>
   );
 }

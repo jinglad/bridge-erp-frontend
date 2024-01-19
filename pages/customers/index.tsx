@@ -1,31 +1,33 @@
-import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import { LoadingButton } from "@mui/lab";
 import {
   Autocomplete,
-  Box,
   Button,
-  ButtonGroup,
+  CircularProgress,
+  Paper,
   Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
+import { Box } from "@mui/system";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { ICustomer, deleteCustomer } from "../../apis/customer-service";
+import { InfiniteData, useInfiniteQuery } from "react-query";
+import { Customers, getCustomers } from "../../apis/customer-service";
 import Layout from "../../components/Layout/Layout";
-import DataTable from "../../components/Table/DataTable";
-import { useCustomers } from "../../hooks/useCustomers";
-import useDebounce from "../../hooks/useDebounce";
-import { IColumn } from "../../interfaces/common";
-import { DeleteOutline, ModeEditOutlineOutlined } from "@mui/icons-material";
-import DeleteDialog from "../../components/DeleteDialog";
-import { useMutation, useQueryClient } from "react-query";
-import { toast } from "react-toastify";
-import EditCustomerDialog from "../../components/Customer/EditCustomerDialog";
+
+import AddOutlinedIcon from "@mui/icons-material/AddOutlined";
+import SearchIcon from "@mui/icons-material/Search";
 
 function Customer() {
   const router = useRouter();
-  const queryClient = useQueryClient();
   const [customerName, setCustomerName] = useState("");
+<<<<<<< HEAD
   const [selected, setSelected] = useState<null | ICustomer>(null);
   const [editModal, setEditModal] = useState<{
     open: boolean;
@@ -38,32 +40,29 @@ function Customer() {
   const debouncedCustomerName = useDebounce(customerName, 500);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
+=======
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
 
-  const { data, isLoading } = useCustomers({
-    page: page + 1,
-    limit,
-    searchTerm: debouncedCustomerName,
-  });
-
-  const { mutateAsync, isLoading: deleteLoading } = useMutation(
-    deleteCustomer,
+  const { data, fetchNextPage, hasNextPage, isFetching, isFetchingNextPage, status } = useInfiniteQuery(
+    ["customers", customerName],
+    getCustomers,
     {
-      onSuccess: (data) => {
-        console.log(data);
-        toast.success("Customer deleted successfully");
-        queryClient.invalidateQueries(["customers"]);
-      },
-      onError: (error: any) => {
-        toast.error(error.message || "Something wen't wrong");
+      getNextPageParam: (lastPage, pages) => {
+        if (pages.length === lastPage.totalPages) {
+          return undefined;
+        } else {
+          return pages.length;
+        }
       },
     }
   );
 
-  const handleDelete = async () => {
-    await mutateAsync(selected?._id as string);
-    setDeleteModal(false);
+  const getCustomerFormattedData = (data: InfiniteData<Customers> | undefined) => {
+    const customers = data?.pages.flatMap((page) => page.customer.map((c) => c.customerName));
+    return [...new Set(customers)];
   };
 
+<<<<<<< HEAD
   const columns: IColumn[] = [
     {
       field: "customerName",
@@ -103,6 +102,8 @@ function Customer() {
     },
   ];
 
+=======
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
   return (
     <Layout>
       <Stack spacing={2}>
@@ -118,47 +119,61 @@ function Customer() {
           }}
         >
           <Autocomplete
-            // freeSolo={true}
             sx={{ flex: 1 }}
-            loading={isLoading}
-            options={
-              data?.data?.map((customer) => customer?.customerName) || []
-            }
+            loading={status === "loading"}
+            options={getCustomerFormattedData(data)}
             onInputChange={(e, value) => {
               setCustomerName(value);
               setPage(0);
             }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                placeholder="search customers"
-                variant="outlined"
-              />
-            )}
+            renderInput={(params) => <TextField {...params} placeholder="search customer" variant="outlined" />}
           />
 
-          <Button
-            startIcon={<AddOutlinedIcon />}
-            onClick={() => router.push("/customers/create")}
-          >
+          <Button startIcon={<AddOutlinedIcon />} onClick={() => router.push("/customers/create")}>
             Add customer
           </Button>
         </Box>
+        <TableContainer component={Paper}>
+          <Table aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>customer Name </TableCell>
+              </TableRow>
+            </TableHead>
 
-        <DataTable
-          isLoading={isLoading}
-          columns={columns}
-          rows={data?.data || []}
-          pagination={true}
-          total={data?.meta?.total}
-          paginationOptions={{
-            page,
-            limit,
-            handleChangePage: (e, page) => setPage(page),
-            handleChangePageSize: (e) => setLimit(+e.target.value),
-          }}
-        />
+            {status === "loading" ? (
+              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
+                <CircularProgress />
+              </TableBody>
+            ) : (
+              <>
+                {data?.pages.map((group, i) => (
+                  <TableBody key={i}>
+                    {group?.customer.map((row) => (
+                      <TableRow key={row._id} >
+                        <TableCell>{row.customerName}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                ))}
+              </>
+            )}
+          </Table>
+        </TableContainer>
+        <Box textAlign="center">
+          {hasNextPage && (
+            <LoadingButton
+              variant="contained"
+              loading={isFetchingNextPage}
+              onClick={() => fetchNextPage()}
+              disabled={!hasNextPage || isFetchingNextPage}
+            >
+              Load More
+            </LoadingButton>
+          )}
+        </Box>
       </Stack>
+<<<<<<< HEAD
 
       {/* Edit & delete modal */}
       {editModal.open ? (
@@ -181,6 +196,8 @@ function Customer() {
         handleDelete={handleDelete}
         deleteLoading={deleteLoading}
       />
+=======
+>>>>>>> 3608fb80dcf57a98b0f021a5445f16e4321f5b1c
     </Layout>
   );
 }
