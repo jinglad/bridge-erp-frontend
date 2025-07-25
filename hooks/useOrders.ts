@@ -9,6 +9,7 @@ export const useOrders = ({
   supplier,
   order_return = false,
   converted_date,
+  customer,
 }: {
   createdDate?: string | Date | null;
   page?: number;
@@ -17,6 +18,7 @@ export const useOrders = ({
   supplier?: string;
   order_return?: boolean;
   converted_date?: string;
+  customer?: string | null;
 }) => {
   return useQuery({
     queryKey: [
@@ -28,6 +30,7 @@ export const useOrders = ({
       supplier,
       order_return,
       converted_date,
+      customer,
     ],
     queryFn: () =>
       getOrders({
@@ -38,6 +41,7 @@ export const useOrders = ({
         supplier,
         order_return,
         converted_date,
+        customer,
       }),
     keepPreviousData: false,
     refetchOnMount: true,

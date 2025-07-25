@@ -1,5 +1,6 @@
 import { DesktopDatePicker, LocalizationProvider } from "@mui/lab";
 import {
+  Autocomplete,
   Box,
   Button,
   ButtonGroup,
@@ -16,6 +17,7 @@ import ViewOrder from "../components/ViewOrderDialog";
 import { useOrders } from "../hooks/useOrders";
 import { IColumn } from "../interfaces/common";
 import { IOrder } from "../interfaces/order.interface";
+import { useCustomers } from "../hooks/useCustomers";
 
 type Props = {};
 
@@ -27,12 +29,19 @@ const Order = (props: Props) => {
   const [selected, setSelected] = useState<null | IOrder>(null);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(30);
+  const [selectedCustomer, setSelectedCustomer] = useState<null | string>(null);
 
   const { data, isLoading } = useOrders({
     page: page + 1,
     limit,
     createdDate,
     order_return: false,
+    customer: selectedCustomer,
+  });
+
+  const { data: customerData, isLoading: isLoadingCustomers } = useCustomers({
+    page: 1,
+    limit: 200,
   });
 
   const handleClickOpen = () => {
@@ -139,12 +148,30 @@ const Order = (props: Props) => {
                 )}
               />
             </LocalizationProvider>
-            {createdDate && (
+            <Autocomplete
+              disablePortal
+              options={customerData?.data ?? []}
+              getOptionLabel={(option) => option.customerName}
+              sx={{ width: 300 }}
+              renderInput={(params) => (
+                <TextField {...params} label="Customer" variant="outlined" />
+              )}
+              value={
+                selectedCustomer
+                  ? customerData?.data?.find((c) => c._id === selectedCustomer)
+                  : null
+              }
+              onChange={(e, value) => {
+                setSelectedCustomer(value?._id || null);
+              }}
+            />
+            {(createdDate || selectedCustomer) && (
               <Button
                 color="error"
                 onClick={() => {
                   setDate(null);
                   setCreatedDate(null);
+                  setSelectedCustomer(null);
                 }}
               >
                 clear

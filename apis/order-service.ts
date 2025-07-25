@@ -44,6 +44,7 @@ export const getOrders = async ({
   supplier,
   order_return,
   converted_date,
+  customer,
 }: {
   createdDate: string | Date | null;
   page: number;
@@ -52,6 +53,7 @@ export const getOrders = async ({
   supplier?: string;
   order_return?: boolean;
   converted_date?: string;
+  customer?: string | null;
 }) => {
   const params = {
     page,
@@ -61,6 +63,7 @@ export const getOrders = async ({
     searchTerm: searchTerm ? searchTerm : undefined,
     supplier: supplier ? supplier : undefined,
     converted_date: converted_date ? converted_date : undefined,
+    customer: customer ? customer : null,
   };
 
   try {
