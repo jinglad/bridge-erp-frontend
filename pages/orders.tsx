@@ -41,7 +41,7 @@ const Order = (props: Props) => {
 
   const { data: customerData, isLoading: isLoadingCustomers } = useCustomers({
     page: 1,
-    limit: 200,
+    limit: -1, // Fetch all customers
   });
 
   const handleClickOpen = () => {
