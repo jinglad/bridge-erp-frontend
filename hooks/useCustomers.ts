@@ -30,6 +30,7 @@ export const useCustomer = (id: string) => {
   return useQuery(["customers", id], () => getCustomer(id), {
     refetchOnWindowFocus: false,
     retry: 0,
+    enabled: !!id,
     onError: (error: IError) => {
       toast.error(error?.response?.data?.message);
     },

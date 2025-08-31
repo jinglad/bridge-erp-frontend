@@ -7,6 +7,7 @@ export interface IOrder {
   customerName?: string;
   products: IProduct[];
   to_be_paid: number;
+  to_be_paid_total: number;
   paid: number;
   payment_method: string;
   discount: number;
