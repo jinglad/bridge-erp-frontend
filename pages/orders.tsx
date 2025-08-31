@@ -83,7 +83,11 @@ const Order = (props: Props) => {
     },
     {
       field: "to_be_paid",
-      label: "To be paid",
+      label: "Due",
+    },
+    {
+      field: "to_be_paid_total",
+      label: "Total Due",
     },
     {
       field: "actions",
@@ -218,74 +222,3 @@ const Order = (props: Props) => {
 };
 
 export default Order;
-
-{
-  /*
-   *
-   *
-   * <TableContainer component={Paper}>
-          <Table aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Supplier</TableCell>
-                <TableCell>Paid</TableCell>
-                <TableCell>To be paid</TableCell>
-                <TableCell align="right">Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            {status === "loading" ? (
-              <TableBody sx={{ display: "flex", m: "4rem", width: "100%" }}>
-                <CircularProgress />
-              </TableBody>
-            ) : (
-              <>
-                {data?.pages.map((group, i) => (
-                  <TableBody key={i}>
-                    {group?.orders.map((row: any) => (
-                      <TableRow
-                        key={row._id}
-                        sx={{
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        <TableCell>{row.customer}</TableCell>
-                        <TableCell>
-                          {parseFloat(row.paid.toString()).toFixed(2)}
-                        </TableCell>
-                        <TableCell>
-                          {parseFloat(row.to_be_paid.toString()).toFixed(2)}
-                        </TableCell>
-                        <TableCell align="right">
-                          <ButtonGroup size="small">
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickOpen();
-                              }}
-                            >
-                              View
-                            </Button>
-                            <Button
-                              color="info"
-                              variant="contained"
-                              onClick={() => {
-                                setSelected(row);
-                                handleClickSalesOpen();
-                              }}
-                            >
-                              Return
-                            </Button>
-                          </ButtonGroup>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                ))}
-              </>
-            )}
-          </Table>
-        </TableContainer>
-   */
-}

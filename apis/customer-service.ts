@@ -4,6 +4,7 @@ import http from "./http-common";
 export interface ICustomer {
   _id: string;
   customerName: string;
+  to_be_paid?: number;
 }
 
 export const createCustomer = async (customerName: string) => {

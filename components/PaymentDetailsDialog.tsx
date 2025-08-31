@@ -32,6 +32,7 @@ import { createOrder } from "../apis/order-service";
 import { IProduct } from "../apis/product-service";
 import { PrintContext } from "../context/PrintContext";
 import { ICustomer } from "../apis/customer-service";
+import { useCustomer } from "../hooks/useCustomers";
 
 type PaymentDetailsDialogProps = {
   cartItems: IProduct[];
@@ -47,6 +48,10 @@ const PaymentDetailsDialog = ({
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
+
+  const { data: customerData, isLoading: customerDataLoading } = useCustomer(
+    customerId?._id
+  );
 
   const { mutateAsync, isLoading } = useMutation("createOrder", createOrder, {
     onSuccess: (data) => {
@@ -71,6 +76,7 @@ const PaymentDetailsDialog = ({
     }
   );
   const watchDiscount = watch("discount"); // you can supply default value as second argument
+  const watchPaid = watch("paid");
 
   useEffect(() => {
     setValue(
@@ -83,6 +89,10 @@ const PaymentDetailsDialog = ({
       )
     );
   }, [watchDiscount, cartItems, setValue]);
+
+  const totalAmount = (cartItems: IProduct[]) => {
+    return cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0);
+  };
 
   const onSubmit = async (data: any) => {
     //check if qty is available
@@ -107,12 +117,7 @@ const PaymentDetailsDialog = ({
       paid: Number(parseFloat(data.paid).toFixed(2)),
       to_be_paid: Number(
         parseFloat(
-          (
-            cartItems.reduce(
-              (acc, curr) => acc + curr.sell_price * curr.qty,
-              0
-            ) - Number(data.paid)
-          ).toString()
+          (totalAmount(cartItems) - Number(data.paid)).toString()
         ).toFixed(2)
       ),
       buy_total: Number(
@@ -132,43 +137,23 @@ const PaymentDetailsDialog = ({
       createdDate: new Date().toDateString(),
       // createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     };
-    // console.log(newOrder);
     await mutateAsync(newOrder);
     handleClose();
   };
 
-  const componentRef = useRef(null);
-
   const router = useRouter();
   const { setValue: setPrint } = useContext(PrintContext);
-
-  const pageStyle = `
-  @page {
-    size: 80mm auto;
-    margin: 0;
-    padding: 10px 15px;
-  }
-`;
-
-  const reactToPrintContent = useCallback(() => {
-    return componentRef.current;
-  }, [componentRef]);
-
-  // const handlePrint = useReactToPrint({
-  //   // content: reactToPrintContent,
-  //   // documentTitle: "AwesomeFileName",
-  //   // removeAfterPrint: true,
-  //   // pageStyle: pageStyle,
-  // });
 
   const handlePrint = () => {
     setPrint({
       payment_method: getValues("payment_method"),
       discount: Number(getValues("discount")),
       paid: Number(getValues("paid")),
-      to_be_paid:
-        cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
-        Number(getValues("paid")),
+      to_be_paid: totalAmount(cartItems) - Number(getValues("paid")),
+      to_be_paid_total:
+        totalAmount(cartItems) -
+          Number(getValues("paid")) +
+          customerData?.data?.to_be_paid! || 0,
       products: cartItems,
       customer: customerId?.customerName,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
@@ -252,11 +237,7 @@ const PaymentDetailsDialog = ({
                             inputProps={{
                               min: 0,
                               max: Math.ceil(
-                                cartItems.reduce(
-                                  (acc, curr) =>
-                                    acc + curr.sell_price * curr.qty,
-                                  0
-                                ) - watchDiscount
+                                totalAmount(cartItems) - watchDiscount
                               ),
                               step: "any",
                             }}
@@ -272,10 +253,7 @@ const PaymentDetailsDialog = ({
                             defaultValue={0}
                             inputProps={{
                               min: 0,
-                              max: cartItems.reduce(
-                                (acc, curr) => acc + curr.sell_price * curr.qty,
-                                0
-                              ),
+                              max: totalAmount(cartItems),
                               step: "any",
                             }}
                             {...register(`discount`)}
@@ -321,7 +299,21 @@ const PaymentDetailsDialog = ({
                     <TableCell colSpan={2}>Discount:</TableCell>
                     <TableCell>{watchDiscount}</TableCell>
                   </TableRow>
-
+                  <TableRow>
+                    <TableCell colSpan={2}>Total Due:</TableCell>
+                    <TableCell>
+                      {totalAmount(cartItems) -
+                        watchDiscount -
+                        watchPaid +
+                        (customerData?.data?.to_be_paid || 0)}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={2}>Current Due:</TableCell>
+                    <TableCell>
+                      {totalAmount(cartItems) - watchDiscount - watchPaid}
+                    </TableCell>
+                  </TableRow>
                   <TableRow>
                     <TableCell colSpan={2}>Net Total :</TableCell>
                     <TableCell id="netSalePrice">
@@ -342,18 +334,6 @@ const PaymentDetailsDialog = ({
                 </TableBody>
               </Table>
             </TableContainer>
-            {/* <OrderToPrint
-              ref={componentRef}
-              payment_method={getValues("payment_method")}
-              discount={Number(getValues("discount"))}
-              paid={Number(getValues("paid"))}
-              to_be_paid={
-                cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) - Number(getValues("paid"))
-              }
-              products={cartItems}
-              customer={customerName}
-              createdDate={moment(new Date()).format("ddd MMM D YYYY")}
-            /> */}
           </DialogContent>
           <DialogActions>
             <LoadingButton

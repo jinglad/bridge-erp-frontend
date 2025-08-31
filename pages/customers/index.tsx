@@ -71,6 +71,11 @@ function Customer() {
       align: "left",
     },
     {
+      field: "to_be_paid",
+      label: "Total Due",
+      align: "center",
+    },
+    {
       field: "actions",
       label: "Actions",
       align: "right",

@@ -31,29 +31,8 @@ interface ViewOrderProps {
 }
 
 function ViewOrder({ onClose, open, order }: ViewOrderProps) {
-  const componentRef = useRef(null);
-  const [printOpen, setPrintOpen] = useState(false);
   const router = useRouter();
   const { setValue } = useContext(PrintContext);
-
-  const pageStyle = `
-  @page {
-    size: 80mm auto;
-    margin: 0;
-    padding: 0;
-  }
-`;
-
-  const reactToPrintContent = useCallback(() => {
-    return componentRef.current;
-  }, [componentRef]);
-
-  // const handlePrint = useReactToPrint({
-  //   content: reactToPrintContent,
-  //   documentTitle: "AwesomeFileName",
-  //   removeAfterPrint: true,
-  //   pageStyle: pageStyle,
-  // });
 
   const handlePrint = () => {
     setValue({
@@ -61,6 +40,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       discount: Number(order.discount),
       paid: Number(order.paid),
       to_be_paid: order.to_be_paid,
+      to_be_paid_total: order.to_be_paid_total,
       products: order.products,
       customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
@@ -167,16 +147,6 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
           </Button>
         </DialogActions>
       </DialogContent>
-      {/* <OrderToPrint
-        ref={componentRef}
-        payment_method={order.payment_method}
-        discount={Number(order.discount)}
-        paid={Number(order.paid)}
-        to_be_paid={order.to_be_paid}
-        products={order.products}
-        customer={order.customer}
-        createdDate={moment(order.createdDate).format("ddd MMM D YYYY")}
-      /> */}
     </Dialog>
   );
 }
