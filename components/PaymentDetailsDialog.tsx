@@ -94,6 +94,15 @@ const PaymentDetailsDialog = ({
     return cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0);
   };
 
+  const getTotalDue = (cartItems: IProduct[]) => {
+    return Math.max(
+      0,
+      totalAmount(cartItems) -
+        Number(getValues("discount")) -
+        Number(getValues("paid"))
+    );
+  };
+
   const onSubmit = async (data: any) => {
     //check if qty is available
 
@@ -115,11 +124,7 @@ const PaymentDetailsDialog = ({
       payment_method: data.payment_method,
       discount: Number(data.discount),
       paid: Number(parseFloat(data.paid).toFixed(2)),
-      to_be_paid: Number(
-        parseFloat(
-          (totalAmount(cartItems) - Number(data.paid)).toString()
-        ).toFixed(2)
-      ),
+      to_be_paid: getTotalDue(cartItems).toFixed(2),
       buy_total: Number(
         parseFloat(
           cartItems
@@ -132,7 +137,10 @@ const PaymentDetailsDialog = ({
         category: item.category?._id,
         brand: item.brand?._id,
       })),
-      customer: customerId?._id,
+      customer: {
+        id: customerId._id,
+        to_be_paid: customerData?.data?.to_be_paid || 0,
+      },
       converted_date: new Date(),
       createdDate: new Date().toDateString(),
       // createdDate: moment(new Date()).format("ddd MMM D YYYY"),
@@ -149,11 +157,19 @@ const PaymentDetailsDialog = ({
       payment_method: getValues("payment_method"),
       discount: Number(getValues("discount")),
       paid: Number(getValues("paid")),
-      to_be_paid: totalAmount(cartItems) - Number(getValues("paid")),
-      to_be_paid_total:
+      to_be_paid: Math.max(
+        0,
         totalAmount(cartItems) -
+          Number(getValues("discount")) -
+          Number(getValues("paid"))
+      ),
+      to_be_paid_total: Math.max(
+        0,
+        totalAmount(cartItems) -
+          Number(getValues("discount")) -
           Number(getValues("paid")) +
-          customerData?.data?.to_be_paid! || 0,
+          (customerData?.data?.to_be_paid || 0)
+      ),
       products: cartItems,
       customer: customerId?.customerName,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
@@ -237,7 +253,9 @@ const PaymentDetailsDialog = ({
                             inputProps={{
                               min: 0,
                               max: Math.ceil(
-                                totalAmount(cartItems) - watchDiscount
+                                totalAmount(cartItems) -
+                                  watchDiscount +
+                                  customerData?.data?.to_be_paid!
                               ),
                               step: "any",
                             }}
@@ -302,16 +320,22 @@ const PaymentDetailsDialog = ({
                   <TableRow>
                     <TableCell colSpan={2}>Total Due:</TableCell>
                     <TableCell>
-                      {totalAmount(cartItems) -
-                        watchDiscount -
-                        watchPaid +
-                        (customerData?.data?.to_be_paid || 0)}
+                      {Math.max(
+                        0,
+                        totalAmount(cartItems) -
+                          watchDiscount +
+                          (customerData?.data?.to_be_paid || 0) -
+                          watchPaid
+                      )}
                     </TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={2}>Current Due:</TableCell>
                     <TableCell>
-                      {totalAmount(cartItems) - watchDiscount - watchPaid}
+                      {Math.max(
+                        0,
+                        totalAmount(cartItems) - watchDiscount - watchPaid
+                      )}
                     </TableCell>
                   </TableRow>
                   <TableRow>
