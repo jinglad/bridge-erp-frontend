@@ -170,6 +170,7 @@ const PaymentDetailsDialog = ({
           Number(getValues("paid")) +
           (customerData?.data?.to_be_paid || 0)
       ),
+      previous_due: customerData?.data?.to_be_paid || 0,
       products: cartItems,
       customer: customerId?.customerName,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
@@ -238,7 +239,7 @@ const PaymentDetailsDialog = ({
                   <TableRow>
                     <TableCell
                       colSpan={3}
-                      rowSpan={4}
+                      rowSpan={5}
                       sx={{ maxWidth: "200px" }}
                     >
                       <Grid container spacing={1}>
@@ -318,15 +319,9 @@ const PaymentDetailsDialog = ({
                     <TableCell>{watchDiscount}</TableCell>
                   </TableRow>
                   <TableRow>
-                    <TableCell colSpan={2}>Total Due:</TableCell>
+                    <TableCell colSpan={2}>Previous Due:</TableCell>
                     <TableCell>
-                      {Math.max(
-                        0,
-                        totalAmount(cartItems) -
-                          watchDiscount +
-                          (customerData?.data?.to_be_paid || 0) -
-                          watchPaid
-                      )}
+                      {Math.max(0, customerData?.data?.to_be_paid || 0)}
                     </TableCell>
                   </TableRow>
                   <TableRow>
@@ -338,6 +333,19 @@ const PaymentDetailsDialog = ({
                       )}
                     </TableCell>
                   </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={2}>Total Due:</TableCell>
+                    <TableCell>
+                      {Math.max(
+                        0,
+                        totalAmount(cartItems) -
+                          watchDiscount +
+                          (customerData?.data?.to_be_paid || 0) -
+                          watchPaid
+                      )}
+                    </TableCell>
+                  </TableRow>
+
                   <TableRow>
                     <TableCell colSpan={2}>Net Total :</TableCell>
                     <TableCell id="netSalePrice">

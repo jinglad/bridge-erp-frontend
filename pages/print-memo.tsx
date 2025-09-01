@@ -14,6 +14,7 @@ const PrintMemoPage = () => {
     products,
     to_be_paid,
     to_be_paid_total,
+    previous_due,
     createdDate,
   } = value;
 
@@ -212,6 +213,35 @@ const PrintMemoPage = () => {
           }}
         >
           ৳{parseFloat(paid?.toString()).toFixed(2)}
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "14px!important",
+          p: "3px 12px",
+          fontWeight: 900,
+          fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr: 1,
+        }}
+      >
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          Previous Due
+        </Box>
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          ৳{parseFloat(previous_due?.toString()).toFixed(2)}
         </Box>
       </Box>
       <Box
