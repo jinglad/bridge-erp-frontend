@@ -16,12 +16,10 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import { Router, useRouter } from "next/router";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useReactToPrint } from "react-to-print";
+import { useRouter } from "next/router";
+import { useContext } from "react";
 
 import { PrintContext } from "../context/PrintContext";
-import { OrderToPrint } from "./OrderToPrint";
 import { IOrder } from "../interfaces/order.interface";
 
 interface ViewOrderProps {
@@ -41,7 +39,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       paid: Number(order.paid),
       to_be_paid: order.to_be_paid,
       to_be_paid_total: order.to_be_paid_total,
-      previous_due: Math.max(0, order.to_be_paid_total - order.to_be_paid),
+      previous_due: order.previous_due,
       products: order.products,
       customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
