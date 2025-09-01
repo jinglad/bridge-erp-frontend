@@ -14,4 +14,5 @@ export interface IOrder {
   order_return: boolean;
   buy_total: number;
   createdDate?: Date;
+  previous_due?: number;
 }

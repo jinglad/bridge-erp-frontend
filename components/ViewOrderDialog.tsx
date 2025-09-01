@@ -41,6 +41,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       paid: Number(order.paid),
       to_be_paid: order.to_be_paid,
       to_be_paid_total: order.to_be_paid_total,
+      previous_due: Math.max(0, order.to_be_paid_total - order.to_be_paid),
       products: order.products,
       customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
