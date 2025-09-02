@@ -40,6 +40,19 @@ type PaymentDetailsDialogProps = {
   onSuccess: () => void;
 };
 
+export const totalAmount = (cartItems: IProduct[]) => {
+  return cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0);
+};
+
+export const calculateNetTotal = (
+  cartItems: IProduct[],
+  discount: number = 0,
+  previousDue: number = 0
+) => {
+  const total = totalAmount(cartItems);
+  return total - discount + previousDue;
+};
+
 const PaymentDetailsDialog = ({
   cartItems,
   customerId,
@@ -82,17 +95,14 @@ const PaymentDetailsDialog = ({
     setValue(
       "paid",
       Number(
-        (
-          cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0) -
-          watchDiscount
+        calculateNetTotal(
+          cartItems,
+          watchDiscount,
+          customerData?.data?.to_be_paid || 0
         ).toFixed(2)
       )
     );
-  }, [watchDiscount, cartItems, setValue]);
-
-  const totalAmount = (cartItems: IProduct[]) => {
-    return cartItems.reduce((acc, curr) => acc + curr.sell_price * curr.qty, 0);
-  };
+  }, [watchDiscount, cartItems, setValue, customerData?.data?.to_be_paid]);
 
   const getTotalDue = (cartItems: IProduct[]) => {
     return Math.max(
@@ -101,6 +111,16 @@ const PaymentDetailsDialog = ({
         Number(getValues("discount")) -
         Number(getValues("paid"))
     );
+  };
+
+  const calculateTotalDueAmount = (
+    cartItems: IProduct[],
+    discount: number = 0,
+    paid: number = 0,
+    previousDue: number = 0
+  ) => {
+    const netTotal = calculateNetTotal(cartItems, discount, previousDue);
+    return Math.max(0, netTotal - paid);
   };
 
   const onSubmit = async (data: any) => {
@@ -172,6 +192,11 @@ const PaymentDetailsDialog = ({
       ),
       previous_due: customerData?.data?.to_be_paid || 0,
       products: cartItems,
+      netTotal: calculateNetTotal(
+        cartItems,
+        watchDiscount,
+        customerData?.data?.to_be_paid || 0
+      ),
       customer: customerId?.customerName,
       createdDate: moment(new Date()).format("ddd MMM D YYYY"),
     });
@@ -254,9 +279,11 @@ const PaymentDetailsDialog = ({
                             inputProps={{
                               min: 0,
                               max: Math.ceil(
-                                totalAmount(cartItems) -
-                                  watchDiscount +
-                                  customerData?.data?.to_be_paid!
+                                calculateNetTotal(
+                                  cartItems,
+                                  watchDiscount,
+                                  customerData?.data?.to_be_paid || 0
+                                )
                               ),
                               step: "any",
                             }}
@@ -336,12 +363,11 @@ const PaymentDetailsDialog = ({
                   <TableRow>
                     <TableCell colSpan={2}>Total Due:</TableCell>
                     <TableCell>
-                      {Math.max(
-                        0,
-                        totalAmount(cartItems) -
-                          watchDiscount +
-                          (customerData?.data?.to_be_paid || 0) -
-                          watchPaid
+                      {calculateTotalDueAmount(
+                        cartItems,
+                        watchDiscount,
+                        watchPaid,
+                        customerData?.data?.to_be_paid || 0
                       )}
                     </TableCell>
                   </TableRow>
@@ -350,15 +376,10 @@ const PaymentDetailsDialog = ({
                     <TableCell colSpan={2}>Net Total :</TableCell>
                     <TableCell id="netSalePrice">
                       {parseFloat(
-                        (watchDiscount
-                          ? cartItems.reduce(
-                              (acc, curr) => acc + curr.sell_price * curr.qty,
-                              0
-                            ) - watchDiscount
-                          : cartItems.reduce(
-                              (acc, curr) => acc + curr.sell_price * curr.qty,
-                              0
-                            )
+                        calculateNetTotal(
+                          cartItems,
+                          watchDiscount,
+                          customerData?.data?.to_be_paid || 0
                         ).toString()
                       ).toFixed(2)}
                     </TableCell>

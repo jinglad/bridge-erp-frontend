@@ -21,6 +21,7 @@ import { useContext } from "react";
 
 import { PrintContext } from "../context/PrintContext";
 import { IOrder } from "../interfaces/order.interface";
+import { calculateNetTotal } from "./PaymentDetailsDialog";
 
 interface ViewOrderProps {
   order: IOrder;
@@ -43,6 +44,11 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       products: order.products,
       customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
+      netTotal: calculateNetTotal(
+        order.products,
+        order.discount,
+        order.previous_due
+      ),
     });
     router.push("/print-memo").then();
   };
