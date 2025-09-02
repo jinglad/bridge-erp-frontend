@@ -209,7 +209,7 @@ const PrintMemoPage = () => {
             fontWeight: 900,
           }}
         >
-          {capitalizeFirstLetter(payment_method)}
+          Previous Due
         </Box>
         <Box
           sx={{
@@ -217,7 +217,7 @@ const PrintMemoPage = () => {
             fontWeight: 900,
           }}
         >
-          ৳{parseFloat(paid?.toString()).toFixed(2)}
+          ৳{parseFloat(previous_due?.toString()).toFixed(2)}
         </Box>
       </Box>
       <Box
@@ -238,7 +238,7 @@ const PrintMemoPage = () => {
             fontWeight: 900,
           }}
         >
-          Previous Due
+          {capitalizeFirstLetter(payment_method)}
         </Box>
         <Box
           sx={{
@@ -246,7 +246,7 @@ const PrintMemoPage = () => {
             fontWeight: 900,
           }}
         >
-          ৳{parseFloat(previous_due?.toString()).toFixed(2)}
+          ৳{parseFloat(paid?.toString()).toFixed(2)}
         </Box>
       </Box>
       <Box
