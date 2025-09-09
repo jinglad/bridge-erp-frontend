@@ -4,13 +4,21 @@ import {
   Box,
   Button,
   ButtonGroup,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Stack,
   TextField,
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { ICustomer, deleteCustomer } from "../../apis/customer-service";
+import {
+  ICustomer,
+  deleteCustomer,
+  updateCustomerDue,
+} from "../../apis/customer-service";
 import Layout from "../../components/Layout/Layout";
 import DataTable from "../../components/Table/DataTable";
 import { useCustomers } from "../../hooks/useCustomers";
@@ -35,6 +43,16 @@ function Customer() {
     data: null,
   });
   const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [paymentModal, setPaymentModal] = useState<{
+    open: boolean;
+    customer: ICustomer | null;
+  }>({
+    open: false,
+    customer: null,
+  });
+  const [paymentInputs, setPaymentInputs] = useState<{ [key: string]: number }>(
+    {}
+  );
   const debouncedCustomerName = useDebounce(customerName, 500);
   const [page, setPage] = useState<number>(0);
   const [limit, setLimit] = useState<number>(10);
@@ -64,6 +82,39 @@ function Customer() {
     setDeleteModal(false);
   };
 
+  const handleOpenPaymentModal = (customer: ICustomer) => {
+    setPaymentModal({ open: true, customer });
+  };
+
+  const handleClosePaymentModal = () => {
+    setPaymentModal({ open: false, customer: null });
+  };
+
+  const handlePaymentSubmit = async (paymentAmount: number) => {
+    if (!paymentModal.customer) return;
+
+    if (paymentAmount <= 0) {
+      toast.error("Payment amount must be greater than zero.");
+      return;
+    }
+    if (paymentAmount > (paymentModal.customer.to_be_paid || 0)) {
+      toast.error("Payment amount exceeds the customer's total due.");
+      return;
+    }
+
+    const newDueAmount =
+      (paymentModal.customer.to_be_paid || 0) - paymentAmount;
+
+    try {
+      await updateCustomerDue(paymentModal.customer._id, newDueAmount);
+      toast.success("Payment successful");
+      queryClient.invalidateQueries(["customers"]);
+      handleClosePaymentModal();
+    } catch (error: any) {
+      toast.error(error.message || "Payment failed");
+    }
+  };
+
   const columns: IColumn[] = [
     {
       field: "customerName",
@@ -74,6 +125,25 @@ function Customer() {
       field: "to_be_paid",
       label: "Total Due",
       align: "center",
+    },
+    {
+      field: "payment",
+      label: "Payment",
+      align: "center",
+      render: (row: ICustomer) => {
+        if (row.to_be_paid && row.to_be_paid > 0) {
+          return (
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => handleOpenPaymentModal(row)}
+            >
+              Pay
+            </Button>
+          );
+        }
+        return <></>;
+      },
     },
     {
       field: "actions",
@@ -186,6 +256,42 @@ function Customer() {
         handleDelete={handleDelete}
         deleteLoading={deleteLoading}
       />
+
+      {/* Payment modal */}
+      {paymentModal.open && (
+        <Dialog open={paymentModal.open} onClose={handleClosePaymentModal}>
+          <DialogTitle>Make a Payment</DialogTitle>
+          <DialogContent>
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Payment Amount"
+              type="number"
+              fullWidth
+              onChange={(e) =>
+                setPaymentInputs({
+                  [paymentModal.customer?._id || ""]: Number(e.target.value),
+                })
+              }
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClosePaymentModal} color="secondary">
+              Cancel
+            </Button>
+            <Button
+              onClick={() =>
+                handlePaymentSubmit(
+                  paymentInputs[paymentModal.customer?._id || ""] || 0
+                )
+              }
+              color="primary"
+            >
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Layout>
   );
 }
