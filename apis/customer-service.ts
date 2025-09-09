@@ -88,3 +88,17 @@ export const deleteCustomer = async (id: string) => {
     throw Error(error.response.data.message);
   }
 };
+
+export const updateCustomerDue = async (id: string, to_be_paid: number) => {
+  try {
+    const { data } = await http.patch<IGetResponse<ICustomer>>(
+      `/api/v1/customer/${id}`,
+      {
+        to_be_paid,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
+};

@@ -144,7 +144,12 @@ const PaymentDetailsDialog = ({
       payment_method: data.payment_method,
       discount: Number(data.discount),
       paid: Number(parseFloat(data.paid).toFixed(2)),
-      to_be_paid: getTotalDue(cartItems).toFixed(2),
+      to_be_paid: Math.max(
+        0,
+        totalAmount(cartItems) -
+          Number(getValues("discount")) -
+          Number(getValues("paid"))
+      ),
       buy_total: Number(
         parseFloat(
           cartItems
@@ -183,18 +188,17 @@ const PaymentDetailsDialog = ({
           Number(getValues("discount")) -
           Number(getValues("paid"))
       ),
-      to_be_paid_total: Math.max(
-        0,
-        totalAmount(cartItems) -
-          Number(getValues("discount")) -
-          Number(getValues("paid")) +
-          (customerData?.data?.to_be_paid || 0)
+      to_be_paid_total: calculateTotalDueAmount(
+        cartItems,
+        Number(getValues("discount")),
+        Number(getValues("paid")),
+        customerData?.data?.to_be_paid || 0
       ),
       previous_due: customerData?.data?.to_be_paid || 0,
       products: cartItems,
       netTotal: calculateNetTotal(
         cartItems,
-        watchDiscount,
+        Number(getValues("discount")),
         customerData?.data?.to_be_paid || 0
       ),
       customer: customerId?.customerName,
