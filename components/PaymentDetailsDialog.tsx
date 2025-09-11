@@ -303,7 +303,12 @@ const PaymentDetailsDialog = ({
                             defaultValue={0}
                             inputProps={{
                               min: 0,
-                              max: totalAmount(cartItems),
+                              max: calculateTotalDueAmount(
+                                cartItems,
+                                0,
+                                0,
+                                customerData?.data?.to_be_paid || 0
+                              ),
                               step: "any",
                             }}
                             {...register(`discount`)}
