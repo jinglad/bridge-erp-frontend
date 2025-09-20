@@ -80,14 +80,23 @@ const Order = (props: Props) => {
     {
       field: "paid",
       label: "Paid",
+      render(row) {
+        return row.paid?.toFixed(2);
+      },
     },
     {
       field: "to_be_paid",
       label: "Due",
+      render(row) {
+        return row.to_be_paid?.toFixed(2);
+      },
     },
     {
       field: "to_be_paid_total",
       label: "Total Due",
+      render(row) {
+        return row.to_be_paid_total?.toFixed(2);
+      },
     },
     {
       field: "actions",
