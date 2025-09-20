@@ -150,6 +150,12 @@ const PaymentDetailsDialog = ({
           Number(getValues("discount")) -
           Number(getValues("paid"))
       ),
+      to_be_paid_total: calculateTotalDueAmount(
+        cartItems,
+        Number(data.discount),
+        Number(data.paid),
+        customerData?.data?.to_be_paid || 0
+      ),
       buy_total: Number(
         parseFloat(
           cartItems
