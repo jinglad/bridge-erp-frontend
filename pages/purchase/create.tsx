@@ -1,21 +1,37 @@
 import { LoadingButton } from "@mui/lab";
-import { Autocomplete, Button, ButtonGroup, Grid, TextField, Typography } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  ButtonGroup,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import { useState } from "react";
 import { useFieldArray, useForm } from "react-hook-form";
-import { InfiniteData, useInfiniteQuery, useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { getAndSearchProduct, Products } from "../../apis/product-service";
 import { createPurchase } from "../../apis/purchase-service";
-import { getSupplier, Suppliers } from "../../apis/supplier-service";
 import Layout from "../../components/Layout/Layout";
+import useDebounce from "../../hooks/useDebounce";
+import { useProducts } from "../../hooks/useProducts";
+import { useSuppliers } from "../../hooks/useSuppliers";
 import { useTrackedPurchaseStore } from "../../store/purchaseStore";
 
 const PurchaseCreate = () => {
-  const { purchaseForm, setPurchaseForm, resetPurchaseForm } = useTrackedPurchaseStore();
+  const queryClient = useQueryClient();
+  const [productName, setProductName] = useState("");
+  const [supplierName, setSupplierName] = useState("");
+  const debouncedSupplierName = useDebounce(supplierName, 500);
+  const debouncedProductName = useDebounce(productName, 500);
 
-  const { register, control, handleSubmit, setValue, watch, resetField } = useForm({
-    defaultValues: purchaseForm,
-  });
+  const { purchaseForm, setPurchaseForm, resetPurchaseForm } =
+    useTrackedPurchaseStore();
+
+  const { register, control, handleSubmit, setValue, watch, resetField } =
+    useForm({
+      defaultValues: purchaseForm,
+    });
   const { fields, append, remove } = useFieldArray({
     control,
     name: "products",
@@ -26,62 +42,52 @@ const PurchaseCreate = () => {
     setPurchaseForm(data);
   });
 
-  const [productName, setProductName] = useState("");
-
-  const { mutate, mutateAsync, isLoading } = useMutation("createPurchase", createPurchase, {
-    onSuccess: async (data) => {
-      toast.success(data.msg);
-      resetField("products", {
-        defaultValue: [{ name: "", qty: 0, sell_price: 0, buy_price: 0, _id: "" }],
-      });
-      resetField("supplier", {
-        defaultValue: "",
-      });
-      resetPurchaseForm();
-    },
-    onError: (error: any) => {
-      toast.error(error.response.data.msg);
-    },
-  });
+  const { mutateAsync, isLoading } = useMutation(
+    "createPurchase",
+    createPurchase,
+    {
+      onSuccess: async (data) => {
+        toast.success(data?.message || "Purchase Created Successfully");
+        resetField("products", {
+          defaultValue: [
+            { name: "", purchase_qty: 0, sell_price: 0, buy_price: 0, _id: "" },
+          ],
+        });
+        resetField("supplier", {
+          defaultValue: "",
+        });
+        resetPurchaseForm();
+        // queryClient.invalidateQueries(["purchases"]);
+      },
+      onError: (error: any) => {
+        toast.error(error?.message || "Something went wrong");
+      },
+    }
+  );
 
   const onSubmit = async (data: any) => {
-    await mutateAsync({
+    const inputData = {
       ...data,
+      supplier: data.supplier._id,
+      paid: data.products.reduce(
+        (acc: number, cur: any) => acc + cur.buy_price * cur.purchase_qty,
+        0
+      ),
       to_be_paid: 0,
-      paid: data.products.reduce((acc: number, cur: any) => acc + cur.buy_price * cur.qty, 0),
+      createdDate: new Date().toDateString(),
+      converted_date: new Date().toISOString(),
       payment_method: "cash",
-    });
+    };
+    await mutateAsync(inputData);
   };
 
-  const { data, status } = useInfiniteQuery(["searchedProducts", productName], getAndSearchProduct, {
-    getNextPageParam: (lastPage, pages) => {
-      if (pages.length === lastPage.totalPages) {
-        return undefined;
-      } else {
-        return pages.length;
-      }
-    },
+  const { data: productsData, isLoading: productsLoading } = useProducts({
+    searchTerm: debouncedProductName,
   });
 
-  const { data: spData, status: spStatus } = useInfiniteQuery(["suppliers", purchaseForm.supplier], getSupplier, {
-    getNextPageParam: (lastPage, pages) => {
-      if (pages.length === lastPage.totalPages) {
-        return undefined;
-      } else {
-        return pages.length;
-      }
-    },
+  const { data: spData, isLoading: spLoading } = useSuppliers({
+    searchTerm: debouncedSupplierName,
   });
-
-  const getSupplierFormattedData = (data: InfiniteData<Suppliers> | undefined) => {
-    const brands = data?.pages.flatMap((page) => page.supplier.map((sp) => sp.name));
-    return [...new Set(brands)];
-  };
-
-  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const productName = data?.pages.flatMap((page) => page.products);
-    return productName || [];
-  };
 
   return (
     <Layout>
@@ -95,31 +101,23 @@ const PurchaseCreate = () => {
             <Grid container item spacing={3}>
               <Grid item xs={12} sm={6}>
                 <Autocomplete
-                  loading={spStatus === "loading"}
-                  options={getSupplierFormattedData(spData)}
+                  loading={spLoading}
+                  options={spData?.data || []}
+                  getOptionLabel={(option) => option.name}
+                  isOptionEqualToValue={(option, value) =>
+                    option?._id === value?._id
+                  }
                   onChange={(e, value) => {
                     if (value) {
-                      setPurchaseForm({ ...purchaseForm, supplier: value });
+                      setValue("supplier", value);
                     }
                   }}
                   onInputChange={(event, newInputValue, reason) => {
-                    if (reason === "clear") {
-                      setPurchaseForm({ ...purchaseForm, supplier: "" });
-                    }
-                    return;
+                    setSupplierName(newInputValue);
                   }}
-                  value={purchaseForm.supplier}
+                  value={purchaseForm?.supplier}
                   renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      placeholder="suppliers"
-                      {...register(`supplier`, {
-                        onChange: (e) => {
-                          setPurchaseForm({ ...purchaseForm, supplier: e.target.value });
-                        },
-                      })}
-                      required
-                    />
+                    <TextField {...params} placeholder="suppliers" required />
                   )}
                 />
               </Grid>
@@ -128,9 +126,12 @@ const PurchaseCreate = () => {
                   <Grid item container key={field.id} spacing={3}>
                     <Grid item xs={12} sm={12} md={12}>
                       <Autocomplete
-                        loading={status === "loading"}
-                        options={getProductFormattedData(data)}
+                        loading={productsLoading}
+                        options={productsData?.data || []}
                         getOptionLabel={(option) => option.name}
+                        isOptionEqualToValue={(option, value) =>
+                          option._id === value._id
+                        }
                         onInputChange={(e, value) => {
                           setProductName(value);
                         }}
@@ -138,21 +139,28 @@ const PurchaseCreate = () => {
                           if (value) {
                             setValue(`products.${index}.name`, value.name);
                             setValue(`products.${index}._id`, value._id);
-                            setValue(`products.${index}.buy_price`, Number(value.buy_price));
-                            setValue(`products.${index}.sell_price`, Number(value.sell_price));
+                            setValue(
+                              `products.${index}.buy_price`,
+                              Number(value.buy_price)
+                            );
+                            setValue(
+                              `products.${index}.sell_price`,
+                              Number(value.sell_price)
+                            );
                             setProductName("");
                           }
                         }}
                         value={
-                          purchaseForm.products !== undefined && purchaseForm.products[index]
+                          purchaseForm.products !== undefined &&
+                          purchaseForm.products[index]
                             ? purchaseForm.products[index]
-                            : {
+                            : ({
                                 name: "",
-                                qty: 0,
+                                purchase_qty: 0,
                                 sell_price: 0,
                                 buy_price: 0,
                                 _id: index.toString(),
-                              }
+                              } as any)
                         }
                         renderInput={(params) => (
                           <TextField
@@ -170,7 +178,7 @@ const PurchaseCreate = () => {
                         label="Purchase Quantity"
                         type="number"
                         required
-                        {...register(`products.${index}.qty`, {
+                        {...register(`products.${index}.purchase_qty`, {
                           valueAsNumber: true,
                         })}
                         fullWidth
@@ -207,7 +215,12 @@ const PurchaseCreate = () => {
                       />
                     </Grid>
                     <Grid item xs={12} sm={2} md={3}>
-                      <Button fullWidth color="error" variant="contained" onClick={() => remove(index)}>
+                      <Button
+                        fullWidth
+                        color="error"
+                        variant="contained"
+                        onClick={() => remove(index)}
+                      >
                         Delete
                       </Button>
                     </Grid>
@@ -228,7 +241,7 @@ const PurchaseCreate = () => {
                   }}
                   disabled
                   value={watch("products").reduce((acc: number, cur: any) => {
-                    return acc + cur.qty * cur.buy_price;
+                    return acc + cur.purchase_qty * cur.buy_price;
                   }, 0)}
                   fullWidth
                   inputProps={{
@@ -246,7 +259,7 @@ const PurchaseCreate = () => {
                       append(
                         {
                           name: "",
-                          qty: 0,
+                          purchase_qty: 0,
                           sell_price: 0,
                           buy_price: 0,
                           _id: fields.length.toString(),
@@ -259,7 +272,12 @@ const PurchaseCreate = () => {
                   >
                     ADD PRODUCT
                   </Button>
-                  <LoadingButton loading={isLoading} type="submit" variant="contained" color="success">
+                  <LoadingButton
+                    loading={isLoading}
+                    type="submit"
+                    variant="contained"
+                    color="success"
+                  >
                     Submit
                   </LoadingButton>
                 </ButtonGroup>

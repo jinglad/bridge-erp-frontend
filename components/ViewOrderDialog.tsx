@@ -16,43 +16,22 @@ import {
   Typography,
 } from "@mui/material";
 import moment from "moment";
-import { Router, useRouter } from "next/router";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { useReactToPrint } from "react-to-print";
-import { Order } from "../apis/order-service";
+import { useRouter } from "next/router";
+import { useContext } from "react";
+
 import { PrintContext } from "../context/PrintContext";
-import { OrderToPrint } from "./OrderToPrint";
+import { IOrder } from "../interfaces/order.interface";
+import { calculateNetTotal } from "./PaymentDetailsDialog";
 
 interface ViewOrderProps {
-  order: Order;
+  order: IOrder;
   open: boolean;
   onClose: () => void;
 }
 
 function ViewOrder({ onClose, open, order }: ViewOrderProps) {
-  const componentRef = useRef(null);
-  const [printOpen, setPrintOpen] = useState(false);
   const router = useRouter();
   const { setValue } = useContext(PrintContext);
-
-  const pageStyle = `
-  @page {
-    size: 80mm auto;
-    margin: 0;
-    padding: 0;
-  }
-`;
-
-  const reactToPrintContent = useCallback(() => {
-    return componentRef.current;
-  }, [componentRef]);
-
-  // const handlePrint = useReactToPrint({
-  //   content: reactToPrintContent,
-  //   documentTitle: "AwesomeFileName",
-  //   removeAfterPrint: true,
-  //   pageStyle: pageStyle,
-  // });
 
   const handlePrint = () => {
     setValue({
@@ -60,9 +39,16 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
       discount: Number(order.discount),
       paid: Number(order.paid),
       to_be_paid: order.to_be_paid,
+      to_be_paid_total: order.to_be_paid_total,
+      previous_due: order.previous_due,
       products: order.products,
-      customer: order.customer,
+      customer: order?.customer?.customerName,
       createdDate: moment(order.createdDate).format("ddd MMM D YYYY"),
+      netTotal: calculateNetTotal(
+        order.products,
+        order.discount,
+        order.previous_due
+      ),
     });
     router.push("/print-memo").then();
   };
@@ -85,7 +71,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
                   Customer:
                 </TableCell>
-                <TableCell>{order.customer}</TableCell>
+                <TableCell>{order?.customer?.customerName}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
@@ -101,7 +87,7 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
               </TableRow>
               <TableRow>
                 <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
-                  Buy_Price_Total:
+                  Buy Total:
                 </TableCell>
                 <TableCell>{order?.buy_total}</TableCell>
               </TableRow>
@@ -116,6 +102,14 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
                   Discount:
                 </TableCell>
                 <TableCell>{order.discount}</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                  Created Date:
+                </TableCell>
+                <TableCell>
+                  {moment(order.createdDate).format("ddd MMM D YYYY")}
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>
@@ -158,16 +152,6 @@ function ViewOrder({ onClose, open, order }: ViewOrderProps) {
           </Button>
         </DialogActions>
       </DialogContent>
-      {/* <OrderToPrint
-        ref={componentRef}
-        payment_method={order.payment_method}
-        discount={Number(order.discount)}
-        paid={Number(order.paid)}
-        to_be_paid={order.to_be_paid}
-        products={order.products}
-        customer={order.customer}
-        createdDate={moment(order.createdDate).format("ddd MMM D YYYY")}
-      /> */}
     </Dialog>
   );
 }

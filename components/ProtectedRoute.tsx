@@ -7,14 +7,13 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [isAdmin, setIsAdmin] = useState<string | null>(null);
 
+  // console.log(user);
+
   useEffect(() => {
-    const admin = localStorage.getItem("is-admin");
-    const accessToken = localStorage.getItem("token");
-    setIsAdmin(admin);
-    if (admin !== "admin" || !accessToken) {
+    if (!user || user?.role !== "admin" || !accessToken) {
       router.push("/login").then();
     }
-  }, [router.pathname, user, router]);
+  }, [user, accessToken]);
 
   return <>{isAdmin === "admin" ? children : null}</>;
 };

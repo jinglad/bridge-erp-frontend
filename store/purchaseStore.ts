@@ -1,10 +1,11 @@
 import create from "zustand";
 import { persist } from "zustand/middleware";
 import { createTrackedSelector } from "react-tracked";
+import { ISupplier } from "../apis/supplier-service";
 
 interface IProductForm {
   name: string;
-  qty: number;
+  purchase_qty: number;
   buy_price: number;
   sell_price: number;
   _id: string;
@@ -12,7 +13,7 @@ interface IProductForm {
 
 export interface PurchaseForm {
   products: IProductForm[];
-  supplier: string;
+  supplier: ISupplier | null;
 }
 
 interface PurchaseStore {
@@ -25,8 +26,10 @@ const usePurchaseStore = create<PurchaseStore>()(
   persist(
     (set) => ({
       purchaseForm: {
-        products: [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }],
-        supplier: "",
+        products: [
+          { name: "", purchase_qty: 1, buy_price: 0, sell_price: 0, _id: "" },
+        ],
+        supplier: null,
       },
       setPurchaseForm: (purchaseForm: PurchaseForm) => {
         set({
@@ -35,12 +38,14 @@ const usePurchaseStore = create<PurchaseStore>()(
       },
 
       resetPurchaseForm: () => {
-        const newProducts = [{ name: "", qty: 1, buy_price: 0, sell_price: 0, _id: "" }];
+        const newProducts = [
+          { name: "", purchase_qty: 1, buy_price: 0, sell_price: 0, _id: "" },
+        ];
 
         set({
           purchaseForm: {
             products: newProducts,
-            supplier: "",
+            supplier: null,
           },
         });
       },

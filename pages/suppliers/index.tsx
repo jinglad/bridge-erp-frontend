@@ -31,8 +31,17 @@ type Props = {};
 
 function Suppliers({}: Props) {
   const router = useRouter();
-  const [open, setOpen] = React.useState(false);
-  const [selected, setSelected] = useState<null | Supplier>(null);
+  const queryClient = useQueryClient();
+
+  const [editModal, setEditModal] = useState<{
+    open: boolean;
+    data: ISupplier | null;
+  }>({
+    open: false,
+    data: null,
+  });
+  const [deleteModal, setDeleteModal] = useState<boolean>(false);
+  const [selected, setSelected] = useState<null | ISupplier>(null);
   const [supplierName, setSupplierName] = useState("");
   const debouncedSupplierNameSearchQuery = useDebounce(supplierName, 500);
 
@@ -55,10 +64,42 @@ function Suppliers({}: Props) {
     setOpen(true);
   };
 
-  const handleClose = () => {
-    setOpen(false);
-    setSelected(null);
-  };
+  const columns: IColumn[] = [
+    {
+      field: "name",
+      label: "Supplier Name",
+      align: "left",
+    },
+    {
+      field: "email",
+      label: "Email",
+    },
+    {
+      field: "phone",
+      label: "Phone",
+    },
+    {
+      field: "address",
+      label: "Address",
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: ISupplier) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            onClick={() => {
+              setSelected(row);
+              setEditModal({
+                open: true,
+                data: row,
+              });
+            }}
+          >
+            <ModeEditOutlineOutlined />
+          </Button>
 
   const getSupplierFormattedData = (data: InfiniteData<Suppliers> | undefined) => {
     const brands = data?.pages.flatMap((page) => page.supplier.map((sp) => sp.name));
@@ -86,6 +127,7 @@ function Suppliers({}: Props) {
             options={getSupplierFormattedData(data)}
             onInputChange={(e, value) => {
               setSupplierName(value);
+              setPage(0);
             }}
             renderInput={(params) => <TextField {...params} placeholder="search supplier" variant="outlined" />}
           />
@@ -152,7 +194,27 @@ function Suppliers({}: Props) {
           </LoadingButton>
         )}
       </Stack>
-      {selected && <EditSupplierDialog onClose={handleClose} open={open} supplier={selected} key={selected._id} />}
+      {editModal.open ? (
+        <EditSupplierDialog
+          onClose={() =>
+            setEditModal({
+              open: false,
+              data: null,
+            })
+          }
+          open={editModal.open}
+          supplier={editModal.data as ISupplier}
+        />
+      ) : null}
+
+      <DeleteDialog
+        open={deleteModal}
+        onClose={() => setDeleteModal(false)}
+        title="Delete Supplier"
+        text="Are you sure you want to delete this supplier?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
     </Layout>
   );
 }

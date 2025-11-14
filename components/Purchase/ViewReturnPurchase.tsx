@@ -1,4 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
+import { LoadingButton } from "@mui/lab";
 import {
   Button,
   Dialog,
@@ -15,15 +16,36 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { Purchase } from "../apis/purchase-service";
+import { useMutation, useQueryClient } from "react-query";
+import { toast } from "react-toastify";
+import { createReturnPurchase } from "../../apis/purchase-service";
+import { IPurchase } from "../../interfaces/purchase";
 
 interface ViewPurchaseProps {
-  purchase: Purchase;
+  purchase: IPurchase;
   open: boolean;
   onClose: () => void;
 }
 
-function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
+function ViewReturnPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
+  const queryClient = useQueryClient();
+
+  const { mutateAsync, isLoading } = useMutation(createReturnPurchase, {
+    onSuccess: (data) => {
+      console.log(data);
+      toast.success(data?.message || "Purchase returned successfully");
+      queryClient.invalidateQueries(["purchases"]);
+    },
+    onError: (error: any) => {
+      toast.error(error?.message || "Something wen't wrong");
+    },
+  });
+
+  const purchaseReturn = async () => {
+    await mutateAsync(purchase._id);
+    onClose();
+  };
+
   return (
     <Dialog maxWidth="md" fullWidth open={open} onClose={onClose}>
       <DialogTitle>
@@ -38,13 +60,18 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         <TableContainer>
           <Table size="small" aria-label="simple table">
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Supplier:</TableCell>
-              <TableCell>{purchase.supplier}</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Supplier:
+              </TableCell>
+              <TableCell>{purchase?.supplier?.name}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
 
-        <Typography sx={{ marginLeft: "16px", paddingTop: "10px" }} variant="h6">
+        <Typography
+          sx={{ marginLeft: "16px", paddingTop: "10px" }}
+          variant="h6"
+        >
           Products
         </Typography>
 
@@ -62,7 +89,7 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
               {purchase.products.map((product) => (
                 <TableRow key={product._id}>
                   <TableCell>{product.name}</TableCell>
-                  <TableCell>{product.qty}</TableCell>
+                  <TableCell>{product.purchase_qty}</TableCell>
                   <TableCell>{product.buy_price}</TableCell>
                   <TableCell>{product.sell_price}</TableCell>
                 </TableRow>
@@ -72,6 +99,13 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
         </TableContainer>
 
         <DialogActions>
+          <LoadingButton
+            variant="contained"
+            loading={isLoading}
+            onClick={purchaseReturn}
+          >
+            Return
+          </LoadingButton>
           <Button color="error" onClick={onClose}>
             close
           </Button>
@@ -81,4 +115,4 @@ function ViewPurchase({ onClose, open, purchase }: ViewPurchaseProps) {
   );
 }
 
-export default ViewPurchase;
+export default ViewReturnPurchase;

@@ -21,13 +21,16 @@ interface EditSupplierDialogProps {
   onClose: () => void;
 }
 
-function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps) {
+function EditSupplierDialog({
+  onClose,
+  open,
+  supplier,
+}: EditSupplierDialogProps) {
   const queryClient = useQueryClient();
   const { mutateAsync, isLoading } = useMutation(updateSupplier, {
     onSuccess: (data) => {
-      notify(data.msg);
-      queryClient.invalidateQueries("suppliers");
-      reset();
+      toast.success(data?.message || "Supplier updated successfully");
+      queryClient.invalidateQueries(["suppliers"]);
       onClose();
     },
   });
@@ -46,7 +49,9 @@ function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps
   });
 
   const onSubmit = async (data: any) => {
-    await mutateAsync({ _id: supplier._id, ...data });
+    // console.log(data);
+    await mutateAsync({ id: supplier._id, input: data });
+    reset();
   };
 
   return (
@@ -56,13 +61,31 @@ function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps
         <form onSubmit={handleSubmit(onSubmit)}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <TextField required id="Supplier" {...register("name")} label="Supplier Name" fullWidth />
+              <TextField
+                required
+                id="Supplier"
+                {...register("name")}
+                label="Supplier Name"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12}>
-              <TextField required id="emailAddress" {...register("email")} label="Email Address" fullWidth />
+              <TextField
+                required
+                id="emailAddress"
+                {...register("email")}
+                label="Email Address"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
-              <TextField required {...register("phone")} id="contactNo" label="Contact No" fullWidth />
+              <TextField
+                required
+                {...register("phone")}
+                id="contactNo"
+                label="Contact No"
+                fullWidth
+              />
             </Grid>
             <Grid item xs={12} sm={6}>
               <TextField
@@ -75,7 +98,12 @@ function EditSupplierDialog({ onClose, open, supplier }: EditSupplierDialogProps
             </Grid>
             <Grid item xs={12} sm={3}>
               <ButtonGroup>
-                <LoadingButton color="success" variant="contained" type="submit" loading={isLoading}>
+                <LoadingButton
+                  color="success"
+                  variant="contained"
+                  type="submit"
+                  loading={isLoading}
+                >
                   Submit
                 </LoadingButton>
                 <Button color="error" onClick={onClose}>

@@ -13,7 +13,10 @@ const PrintMemoPage = () => {
     payment_method,
     products,
     to_be_paid,
+    to_be_paid_total,
+    previous_due,
     createdDate,
+    netTotal,
   } = value;
 
   const router = useRouter();
@@ -25,6 +28,10 @@ const PrintMemoPage = () => {
     }
     setValue({});
   }, []);
+
+  const capitalizeFirstLetter = (string: string) => {
+    return string?.charAt(0)?.toUpperCase() + string?.slice(1);
+  };
 
   return (
     <Box
@@ -193,7 +200,7 @@ const PrintMemoPage = () => {
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
-          pr:1,
+          pr: 1,
         }}
       >
         <Box
@@ -202,7 +209,36 @@ const PrintMemoPage = () => {
             fontWeight: 900,
           }}
         >
-          {payment_method}
+          Previous Due
+        </Box>
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          ৳{parseFloat(previous_due?.toString()).toFixed(2)}
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "14px!important",
+          p: "3px 12px",
+          fontWeight: 900,
+          fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr: 1,
+        }}
+      >
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          {capitalizeFirstLetter(payment_method)}
         </Box>
         <Box
           sx={{
@@ -222,7 +258,7 @@ const PrintMemoPage = () => {
           p: "3px 12px",
           fontWeight: 900,
           fontFamily: "'Noto Sans Bengali', sans-serif!important",
-          pr:1,
+          pr: 1,
         }}
       >
         <Box
@@ -240,6 +276,64 @@ const PrintMemoPage = () => {
           }}
         >
           ৳{parseFloat(to_be_paid?.toString()).toFixed(2)}
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "14px!important",
+          p: "3px 12px",
+          fontWeight: 900,
+          fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr: 1,
+        }}
+      >
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          Total Due
+        </Box>
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          ৳{parseFloat(to_be_paid_total?.toString()).toFixed(2)}
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          width: "100%",
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: "14px!important",
+          p: "3px 12px",
+          fontWeight: 900,
+          fontFamily: "'Noto Sans Bengali', sans-serif!important",
+          pr: 1,
+        }}
+      >
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          Net Total
+        </Box>
+        <Box
+          sx={{
+            fontSize: "14px!important",
+            fontWeight: 900,
+          }}
+        >
+          ৳{parseFloat(netTotal?.toString()).toFixed(2)}
         </Box>
       </Box>
       <DoubleDivider />

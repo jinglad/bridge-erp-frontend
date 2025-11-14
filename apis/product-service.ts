@@ -3,14 +3,19 @@ import http from "./http-common";
 export interface Product {
   _id: string;
   name: string;
+  category: ICategory;
+  categoryName?: string;
+  brand: IBrand;
+  brandName?: string;
   reorder_limit: string;
   brand: string;
   category: string;
   image: string;
   qty: number;
+  purchase_qty?: number;
   sell_price: number;
   buy_price: number;
-  available: number;
+  available?: number;
 }
 
 export interface Products {
@@ -44,7 +49,13 @@ export const getProducts = async ({ pageParam = 0 }) => {
   }
 };
 
-export const getAndSearchProduct = async ({ queryKey, pageParam = 0 }: { queryKey: string[]; pageParam?: number }) => {
+export const getAndSearchProduct = async ({
+  queryKey,
+  pageParam = 0,
+}: {
+  queryKey: string[];
+  pageParam?: number;
+}) => {
   const name = queryKey[1]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const brand = queryKey[2]; // queryKey[0] is the original query key 'infiniteLookupDefs'
   const category = queryKey[3]; // queryKey[0] is the original query key 'infiniteLookupDefs'

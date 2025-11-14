@@ -24,46 +24,14 @@ const EmailLogin = () => {
   const { setUser } = useAuth();
   const router = useRouter();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    setLoading(true);
-    signInWithEmailAndPassword(auth, data.email, data.password)
-      .then((user) => {
-        setUser(user.user);
-        fetch(`${process.env.NEXT_PUBLIC_REST_API_ENDPOINT}/login`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-          },
-          body: JSON.stringify(user.user),
-        })
-          .then((res) => {
-            if (res.ok) return res.json();
-          })
-          .then((data) => {
-            checkAdmin(user.user.email, data.accessToken).then((res) => {
-              if (res?.admin) {
-                localStorage.setItem("token", data.accessToken);
-                localStorage.setItem("is-admin", "admin");
-                router.push("/");
-                setLoading(false);
-              } else {
-                alert("You are not admin");
-                setLoading(false);
-              }
-            });
-            reset();
-          })
-          .catch((error) => {
-            console.log(error);
-            setLoading(false);
-            reset();
-          });
-      })
-      .catch((error) => {
-        if (error.code === "auth/wrong-password")
-          alert("Wrong password. Please try again with correct password.");
-        setLoading(false);
-        reset();
+  const handleSuccess = (data: ILoginResponse) => {
+    const { accessToken, user } = data;
+    // console.log(user);
+    if (user?.role === "admin") {
+      setUser({
+        email: user.email,
+        id: user._id,
+        role: user.role,
       });
   };
 

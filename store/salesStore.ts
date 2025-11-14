@@ -3,9 +3,14 @@ import create from "zustand";
 import { devtools, persist } from "zustand/middleware";
 import { Product } from "../apis/product-service";
 
-interface SalesStore {
+interface ICustomer {
+  _id: string;
   customerName: string;
-  setCustomerName: (name: string) => void;
+}
+
+interface SalesStore {
+  customer: ICustomer | null;
+  setCustomer: (data: ICustomer | null) => void;
   setProductName: (name: string) => void;
   productName: string;
   setBrandName: (name: string) => void;
@@ -23,8 +28,8 @@ const useSalesStore = create<SalesStore>()(
   devtools(
     persist(
       (set) => ({
-        customerName: "",
-        setCustomerName: (name: string) => set({ customerName: name }),
+        customer: null,
+        setCustomer: (data: ICustomer | null) => set({ customer: data }),
         productName: "",
         setProductName: (name: string) => set({ productName: name }),
         brandName: "",
@@ -61,7 +66,7 @@ const useSalesStore = create<SalesStore>()(
         reset: () => {
           set((state) => ({
             cartItems: [],
-            customerName: "",
+            customer: null,
           }));
         },
       }),

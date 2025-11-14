@@ -32,6 +32,17 @@ type Props = {};
 function Categories({}: Props) {
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
+<<<<<<< HEAD
+=======
+  const [editModal, setEditModal] = useState<{
+    open: boolean;
+    data: ICategory | null;
+  }>({
+    open: false,
+    data: null,
+  });
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+>>>>>>> dc7ef7a65be175974f4da4702aa0fbcd6b79ae99
   const [categoryName, setCategoryName] = useState("");
   const [selected, setSelected] = useState<null | Category>(null);
   const debouncedCategoryNameSearchQuery = useDebounce(categoryName, 500);
@@ -64,6 +75,48 @@ function Categories({}: Props) {
     return [...new Set(categoryName)];
   };
 
+<<<<<<< HEAD
+=======
+  const columns: IColumn[] = [
+    {
+      field: "categorytitle",
+      label: "Category Name",
+      align: "left",
+    },
+    {
+      field: "actions",
+      label: "Actions",
+      align: "right",
+      render: (row: ICategory) => (
+        <ButtonGroup size="small">
+          <Button
+            color="info"
+            onClick={() => {
+              setSelected(row);
+              // setOpen(true);
+              setEditModal({
+                open: true,
+                data: row,
+              });
+            }}
+          >
+            <ModeEditOutlineOutlined />
+          </Button>
+          <Button
+            color="warning"
+            onClick={() => {
+              setSelected(row);
+              setDeleteDialogOpen(true);
+            }}
+          >
+            <DeleteOutline />
+          </Button>
+        </ButtonGroup>
+      ),
+    },
+  ];
+
+>>>>>>> dc7ef7a65be175974f4da4702aa0fbcd6b79ae99
   return (
     <Layout>
       <Stack spacing={2}>
@@ -85,6 +138,7 @@ function Categories({}: Props) {
             options={getCategoryFormattedData(data)}
             onInputChange={(e, value) => {
               setCategoryName(value);
+              setPage(0);
             }}
             renderInput={(params) => <TextField {...params} placeholder="search category" variant="outlined" />}
           />
@@ -148,7 +202,26 @@ function Categories({}: Props) {
         </Box>
       </Stack>
 
+<<<<<<< HEAD
       {selected && <EditcategoryDialog onClose={handleClose} open={open} category={selected} key={selected._id} />}
+=======
+      {editModal.open && (
+        <EditcategoryDialog
+          onClose={() => setEditModal({ open: false, data: null })}
+          open={editModal.open}
+          category={editModal.data as ICategory}
+        />
+      )}
+
+      <DeleteDialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        title="Delete Category"
+        text="Are you sure you want to delete this category?"
+        handleDelete={handleDelete}
+        deleteLoading={deleteLoading}
+      />
+>>>>>>> dc7ef7a65be175974f4da4702aa0fbcd6b79ae99
     </Layout>
   );
 }

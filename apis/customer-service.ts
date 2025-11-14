@@ -3,6 +3,7 @@ import http from "./http-common";
 export interface Customer {
   _id: string;
   customerName: string;
+  to_be_paid?: number;
 }
 
 export interface Customers {
@@ -39,4 +40,18 @@ export const getCustomers = async ({ queryKey, pageParam = 0 }: { queryKey: stri
   });
 
   return data;
+};
+
+export const updateCustomerDue = async (id: string, to_be_paid: number) => {
+  try {
+    const { data } = await http.patch<IGetResponse<ICustomer>>(
+      `/api/v1/customer/${id}`,
+      {
+        to_be_paid,
+      }
+    );
+    return data;
+  } catch (error: any) {
+    throw Error(error.response.data.message);
+  }
 };

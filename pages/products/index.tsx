@@ -22,12 +22,27 @@ import { Box } from "@mui/system";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { InfiniteData, useInfiniteQuery, useMutation, useQueryClient } from "react-query";
+import {
+  InfiniteData,
+  useInfiniteQuery,
+  useMutation,
+  useQueryClient,
+} from "react-query";
 import { toast } from "react-toastify";
-import { deleteProduct, getAndSearchProduct, Product, Products } from "../../apis/product-service";
+import {
+  deleteProduct,
+  getAndSearchProduct,
+  Product,
+  Products,
+} from "../../apis/product-service";
 import EditProductDialog from "../../components/EditProductDialog";
 import Layout from "../../components/Layout/Layout";
 import useDebounce from "../../hooks/useDebounce";
+import { useProducts } from "../../hooks/useProducts";
+import { IColumn } from "../../interfaces/common";
+import DataTable from "../../components/Table/DataTable";
+import DeleteDialog from "../../components/DeleteDialog";
+import { set } from "nprogress";
 
 const Products: NextPage = () => {
   const router = useRouter();
@@ -36,19 +51,20 @@ const Products: NextPage = () => {
   const [selected, setSelected] = useState<null | Product>(null);
   const debouncedSearchQuery = useDebounce(productName, 500);
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } = useInfiniteQuery(
-    ["searchedProducts", debouncedSearchQuery],
-    getAndSearchProduct,
-    {
-      getNextPageParam: (lastPage, pages) => {
-        if (pages.length === lastPage.totalPages) {
-          return undefined;
-        } else {
-          return pages.length;
-        }
-      },
-    }
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
+    useInfiniteQuery(
+      ["searchedProducts", debouncedSearchQuery],
+      getAndSearchProduct,
+      {
+        getNextPageParam: (lastPage, pages) => {
+          if (pages.length === lastPage.totalPages) {
+            return undefined;
+          } else {
+            return pages.length;
+          }
+        },
+      }
+    );
 
   const queryClient = useQueryClient();
 
@@ -70,8 +86,12 @@ const Products: NextPage = () => {
     setSelected(null);
   };
 
-  const getProductFormattedData = (data: InfiniteData<Products> | undefined) => {
-    const productName = data?.pages.flatMap((page) => page.products.map((product) => product.name));
+  const getProductFormattedData = (
+    data: InfiniteData<Products> | undefined
+  ) => {
+    const productName = data?.pages.flatMap((page) =>
+      page.products.map((product) => product.name)
+    );
     return [...new Set(productName)];
   };
 
@@ -92,10 +112,11 @@ const Products: NextPage = () => {
           <Autocomplete
             freeSolo={true}
             sx={{ flex: 1 }}
-            loading={status === "loading"}
-            options={getProductFormattedData(data)}
-            onInputChange={(e, value) => {
-              setProductName(value);
+            loading={isLoading}
+            options={data?.data?.map((product) => product.name) || []}
+            onChange={(e, value) => {
+              setProductName(value || "");
+              setPage(0);
             }}
             renderInput={(params) => (
               <TextField
@@ -106,7 +127,9 @@ const Products: NextPage = () => {
                   ...params.InputProps,
                   endAdornment: (
                     <React.Fragment>
-                      {status === "loading" ? <CircularProgress color="inherit" size={20} /> : null}
+                      {status === "loading" ? (
+                        <CircularProgress color="inherit" size={20} />
+                      ) : null}
                       {params.InputProps.endAdornment}
                     </React.Fragment>
                   ),
@@ -114,7 +137,10 @@ const Products: NextPage = () => {
               />
             )}
           />
-          <Button onClick={() => router.push("/products/create")} startIcon={<AddOutlinedIcon />}>
+          <Button
+            onClick={() => router.push("/products/create")}
+            startIcon={<AddOutlinedIcon />}
+          >
             Add Product
           </Button>
         </Box>
@@ -142,7 +168,12 @@ const Products: NextPage = () => {
                 {data?.pages.map((group, i) => (
                   <TableBody key={i}>
                     {group?.products.map((row) => (
-                      <TableRow key={row._id} sx={{ "&:last-child td, &:last-child th": { border: 0 } }}>
+                      <TableRow
+                        key={row._id}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
                         <TableCell>{row.name}</TableCell>
                         <TableCell>
                           {/* <Box sx={{ height: "30px", width: "30px", background: "gray" }}></Box> */}
@@ -153,7 +184,13 @@ const Products: NextPage = () => {
                         <TableCell>{row.category}</TableCell>
                         <TableCell>{row.qty}</TableCell>
                         <TableCell
-                          sx={{ color: Number(row.reorder_limit) < row.qty ? "black" : "red", fontWeight: "bold" }}
+                          sx={{
+                            color:
+                              Number(row.reorder_limit) < row.qty
+                                ? "black"
+                                : "red",
+                            fontWeight: "bold",
+                          }}
                         >
                           {row.reorder_limit}
                         </TableCell>
@@ -202,7 +239,14 @@ const Products: NextPage = () => {
         </Box>
       </Stack>
 
-      {selected && <EditProductDialog onClose={handleClose} open={open} product={selected} key={selected._id} />}
+      {selected && (
+        <EditProductDialog
+          onClose={handleClose}
+          open={open}
+          product={selected}
+          key={selected._id}
+        />
+      )}
     </Layout>
   );
 };

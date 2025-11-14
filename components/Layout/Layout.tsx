@@ -67,10 +67,16 @@ export default function Layout({ children }: LayoutProps) {
       >
         <Toolbar>
           <Link href="/">
-            <Typography variant="h6" fontWeight="bold" noWrap component="div" sx={{
-              cursor: "pointer",
-            }}>
-              Bridge ERP
+            <Typography
+              variant="h6"
+              fontWeight="bold"
+              noWrap
+              component="div"
+              sx={{
+                cursor: "pointer",
+              }}
+            >
+              Amjadia
             </Typography>
           </Link>
           <Box flexGrow={1}>

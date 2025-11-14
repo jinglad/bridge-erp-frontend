@@ -18,10 +18,16 @@ import {
 } from "@mui/material";
 import { useMutation, useQueryClient } from "react-query";
 import { toast } from "react-toastify";
-import { deleteOrder, Order, salesReturn } from "../apis/order-service";
+import {
+  createOrder,
+  createOrderReturn,
+  deleteOrder,
+  salesReturn,
+} from "../apis/order-service";
+import { IOrder } from "../interfaces/order.interface";
 
 interface SalesReturnProps {
-  order: Order;
+  order: IOrder;
   open: boolean;
   onClose: () => void;
 }
@@ -29,16 +35,27 @@ interface SalesReturnProps {
 function SalesReturn({ onClose, open, order }: SalesReturnProps) {
   const queryClient = useQueryClient();
 
-  const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
-    onSuccess: (data) => {
-      queryClient.invalidateQueries("orders");
-      toast.success("Return Successful");
-    },
-  });
+  // const { mutateAsync: deleteAsync } = useMutation("deleteOrder", deleteOrder, {
+  //   onSuccess: (data) => {
+  //     queryClient.invalidateQueries("orders");
+  //     toast.success("Return Successful");
+  //   },
+  // });
 
-  const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
-    onSuccess: async (data) => {
-      await deleteAsync(order._id);
+  // const { mutateAsync, isLoading } = useMutation("salesReturn", salesReturn, {
+  //   onSuccess: async (data) => {
+  //     await deleteAsync(order._id);
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(error?.msg || "Something went wrong");
+  //   },
+  // });
+
+  const { mutateAsync, isLoading } = useMutation(createOrderReturn, {
+    onSuccess: (data) => {
+      // toast.success(data?.msg);
+      console.log(data);
+      queryClient.invalidateQueries("orders");
     },
     onError: (error: any) => {
       toast.error(error.response.data.msg);
@@ -46,9 +63,7 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
   });
 
   const saleReturn = async () => {
-    await mutateAsync({
-      ...order,
-    });
+    await mutateAsync(order?._id);
     onClose();
   };
 
@@ -66,29 +81,42 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
         <TableContainer>
           <Table size="small" aria-label="simple table">
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Customer:</TableCell>
-              <TableCell>{order.customer}</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Customer:
+              </TableCell>
+              <TableCell>{order?.customer?.customerName}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Payment method:</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Payment method:
+              </TableCell>
               <TableCell>{order.payment_method}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Paid:</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Paid:
+              </TableCell>
               <TableCell>{order.paid}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>To be paid:</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                To be paid:
+              </TableCell>
               <TableCell>{order.to_be_paid}</TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>Discount:</TableCell>
+              <TableCell sx={{ maxWidth: "50px", fontWeight: "bold" }}>
+                Discount:
+              </TableCell>
               <TableCell>{order.discount}</TableCell>
             </TableRow>
           </Table>
         </TableContainer>
 
-        <Typography sx={{ marginLeft: "16px", paddingTop: "10px" }} variant="h6">
+        <Typography
+          sx={{ marginLeft: "16px", paddingTop: "10px" }}
+          variant="h6"
+        >
           Products
         </Typography>
 
@@ -116,7 +144,11 @@ function SalesReturn({ onClose, open, order }: SalesReturnProps) {
         </TableContainer>
 
         <DialogActions>
-          <LoadingButton variant="contained" loading={isLoading} onClick={saleReturn}>
+          <LoadingButton
+            variant="contained"
+            loading={isLoading}
+            onClick={saleReturn}
+          >
             Return
           </LoadingButton>
           <Button color="error" onClick={onClose}>

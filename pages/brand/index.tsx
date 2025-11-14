@@ -85,6 +85,7 @@ function Brand({}: Props) {
             options={getBrandFormattedData(data)}
             onInputChange={(e, value) => {
               setBrandName(value);
+              setPage(0);
             }}
             renderInput={(params) => <TextField {...params} placeholder="search brands" variant="outlined" />}
           />
